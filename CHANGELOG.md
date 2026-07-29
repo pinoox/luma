@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `package.json` `repository`, `bugs`, and `homepage` fields so npmjs.com displays the GitHub repository link.
+- `.github/workflows/publish.yml` — Tag-based GitHub Actions workflow that builds, validates, and publishes to npm whenever a `v*.*.*` tag is pushed. Includes npm provenance, a `latest` dist-tag, and an automated GitHub Release.
 
 ## [0.1.0] — 2026-07-29
 

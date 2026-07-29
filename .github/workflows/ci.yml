@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Check tarball contents
+        run: npm run pack:check
+
+      - name: Smoke test — install tarball and import
+        run: |
+          npm pack
+          TARBALL=$(ls pinooxhq-luma-*.tgz | head -1)
+          mkdir smoke && cd smoke
+          npm init -y >/dev/null 2>&1
+          npm install "../${TARBALL}" primevue@^4 vue@^3.5 pinia@^3 vue-router@^5 axios@^1 lucide-vue-next@^1 @primeuix/themes@^1 @pinooxhq/auth@^0.1 sass@^1 vite@^8
+          # The root barrel only exposes Node-friendly exports. SFCs
+          # (`.vue`) are tested via subpath imports that a bundler
+          # would resolve. We resolve them here through Vite's
+          # programmatic API to mirror how a real app imports them.
+          node --input-type=module -e "
+            import { createApp, usePage, useTheme, applyThemeConfig, applyDarkThemeConfig, configureAuth, getActiveAuth, isAuthConfigured, authGuard, setupPrimeVue, ConsolePreset, createAppRouter, redirectToLogin, useAuthStore, auth, http, applyDevBootstrap, resolveDevBootstrap, getBoot, getUrl, hasBoot, flattenNavItems, findNavItemByRoute, findPageMeta, resolveUserDisplayName, buildUserInfo, resolveThemeConfig, setActiveThemeConfig, getActiveThemeConfig, DEFAULT_THEME_CONFIG, initThemeEarly, getActiveTheme } from '@pinooxhq/luma';
+            const checks = { createApp, usePage, useTheme, applyThemeConfig, applyDarkThemeConfig, configureAuth, getActiveAuth, isAuthConfigured, authGuard, setupPrimeVue, ConsolePreset, createAppRouter, redirectToLogin, useAuthStore, auth, http, applyDevBootstrap, resolveDevBootstrap, getBoot, getUrl, hasBoot, flattenNavItems, findNavItemByRoute, findPageMeta, resolveUserDisplayName, buildUserInfo, resolveThemeConfig, setActiveThemeConfig, getActiveThemeConfig, DEFAULT_THEME_CONFIG, initThemeEarly, getActiveTheme };
+            const missing = [];
+            for (const [k, v] of Object.entries(checks)) {
+              if (v === undefined || v === null) missing.push(k);
+            }
+            if (missing.length) throw new Error('Missing exports: ' + missing.join(', '));
+            console.log('luma smoke ok — ' + Object.keys(checks).length + ' exports verified');
+          "

@@ -288,7 +288,7 @@ export default themeConfig;
 ### `src/config/routes.js`
 
 ```js
-import { PageLayout } from '@pinooxhq/luma';
+import { PageLayout } from '@pinooxhq/luma/layouts';
 
 export const routes = [
   {
@@ -321,12 +321,14 @@ export const routes = [
 
 ```js
 import { createApp } from '@pinooxhq/luma';
+import { RootShell } from '@pinooxhq/luma/layouts';
 import pinia from '@stores/index.js';
 import themeConfig from '../theme.config.js';
 import { themeConfig as appThemeConfig } from '@/config/theme.js';
 import { routes } from '@/config/routes.js';
 
 createApp({
+  AppRoot: RootShell,
   themeConfig: {
     ...appThemeConfig,
     brand:  { ...appThemeConfig.brand,  ...themeConfig.brand },
@@ -401,26 +403,32 @@ Any field you omit falls back to a Luma default.
 
 ### Components and layouts
 
-The default app root is `RootShell`. The default per-route layout is
-`PageLayout`. Both can be replaced with your own:
+`createApp()` does NOT default `AppRoot` — you must pass it explicitly.
+The most common pattern is to use `RootShell` as the app-wide shell and
+`PageLayout` as a per-route layout, but either can be replaced:
 
 ```js
-import { RootShell } from '@pinooxhq/luma';
+import { RootShell } from '@pinooxhq/luma/layouts';
 
 createApp({
+  AppRoot: RootShell,  // required — the top-level Vue component
   themeConfig: …,
   routes: [
-    { path: '/', component: RootShell, meta: { requiresAuth: true }, children: […] },
+    { path: '/', component: PageLayout, meta: { requiresAuth: true }, children: […] },
   ],
   pinia: …,
-  AppRoot: MyShell,    // any Vue component
   mount: '#app',       // default
 });
 ```
 
 Individual Luma components (`PSidebar`, `PTopbar`, `PMobileNav`,
 `PCard`, …) can also be imported and composed into your own layouts
-when the defaults don't fit.
+from their respective subpaths:
+
+```js
+import { PSidebar, PTopbar, PMobileNav } from '@pinooxhq/luma/ds';
+import { PView, PHeader, PIcon } from '@pinooxhq/luma/ui';
+```
 
 ### Runtime mutability
 
@@ -486,13 +494,14 @@ call `configureAuth()` from your app's bootstrap before `createApp()`:
 ```js
 // src/main.js
 import { createApp, configureAuth } from '@pinooxhq/luma';
+import { RootShell } from '@pinooxhq/luma/layouts';
 
 configureAuth({
   endpoints: { me: '/api/auth/me', login: '/api/auth/login' },
   // any @pinooxhq/auth options — see its docs
 });
 
-createApp({ themeConfig, routes, pinia });
+createApp({ AppRoot: RootShell, themeConfig, routes, pinia });
 ```
 
 `configureAuth()` replaces Luma's default auth singleton. It's safe to
@@ -519,8 +528,10 @@ hook decide:
 
 ```js
 import { createApp } from '@pinooxhq/luma';
+import { RootShell } from '@pinooxhq/luma/layouts';
 
 createApp({
+  AppRoot: RootShell,
   themeConfig,
   routes,
   pinia,
@@ -784,7 +795,7 @@ function notify() {
 ```vue
 <script setup>
 import { useTheme } from '@pinooxhq/luma';
-import PThemeToggle from '@pinooxhq/luma';
+import { PThemeToggle } from '@pinooxhq/luma/ds';
 
 const { isDark, toggleTheme } = useTheme();
 </script>
@@ -800,7 +811,7 @@ Some apps want to keep the chrome from `RootShell` but design their own
 page interior. Just wrap any component in a route:
 
 ```js
-import { RootShell } from '@pinooxhq/luma';
+import { RootShell } from '@pinooxhq/luma/layouts';
 import MarketingLayout from '@/layouts/marketing-layout.vue';
 
 export const routes = [
@@ -864,7 +875,8 @@ Beyond PrimeVue, Luma ships a small set of opinionated shell components:
 Import any of these alongside PrimeVue components in your pages:
 
 ```js
-import { PView, PHeader, PCard, PEmptyState } from '@pinooxhq/luma';
+import { PView, PHeader } from '@pinooxhq/luma/ui';
+import { PCard, PEmptyState } from '@pinooxhq/luma/ds';
 ```
 
 ---
@@ -874,18 +886,21 @@ import { PView, PHeader, PCard, PEmptyState } from '@pinooxhq/luma';
 Import from the package root for the full surface:
 
 ```js
-import { createApp, PageLayout, usePage } from '@pinooxhq/luma';
+import { createApp, usePage } from '@pinooxhq/luma';
+import { PageLayout } from '@pinooxhq/luma/layouts';
 ```
 
 Or pick a smaller surface:
 
 | Path | What you get |
 |------|--------------|
-| `@pinooxhq/luma` | Full barrel |
+| `@pinooxhq/luma` | Full barrel (Node-safe, no `.vue` SFCs) |
+| `@pinooxhq/luma/ds` | `PSidebar`, `PTopbar`, `PMobileNav`, `PThemeToggle`, `PCard`, `PBadge`, `PEmptyState` |
+| `@pinooxhq/luma/ui` | `PIcon`, `PView`, `PHeader` |
 | `@pinooxhq/luma/layouts` | `RootShell`, `PageLayout` |
 | `@pinooxhq/luma/composables` | `usePage` |
 | `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `redirectToLogin`, `buildAppPath`, `resolveHistoryBase` |
-| `@pinooxhq/luma/core` | `auth`, `http`, `useAuthStore`, `configureAuth`, icon helpers, `formatDate`, `resolveMediaUrl` |
+| `@pinooxhq/luma/core` | `auth`, `http`, `useAuthStore`, `configureAuth`, `env`, `isDev`, `isProd`, icon helpers, `formatDate`, `resolveMediaUrl` |
 | `@pinooxhq/luma/plugins` | `setupPrimeVue`, `ConsolePreset` |
 | `@pinooxhq/luma/styles` | Main SCSS bundle |
 | `@pinooxhq/luma/tokens` | SCSS tokens |

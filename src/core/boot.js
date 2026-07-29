@@ -5,7 +5,10 @@
  * into the HTML. In dev mode (Vite only) the runtime needs the same shape
  * for the router to resolve the history base.
  *
- * Reads every value from `import.meta.env.*`:
+ * Reads every value from `import.meta.env.*` via the `env()` helper so
+ * the package stays importable from Node-side tooling (smoke tests,
+ * non-Vite bundlers) without crashing on missing `import.meta.env`.
+ *
  *   VITE_SERVER_URL   — PHP origin (e.g. http://127.0.0.1:8000)
  *   VITE_PROJECT_PATH — project mount path under server
  *   VITE_APP_PATH     — app route segment (e.g. "/sms")
@@ -14,6 +17,7 @@
  *   VITE_DIRECTION    — "rtl" | "ltr"
  *   VITE_TITLE        — fallback document title
  */
+import { env, isProd } from './env.js';
 
 function trimSlashes(value, { leading = true, trailing = false } = {}) {
     let result = String(value ?? '');
@@ -41,13 +45,14 @@ function ensureTrailingSlash(path) {
  * Falls back to neutral defaults when env vars are unset.
  */
 export function resolveDevBootstrap() {
-    const server       = String(import.meta.env.VITE_SERVER_URL ?? '').replace(/\/+$/, '');
-    const projectPath  = trimSlashes(import.meta.env.VITE_PROJECT_PATH ?? '', { trailing: true });
-    const appSegment   = trimSlashes(import.meta.env.VITE_APP_PATH     ?? '', { trailing: true });
+    const server       = String(env('VITE_SERVER_URL', '')).replace(/\/+$/, '');
+    const projectPath  = trimSlashes(env('VITE_PROJECT_PATH', ''), { trailing: true });
+    const appSegment   = trimSlashes(env('VITE_APP_PATH', ''),     { trailing: true });
     const appPath      = joinPath(projectPath, appSegment);
     const appPathSlash = ensureTrailingSlash(appPath);
-    const apiPath = import.meta.env.VITE_API_PATH
-        ? (import.meta.env.VITE_API_PATH.startsWith('/') ? import.meta.env.VITE_API_PATH : `/${import.meta.env.VITE_API_PATH}`)
+    const apiRaw       = env('VITE_API_PATH', '');
+    const apiPath = apiRaw
+        ? (apiRaw.startsWith('/') ? apiRaw : `/${apiRaw}`)
         : joinPath(appPath, 'api/');
 
     const site = server || (typeof window !== 'undefined' ? window.location.origin : '/');
@@ -55,9 +60,9 @@ export function resolveDevBootstrap() {
     const api  = server ? joinOrigin(server, apiPath) : apiPath;
 
     return {
-        locale: import.meta.env.VITE_LOCALE ?? 'en',
-        direction: import.meta.env.VITE_DIRECTION ?? 'ltr',
-        title: import.meta.env.VITE_TITLE ?? '',
+        locale: env('VITE_LOCALE', 'en'),
+        direction: env('VITE_DIRECTION', 'ltr'),
+        title: env('VITE_TITLE', ''),
         url: {
             APP: app,
             BASE: appPathSlash,
@@ -73,7 +78,7 @@ export function resolveDevBootstrap() {
  * page already has a bootstrap injected.
  */
 export function applyDevBootstrap() {
-    if (import.meta.env.PROD) return;
+    if (isProd()) return;
     if (typeof globalThis === 'undefined') return;
     if (globalThis.__PINOOX__ != null) return;
     globalThis.__PINOOX__ = resolveDevBootstrap();

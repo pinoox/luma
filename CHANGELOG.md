@@ -5,15 +5,34 @@ All notable changes to `@pinooxhq/luma` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.3] — 2026-07-30
-
-### Changed
-- `.github/workflows/publish.yml` — Removed `environment: npm` and `id-token: write` so the workflow runs against repo-level secrets only. The previous version required creating an `npm` environment in repo settings before any job could run, which surfaced as a confusing "deployment failed" error. Provenance can be re-enabled later via npm trusted publishers.
-
-## [0.1.2] — 2026-07-30
+## [0.2.0] — 2026-07-30
 
 ### Added
-- `.github/workflows/publish.yml` — Tag-based GitHub Actions workflow that builds, validates, and publishes to npm whenever a `v*.*.*` tag is pushed. Includes npm provenance, a `latest` dist-tag, and an automated GitHub Release. (Replaced in v0.1.3.)
+- `package.json` `scripts.pack:check` and `scripts.test:smoke` for offline tarball validation in Node.
+- `.github/workflows/ci.yml` — Runs on every push to `main`/`master` and on every PR. Verifies the published tarball contents with `npm run pack:check` and runs a smoke test that installs the tarball into a scratch project and imports every public API.
+- `.github/workflows/publish.yml` — Trusted-publisher release workflow. Triggers on `v*` tag pushes, validates tag matches `package.json` version, and publishes with `--provenance --access public` using npm's OIDC trusted publisher flow (no long-lived `NPM_TOKEN` required once the trusted publisher is configured on the npm package page).
+- `src/core/env.js` — Node-safe accessors (`env(key, fallback)`, `isDev()`, `isProd()`) for `import.meta.env.*`. Re-exported from the root barrel and from `@pinooxhq/luma/core`.
+- Re-exported `env`, `isDev`, `isProd` from `@pinooxhq/luma` and `@pinooxhq/luma/core`.
+
+### Changed
+- **Breaking:** `createApp({ AppRoot })` now REQUIRES `AppRoot` (no default `RootShell`). Apps should pass `RootShell` explicitly:
+  ```js
+  import { createApp } from '@pinooxhq/luma';
+  import { RootShell } from '@pinooxhq/luma/layouts';
+  createApp({ AppRoot: RootShell, themeConfig, routes });
+  ```
+  Reason: importing `RootShell.vue` inside `createApp.js` forced every Node-side consumer of `@pinooxhq/luma` (smoke tests, non-Vite bundlers) to resolve `.vue` files at module load. Decoupling makes the root barrel Node-safe.
+- **Breaking:** The root barrel (`@pinooxhq/luma`) no longer re-exports `.vue` SFC components (`PCard`, `PBadge`, `PEmptyState`, `PSidebar`, `PTopbar`, `PMobileNav`, `PThemeToggle`, `PIcon`, `PView`, `PHeader`, `RootShell`, `PageLayout`). Apps must import them through subpath exports (`@pinooxhq/luma/ds`, `@pinooxhq/luma/ui`, `@pinooxhq/luma/layouts`) which Vite/Rolldown/Webpack resolve via their `.vue` loaders.
+- `setupPrimeVue(app, { IconComponent })` now accepts an optional `IconComponent` instead of importing `PIcon` internally. Apps that want the global `<PIcon>` component should import it from `@pinooxhq/luma/ui` and pass it in:
+  ```js
+  import { PIcon } from '@pinooxhq/luma/ui';
+  setupPrimeVue(app, { IconComponent: PIcon });
+  ```
+- Replaced direct `import.meta.env.*` reads with `env()` / `isDev()` / `isProd()` helpers across `core/boot.js`, `core/auth/index.js`, and `router/guards.js`. The package now imports cleanly under Node, jsdom, and non-Vite loaders.
+
+### Notes
+- Apps that consumed `RootShell`/`PageLayout` or any SFC component from the root barrel must switch to the matching subpath import (`@pinooxhq/luma/layouts`, `@pinooxhq/luma/ui`, `@pinooxhq/luma/ds`). The trade-off is documented in each export entry.
+- The `npm` trusted publisher must be configured on https://www.npmjs.com/package/@pinooxhq/luma → Settings → Trusted Publishers before the publish workflow can succeed.
 
 ## [0.1.1] — 2026-07-30
 

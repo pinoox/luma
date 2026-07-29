@@ -2,6 +2,7 @@ import axios from 'axios';
 import { defineStore } from 'pinia';
 import { createAuth, createHttp } from '@pinooxhq/auth';
 import { createPiniaAuthStore } from '@pinooxhq/auth/vue';
+import { env, isDev } from '../env.js';
 
 /**
  * Default auth instance. Luma auto-creates one at module load using the
@@ -20,7 +21,7 @@ import { createPiniaAuthStore } from '@pinooxhq/auth/vue';
  * by calling `createAuth()` again.
  */
 const defaultAuth = createAuth({
-    debug: import.meta.env.DEV,
+    debug: isDev(),
 });
 
 let activeAuth = defaultAuth;
@@ -36,7 +37,7 @@ let isConfigured = false;
  */
 export const configureAuth = (options = {}) => {
     activeAuth = createAuth({
-        debug: import.meta.env.DEV,
+        debug: isDev(),
         ...options,
     });
     isConfigured = true;
@@ -56,7 +57,7 @@ export const isAuthConfigured = () => isConfigured;
 export const http = createHttp({
     auth: defaultAuth,
     axios,
-    baseURL: import.meta.env.VITE_API_PATH || undefined,
+    baseURL: env('VITE_API_PATH', '') || undefined,
 });
 
 export const useAuthStore = createPiniaAuthStore(defineStore, 'auth');

@@ -45,8 +45,15 @@ import {
     getActiveAuth,
 } from './core/auth/index.js';
 import { createAppRouter, redirectToLogin } from './router/guards.js';
-import RootShell from './layouts/RootShell.vue';
 
+// `RootShell` is intentionally NOT imported here. It's a Vue SFC, and
+// importing it from this module would force Node-side consumers of the
+// root barrel (`@pinooxhq/luma`) to resolve `.vue` files. Apps that want
+// the default shell can either:
+//   1. Import it explicitly from `@pinooxhq/luma/layouts` (resolved by
+//      a bundler's `.vue` loader), OR
+//   2. Pass their own `AppRoot` component to `createApp()`.
+// The default below is `null`, so apps must pass `AppRoot` explicitly.
 const DEFAULT_MOUNT = '#app';
 
 let unauthorizedRedirectPending = false;
@@ -93,6 +100,11 @@ const resolveAuthBootOptions = (themeConfig, authOptions) => {
  *   auth?: object,
  *   verifyAuth?: (ctx: { store, route, adoptedFromUrl }) => Promise<boolean>,
  * }} options
+ *
+ * Apps must supply `AppRoot` — usually the `RootShell` component
+ * imported from `@pinooxhq/luma/layouts`. There's no default here
+ * because that would force a `.vue` import into this module's graph,
+ * which breaks Node-side tooling (e.g. `npm run test:smoke`).
  */
 export async function createApp(options = {}) {
     const {
@@ -100,10 +112,19 @@ export async function createApp(options = {}) {
         routes = [],
         pinia,
         mount = DEFAULT_MOUNT,
-        AppRoot = RootShell,
+        AppRoot,
         auth: authOptions,
         verifyAuth,
     } = options;
+
+    if (!AppRoot) {
+        throw new Error(
+            'createApp() requires an `AppRoot` component. ' +
+            'Import the default shell from `@pinooxhq/luma/layouts` ' +
+            'and pass it as the third option, or supply your own root ' +
+            'component.'
+        );
+    }
 
     // 0. Resolve theme config first so auth defaults can read `themeConfig.auth`.
     const config = setActiveThemeConfig(userConfig);

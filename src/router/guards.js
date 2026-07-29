@@ -3,6 +3,7 @@ import {
     useAuthStore,
 } from '../core/auth/index.js';
 import { getActiveThemeConfig } from '../ds/theme-config.js';
+import { isDev } from '../core/env.js';
 
 let isFirstSession = false;
 
@@ -197,7 +198,7 @@ export const resolveHistoryBase = () => {
         return base;
     }
     const derived = deriveBaseFromLocation();
-    if (import.meta.env.DEV && derived !== '/') {
+    if (isDev() && derived !== '/') {
         console.warn(`[luma/router] Missing __PINOOX__.url.BASE; using "${derived}" derived from location`);
     }
     return derived;

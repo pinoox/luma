@@ -1,6 +1,6 @@
 {
   "name": "@pinooxhq/luma",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Luma — A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
   "type": "module",
   "main": "./exports/index.js",
@@ -129,5 +129,13 @@
     "pinia",
     "vue-router"
   ],
+  "homepage": "https://github.com/pinoox/luma#readme",
+  "bugs": {
+    "url": "https://github.com/pinoox/luma/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pinoox/luma.git"
+  },
   "license": "MIT"
 }

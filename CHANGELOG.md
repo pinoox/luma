@@ -5,11 +5,20 @@ All notable changes to `@pinooxhq/luma` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] — 2026-07-30
+
+### Changed
+- `.github/workflows/publish.yml` — Removed `environment: npm` and `id-token: write` so the workflow runs against repo-level secrets only. The previous version required creating an `npm` environment in repo settings before any job could run, which surfaced as a confusing "deployment failed" error. Provenance can be re-enabled later via npm trusted publishers.
+
+## [0.1.2] — 2026-07-30
+
+### Added
+- `.github/workflows/publish.yml` — Tag-based GitHub Actions workflow that builds, validates, and publishes to npm whenever a `v*.*.*` tag is pushed. Includes npm provenance, a `latest` dist-tag, and an automated GitHub Release. (Replaced in v0.1.3.)
+
 ## [0.1.1] — 2026-07-30
 
 ### Added
 - `package.json` `repository`, `bugs`, and `homepage` fields so npmjs.com displays the GitHub repository link.
-- `.github/workflows/publish.yml` — Tag-based GitHub Actions workflow that builds, validates, and publishes to npm whenever a `v*.*.*` tag is pushed. Includes npm provenance, a `latest` dist-tag, and an automated GitHub Release.
 
 ## [0.1.0] — 2026-07-29
 

@@ -35,5 +35,27 @@ jobs:
             exit 1
           fi
 
+      - name: Verify package is reachable on the registry
+        # Catches the "trust publisher not configured" case before we
+        # attempt to publish. If the trusted publisher hasn't been set
+        # up on the npm package page, npm returns 404 here and we
+        # surface a clear error.
+        run: |
+          PKG=$(node -p "require('./package.json').name")
+          if ! curl -fsSL "https://registry.npmjs.org/${PKG}" -o /dev/null; then
+            echo "::error::Package '${PKG}' is not reachable on the npm registry."
+            echo ""
+            echo "This usually means the npm Trusted Publisher hasn't been configured yet."
+            echo "Go to: https://www.npmjs.com/package/${PKG}/settings/trusted-publishers"
+            echo ""
+            echo "Required values:"
+            echo "  - Provider: GitHub Actions"
+            echo "  - Repository: pinoox/luma"
+            echo "  - Workflow filename: publish.yml"
+            echo "  - Environment name: npm"
+            exit 1
+          fi
+          echo "Package ${PKG} is reachable on the registry."
+
       - name: Publish to npm (Trusted Publisher)
         run: npm publish --provenance --access public

@@ -1,0 +1,9 @@
+// @pinooxhq/luma/tokens — design tokens (Sass variables + `:root` defaults).
+// Apps use this as a single `@forward`/`@use` entrypoint:
+//
+//   @use '@pinooxhq/luma/tokens.scss' as *;
+//   @use '@pinooxhq/luma/tokens.scss' with (
+//     $px-blue-500: #ff0000,
+//   );
+
+@forward '../src/scss/tokens/index.scss';

@@ -1,0 +1,21 @@
+// ============================================================
+// Pinoox Design System — Radius
+// ============================================================
+
+$px-radius-xs: 8px !default;
+$px-radius-sm: 12px !default;
+$px-radius-md: 16px !default;
+$px-radius-lg: 20px !default;
+$px-radius-xl: 28px !default;
+$px-radius-2xl: 36px !default;
+$px-radius-pill: 999px !default;
+$px-radius-circle: 50% !default;
+
+:root {
+  --px-radius-xs: #{$px-radius-xs};
+  --px-radius-sm: #{$px-radius-sm};
+  --px-radius-md: #{$px-radius-md};
+  --px-radius-lg: #{$px-radius-lg};
+  --px-radius-xl: #{$px-radius-xl};
+  --px-radius-pill: #{$px-radius-pill};
+}

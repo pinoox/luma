@@ -1,0 +1,133 @@
+{
+  "name": "@pinooxhq/luma",
+  "version": "0.1.0",
+  "description": "Luma — A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
+  "type": "module",
+  "main": "./exports/index.js",
+  "module": "./exports/index.js",
+  "exports": {
+    ".": {
+      "import": "./exports/index.js",
+      "sass": "./exports/styles.scss",
+      "style": "./exports/styles.scss"
+    },
+    "./ds/*": "./src/ds/*",
+    "./ds": "./src/ds/index.js",
+    "./core/*": "./src/core/*",
+    "./core": "./src/core/index.js",
+    "./ui/*": "./src/ui/*",
+    "./ui": "./src/ui/index.js",
+    "./router/*": "./src/router/*",
+    "./router": "./src/router/guards.js",
+    "./plugins/*": "./src/plugins/*",
+    "./plugins": "./src/plugins/preset.js",
+    "./composables/*": "./src/composables/*",
+    "./composables": "./src/composables/index.js",
+    "./layouts/*": "./src/layouts/*",
+    "./layouts": "./src/layouts/index.js",
+    "./styles/*": {
+      "sass": "./src/scss/*",
+      "style": "./src/scss/*",
+      "import": "./src/scss/*"
+    },
+    "./styles": {
+      "sass": "./src/scss/_styles.scss",
+      "style": "./src/scss/_styles.scss"
+    },
+    "./styles/_main": {
+      "sass": "./src/scss/_main.scss",
+      "style": "./src/scss/_main.scss"
+    },
+    "./tokens/*": {
+      "sass": "./src/scss/tokens/*",
+      "style": "./src/scss/tokens/*",
+      "import": "./src/scss/tokens/*"
+    },
+    "./tokens": {
+      "sass": "./src/scss/tokens/_index.scss",
+      "style": "./src/scss/tokens/_index.scss"
+    },
+    "./tokens/_index": {
+      "sass": "./src/scss/tokens/_index.scss",
+      "style": "./src/scss/tokens/_index.scss"
+    },
+    "./fonts": "./src/fonts/vazir.js",
+    "./fonts/*": "./src/fonts/*",
+    "./preset": {
+      "import": "./exports/preset.js"
+    },
+    "./tokens.scss": {
+      "sass": "./exports/tokens.scss",
+      "style": "./exports/tokens.scss"
+    },
+    "./styles.scss": {
+      "sass": "./exports/styles.scss",
+      "style": "./exports/styles.scss"
+    },
+    "./createApp": {
+      "import": "./src/createApp.js"
+    },
+    "./applyThemeConfig": {
+      "import": "./exports/applyThemeConfig.js"
+    },
+    "./theme-config": {
+      "import": "./src/ds/theme-config.js"
+    },
+    "./vite": {
+      "import": "./vite.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "exports",
+    "src",
+    "vite.js",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": [
+    "**/*.scss",
+    "**/*.vue",
+    "./src/fonts/vazir.js"
+  ],
+  "dependencies": {
+    "@pinooxhq/auth": "^0.1.0",
+    "@primeuix/themes": "^1.2.1",
+    "axios": "^1.16.1",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^3.0.4",
+    "primevue": "^4.3.6",
+    "sass": "^1.100.0",
+    "vue": "^3.5.35",
+    "vue-router": "^5.1.0"
+  },
+  "peerDependencies": {
+    "@pinooxhq/auth": "^0.1.0",
+    "@primeuix/themes": "^1.2.1",
+    "axios": "^1.16.1",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^3.0.4",
+    "primevue": "^4.3.6",
+    "vue": "^3.5.35",
+    "vue-router": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "pinoox",
+    "luma",
+    "design-system",
+    "vue",
+    "vue3",
+    "primevue",
+    "dashboard",
+    "admin-panel",
+    "rtl",
+    "vazir",
+    "ui-framework",
+    "pinia",
+    "vue-router"
+  ],
+  "license": "MIT"
+}

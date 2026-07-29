@@ -1,0 +1,2 @@
+// Sass shim so `@use '@pinooxhq/luma/styles' as *;` resolves to main.scss.
+@forward './main.scss';

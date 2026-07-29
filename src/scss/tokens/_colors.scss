@@ -1,0 +1,181 @@
+// ============================================================
+// Pinoox Design System — Colors
+// Primary: #0E73FD
+// Light bg: #F4F4FE
+// ============================================================
+
+// --- Brand palette (single accent system) ---
+$px-blue-50:  #EEF5FF !default;
+$px-blue-100: #DBE7FE !default;
+$px-blue-200: #B6CEFD !default;
+$px-blue-300: #8BB1FB !default;
+$px-blue-400: #5F95F9 !default;
+$px-blue-500: #0E73FD; // brand
+$px-blue-600: #0858D4 !default;
+$px-blue-700: #0644A8 !default;
+$px-blue-800: #053580 !default;
+$px-blue-900: #03245A !default;
+
+// --- Neutrals (light) ---
+$px-slate-50:  #F8FAFC !default;
+$px-slate-100: #F1F5F9 !default;
+$px-slate-200: #E2E8F0 !default;
+$px-slate-300: #CBD5E1 !default;
+$px-slate-400: #94A3B8 !default;
+$px-slate-500: #64748B !default;
+$px-slate-600: #475569 !default;
+$px-slate-700: #334155 !default;
+$px-slate-800: #1E293B !default;
+$px-slate-900: #0F172A !default;
+
+// --- Neutrals (dark) ---
+$px-dark-50:  #0B1220 !default;
+$px-dark-100: #111827 !default;
+$px-dark-200: #1F2937 !default;
+$px-dark-300: #273449 !default;
+$px-dark-400: #334155 !default;
+$px-dark-500: #475569 !default;
+$px-dark-600: #64748B !default;
+$px-dark-700: #94A3B8 !default;
+$px-dark-800: #CBD5E1 !default;
+$px-dark-900: #E2E8F0 !default;
+
+// --- Surface (light) ---
+$px-bg-light:         #F4F4FE !default;
+$px-bg-light-alt:     #ECEFFB !default;
+$px-surface-light:    rgba(255, 255, 255, 0.78) !default;
+$px-surface-strong:   rgba(255, 255, 255, 0.94) !default;
+$px-surface-muted:    rgba(248, 250, 252, 0.68) !default;
+$px-border-light:     rgba(15, 23, 42, 0.06) !default;
+$px-border-light-soft: rgba(15, 23, 42, 0.04) !default;
+
+// --- Surface (dark) ---
+$px-bg-dark:          #060912 !default;
+$px-bg-dark-alt:      #0B1220 !default;
+$px-surface-dark:     rgba(17, 24, 39, 0.78) !default;
+$px-surface-dark-strong: rgba(17, 24, 39, 0.94) !default;
+$px-surface-dark-muted:  rgba(15, 23, 42, 0.68) !default;
+$px-border-dark:      rgba(148, 163, 184, 0.14) !default;
+$px-border-dark-soft: rgba(148, 163, 184, 0.08) !default;
+
+// --- Status (state colors) ---
+$px-success-50:  #ECFDF5 !default;
+$px-success-500: #10B981 !default;
+$px-success-600: #059669 !default;
+$px-success-soft-light: rgba(16, 185, 129, 0.12) !default;
+$px-success-soft-dark:  rgba(16, 185, 129, 0.18) !default;
+
+$px-warning-50:  #FFFBEB !default;
+$px-warning-500: #F59E0B !default;
+$px-warning-600: #D97706 !default;
+$px-warning-soft-light: rgba(245, 158, 11, 0.12) !default;
+$px-warning-soft-dark:  rgba(245, 158, 11, 0.18) !default;
+
+$px-danger-50:  #FEF2F2 !default;
+$px-danger-500: #EF4444 !default;
+$px-danger-600: #DC2626 !default;
+$px-danger-soft-light: rgba(239, 68, 68, 0.10) !default;
+$px-danger-soft-dark:  rgba(239, 68, 68, 0.18) !default;
+
+$px-info-50:  #EFF6FF !default;
+$px-info-500: #3B82F6 !default;
+$px-info-soft-light: rgba(59, 130, 246, 0.10) !default;
+$px-info-soft-dark:  rgba(59, 130, 246, 0.18) !default;
+
+// --- Semantic CSS vars (exported as :root defaults) ---
+:root {
+  // Brand
+  --px-primary: #{$px-blue-500};
+  --px-primary-hover: #{$px-blue-600};
+  --px-primary-active: #{$px-blue-700};
+  --px-primary-soft: #{$px-blue-100};
+  --px-primary-soft-strong: #{$px-blue-200};
+  --px-primary-contrast: #FFFFFF;
+
+  // Surface (default = light)
+  --px-bg: #{$px-bg-light};
+  --px-bg-alt: #{$px-bg-light-alt};
+  --px-surface: #{$px-surface-light};
+  --px-surface-strong: #{$px-surface-strong};
+  --px-surface-muted: #{$px-surface-muted};
+  --px-border: #{$px-border-light};
+  --px-border-soft: #{$px-border-light-soft};
+  --px-divider: rgba(15, 23, 42, 0.08);
+
+  // Text
+  --px-text: #{$px-slate-800};
+  --px-text-soft: #{$px-slate-600};
+  --px-text-muted: #{$px-slate-500};
+  --px-text-inverse: #{$px-slate-50};
+
+  // Status
+  --px-success: #{$px-success-500};
+  --px-success-soft: #{$px-success-soft-light};
+  --px-warning: #{$px-warning-500};
+  --px-warning-soft: #{$px-warning-soft-light};
+  --px-danger: #{$px-danger-500};
+  --px-danger-soft: #{$px-danger-soft-light};
+  --px-info: #{$px-info-500};
+  --px-info-soft: #{$px-info-soft-light};
+
+  // Glass tint
+  --px-glass-bg: rgba(255, 255, 255, 0.62);
+  --px-glass-bg-strong: rgba(255, 255, 255, 0.84);
+  --px-glass-border: rgba(255, 255, 255, 0.55);
+  --px-glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.08),
+                     inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  --px-gradient-canvas: linear-gradient(
+    145deg,
+    #EEF3FF 0%,
+    #F0F4FF 30%,
+    #F4F4FE 60%,
+    #F7F8FE 100%
+  );
+}
+
+[data-theme="dark"] {
+  --px-primary: #{$px-blue-400};
+  --px-primary-hover: #{$px-blue-300};
+  --px-primary-active: #{$px-blue-200};
+  --px-primary-soft: rgba(14, 115, 253, 0.18);
+  --px-primary-soft-strong: rgba(14, 115, 253, 0.32);
+  --px-primary-contrast: #FFFFFF;
+
+  --px-bg: #{$px-bg-dark};
+  --px-bg-alt: #{$px-bg-dark-alt};
+  --px-surface: #{$px-surface-dark};
+  --px-surface-strong: #{$px-surface-dark-strong};
+  --px-surface-muted: #{$px-surface-dark-muted};
+  --px-border: #{$px-border-dark};
+  --px-border-soft: #{$px-border-dark-soft};
+  --px-divider: rgba(148, 163, 184, 0.14);
+
+  --px-text: #{$px-dark-900};
+  --px-text-soft: #{$px-dark-700};
+  --px-text-muted: #{$px-dark-600};
+  --px-text-inverse: #{$px-slate-900};
+
+  --px-success: #{$px-success-500};
+  --px-success-soft: #{$px-success-soft-dark};
+  --px-warning: #{$px-warning-500};
+  --px-warning-soft: #{$px-warning-soft-dark};
+  --px-danger: #{$px-danger-500};
+  --px-danger-soft: #{$px-danger-soft-dark};
+  --px-info: #{$px-info-500};
+  --px-info-soft: #{$px-info-soft-dark};
+
+  --px-glass-bg: rgba(17, 24, 39, 0.62);
+  --px-glass-bg-strong: rgba(17, 24, 39, 0.88);
+  --px-glass-border: rgba(148, 163, 184, 0.18);
+  --px-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.32),
+                     inset 0 1px 0 rgba(148, 163, 184, 0.12);
+
+  --px-gradient-canvas: linear-gradient(
+    160deg,
+    #050811 0%,
+    #07101F 35%,
+    #08152A 70%,
+    #050811 100%
+  );
+}

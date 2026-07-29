@@ -1,0 +1,67 @@
+// ============================================================
+// Pinoox Design System — Typography
+// Font: Vazir (fa) + system stack fallback
+// ============================================================
+
+$px-font-sans: 'Vazir', 'Vazirmatn', 'Inter', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif !default;
+$px-font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace !default;
+
+// --- Font sizes (modular scale 1.125) ---
+$px-text-2xs: 0.6875rem;  // 11
+$px-text-xs:  0.75rem;    // 12
+$px-text-sm:  0.8125rem;  // 13
+$px-text-base: 0.875rem;  // 14
+$px-text-md:  0.9375rem;  // 15
+$px-text-lg:  1rem;       // 16
+$px-text-xl:  1.125rem;   // 18
+$px-text-2xl: 1.25rem;    // 20
+$px-text-3xl: 1.5rem;     // 24
+$px-text-4xl: 1.875rem;   // 30
+$px-text-5xl: 2.25rem;    // 36
+
+// --- Weights ---
+$px-weight-regular: 400 !default;
+$px-weight-medium:  500 !default;
+$px-weight-semibold: 600 !default;
+$px-weight-bold:    700 !default;
+
+// --- Line heights ---
+$px-leading-none:    1 !default;
+$px-leading-tight:   1.25 !default;
+$px-leading-snug:    1.4 !default;
+$px-leading-normal:  1.55 !default;
+$px-leading-relaxed: 1.7 !default;
+
+// --- Letter spacing ---
+$px-tracking-tighter: -0.02em !default;
+$px-tracking-tight:   -0.01em !default;
+$px-tracking-normal:  0 !default;
+$px-tracking-wide:    0.02em !default;
+
+:root {
+  --px-font-sans: #{$px-font-sans};
+  --px-font-mono: #{$px-font-mono};
+
+  --px-text-2xs: #{$px-text-2xs};
+  --px-text-xs: #{$px-text-xs};
+  --px-text-sm: #{$px-text-sm};
+  --px-text-base: #{$px-text-base};
+  --px-text-md: #{$px-text-md};
+  --px-text-lg: #{$px-text-lg};
+  --px-text-xl: #{$px-text-xl};
+  --px-text-2xl: #{$px-text-2xl};
+  --px-text-3xl: #{$px-text-3xl};
+  --px-text-4xl: #{$px-text-4xl};
+  --px-text-5xl: #{$px-text-5xl};
+
+  --px-weight-regular: #{$px-weight-regular};
+  --px-weight-medium: #{$px-weight-medium};
+  --px-weight-semibold: #{$px-weight-semibold};
+  --px-weight-bold: #{$px-weight-bold};
+
+  --px-leading-none: #{$px-leading-none};
+  --px-leading-tight: #{$px-leading-tight};
+  --px-leading-snug: #{$px-leading-snug};
+  --px-leading-normal: #{$px-leading-normal};
+  --px-leading-relaxed: #{$px-leading-relaxed};
+}

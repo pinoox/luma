@@ -1,0 +1,151 @@
+// ============================================================
+// Pinoox Design System — Tokens Index
+// Exposes all token variables at root scope by re-declaring them.
+// Consumers do `@use './tokens' as *;` then access `$px-*` directly.
+// ============================================================
+
+@use './colors' as c;
+@use './typography' as t;
+@use './spacing' as s;
+@use './radius' as r;
+@use './shadow' as sh;
+@use './motion' as m;
+@use './zindex' as z;
+
+// Colors
+$px-blue-50:    c.$px-blue-50;
+$px-blue-100:   c.$px-blue-100;
+$px-blue-200:   c.$px-blue-200;
+$px-blue-300:   c.$px-blue-300;
+$px-blue-400:   c.$px-blue-400;
+$px-blue-500:   c.$px-blue-500;
+$px-blue-600:   c.$px-blue-600;
+$px-blue-700:   c.$px-blue-700;
+$px-blue-800:   c.$px-blue-800;
+$px-blue-900:   c.$px-blue-900;
+$px-slate-50:   c.$px-slate-50;
+$px-slate-100:  c.$px-slate-100;
+$px-slate-200:  c.$px-slate-200;
+$px-slate-300:  c.$px-slate-300;
+$px-slate-400:  c.$px-slate-400;
+$px-slate-500:  c.$px-slate-500;
+$px-slate-600:  c.$px-slate-600;
+$px-slate-700:  c.$px-slate-700;
+$px-slate-800:  c.$px-slate-800;
+$px-slate-900:  c.$px-slate-900;
+$px-dark-50:    c.$px-dark-50;
+$px-dark-100:   c.$px-dark-100;
+$px-dark-200:   c.$px-dark-200;
+$px-dark-300:   c.$px-dark-300;
+$px-dark-400:   c.$px-dark-400;
+$px-dark-500:   c.$px-dark-500;
+$px-dark-600:   c.$px-dark-600;
+$px-dark-700:   c.$px-dark-700;
+$px-dark-800:   c.$px-dark-800;
+$px-dark-900:   c.$px-dark-900;
+$px-bg-light:         c.$px-bg-light;
+$px-bg-light-alt:     c.$px-bg-light-alt;
+$px-bg-dark:          c.$px-bg-dark;
+$px-bg-dark-alt:      c.$px-bg-dark-alt;
+$px-success-50:   c.$px-success-50;
+$px-success-500:  c.$px-success-500;
+$px-success-600:  c.$px-success-600;
+$px-warning-50:   c.$px-warning-50;
+$px-warning-500:  c.$px-warning-500;
+$px-warning-600:  c.$px-warning-600;
+$px-danger-50:    c.$px-danger-50;
+$px-danger-500:   c.$px-danger-500;
+$px-danger-600:   c.$px-danger-600;
+$px-info-50:      c.$px-info-50;
+$px-info-500:     c.$px-info-500;
+
+// Typography
+$px-font-sans:    t.$px-font-sans;
+$px-font-mono:    t.$px-font-mono;
+$px-text-2xs:     t.$px-text-2xs;
+$px-text-xs:      t.$px-text-xs;
+$px-text-sm:      t.$px-text-sm;
+$px-text-base:    t.$px-text-base;
+$px-text-md:      t.$px-text-md;
+$px-text-lg:      t.$px-text-lg;
+$px-text-xl:      t.$px-text-xl;
+$px-text-2xl:     t.$px-text-2xl;
+$px-text-3xl:     t.$px-text-3xl;
+$px-text-4xl:     t.$px-text-4xl;
+$px-text-5xl:     t.$px-text-5xl;
+$px-weight-regular:  t.$px-weight-regular;
+$px-weight-medium:   t.$px-weight-medium;
+$px-weight-semibold: t.$px-weight-semibold;
+$px-weight-bold:     t.$px-weight-bold;
+$px-leading-none:    t.$px-leading-none;
+$px-leading-tight:   t.$px-leading-tight;
+$px-leading-snug:    t.$px-leading-snug;
+$px-leading-normal:  t.$px-leading-normal;
+$px-leading-relaxed: t.$px-leading-relaxed;
+
+// Spacing
+$px-space-0:   s.$px-space-0;
+$px-space-1:   s.$px-space-1;
+$px-space-2:   s.$px-space-2;
+$px-space-3:   s.$px-space-3;
+$px-space-4:   s.$px-space-4;
+$px-space-5:   s.$px-space-5;
+$px-space-6:   s.$px-space-6;
+$px-space-7:   s.$px-space-7;
+$px-space-8:   s.$px-space-8;
+$px-space-10:  s.$px-space-10;
+$px-space-12:  s.$px-space-12;
+$px-space-16:  s.$px-space-16;
+$px-space-20:  s.$px-space-20;
+$px-space-24:  s.$px-space-24;
+$px-sidebar-width:           s.$px-sidebar-width;
+$px-sidebar-collapsed-width: s.$px-sidebar-collapsed-width;
+$px-topbar-height:           s.$px-topbar-height;
+$px-page-max-width:          s.$px-page-max-width;
+
+// Radius
+$px-radius-xs:     r.$px-radius-xs;
+$px-radius-sm:     r.$px-radius-sm;
+$px-radius-md:     r.$px-radius-md;
+$px-radius-lg:     r.$px-radius-lg;
+$px-radius-xl:     r.$px-radius-xl;
+$px-radius-2xl:    r.$px-radius-2xl;
+$px-radius-pill:   r.$px-radius-pill;
+$px-radius-circle: r.$px-radius-circle;
+
+// Shadow
+$px-shadow-xs:        sh.$px-shadow-xs;
+$px-shadow-sm:        sh.$px-shadow-sm;
+$px-shadow-md:        sh.$px-shadow-md;
+$px-shadow-lg:        sh.$px-shadow-lg;
+$px-shadow-xl:        sh.$px-shadow-xl;
+$px-shadow-glass:     sh.$px-shadow-glass;
+$px-shadow-glass-dark: sh.$px-shadow-glass-dark;
+$px-shadow-floating:  sh.$px-shadow-floating;
+$px-shadow-focus:     sh.$px-shadow-focus;
+$px-blur-sm:  sh.$px-blur-sm;
+$px-blur-md:  sh.$px-blur-md;
+$px-blur-lg:  sh.$px-blur-lg;
+$px-blur-xl:  sh.$px-blur-xl;
+
+// Motion
+$px-duration-instant: m.$px-duration-instant;
+$px-duration-fast:    m.$px-duration-fast;
+$px-duration-base:    m.$px-duration-base;
+$px-duration-slow:    m.$px-duration-slow;
+$px-duration-slower:  m.$px-duration-slower;
+$px-easing-standard:   m.$px-easing-standard;
+$px-easing-emphasized: m.$px-easing-emphasized;
+$px-easing-decelerate: m.$px-easing-decelerate;
+$px-easing-accelerate: m.$px-easing-accelerate;
+
+// Z-index
+$px-z-base:     z.$px-z-base;
+$px-z-raised:   z.$px-z-raised;
+$px-z-dropdown: z.$px-z-dropdown;
+$px-z-sticky:   z.$px-z-sticky;
+$px-z-overlay:  z.$px-z-overlay;
+$px-z-drawer:   z.$px-z-drawer;
+$px-z-modal:    z.$px-z-modal;
+$px-z-toast:    z.$px-z-toast;
+$px-z-tooltip:  z.$px-z-tooltip;

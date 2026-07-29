@@ -1,0 +1,27 @@
+// ============================================================
+// Pinoox Design System — Motion
+// ============================================================
+
+$px-duration-instant: 80ms !default;
+$px-duration-fast: 140ms !default;
+$px-duration-base: 220ms !default;
+$px-duration-slow: 320ms !default;
+$px-duration-slower: 480ms !default;
+
+$px-easing-standard: cubic-bezier(0.4, 0, 0.2, 1) !default;
+$px-easing-emphasized: cubic-bezier(0.2, 0, 0, 1) !default;
+$px-easing-decelerate: cubic-bezier(0, 0, 0.2, 1) !default;
+$px-easing-accelerate: cubic-bezier(0.4, 0, 1, 1) !default;
+
+:root {
+  --px-duration-instant: #{$px-duration-instant};
+  --px-duration-fast: #{$px-duration-fast};
+  --px-duration-base: #{$px-duration-base};
+  --px-duration-slow: #{$px-duration-slow};
+  --px-duration-slower: #{$px-duration-slower};
+
+  --px-easing-standard: #{$px-easing-standard};
+  --px-easing-emphasized: #{$px-easing-emphasized};
+  --px-easing-decelerate: #{$px-easing-decelerate};
+  --px-easing-accelerate: #{$px-easing-accelerate};
+}

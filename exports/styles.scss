@@ -1,0 +1,5 @@
+// @pinooxhq/luma/styles — full design system stylesheet (tokens + layout + PrimeVue overrides + Lucide icon).
+// Apps import this once from their main entry to register CSS variables
+// and base layout primitives.
+
+@forward '../src/scss/main.scss';

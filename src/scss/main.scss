@@ -1,0 +1,22 @@
+// @pinooxhq/luma — main stylesheet
+// Registers design tokens (`:root` + `[data-theme="dark"]`), base styles,
+// Vazir font face, layout, PrimeVue/Lucide overrides.
+//
+// Apps can `@use '@pinooxhq/luma/styles.scss' as *;` or import as a
+// side-effect (`import '@pinooxhq/luma/styles.scss';`) followed by their
+// own `app.scss` for overrides.
+
+@use './tokens/index.scss';
+@use './vazir';
+@use './base';
+@use './layouts/layout';
+@use './components/prime-overrides';
+@use './components/lucide-icon';
+
+.p-card {
+    border: 1px solid var(--px-border);
+}
+
+.p-button {
+    font-family: var(--px-font-sans);
+}

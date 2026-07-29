@@ -1,0 +1,52 @@
+// ============================================================
+// Pinoox Design System — Shadow & Blur
+// ============================================================
+
+$px-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06) !default;
+$px-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08) !default;
+$px-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10) !default;
+$px-shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12) !default;
+$px-shadow-xl: 0 24px 64px rgba(15, 23, 42, 0.16) !default;
+
+$px-shadow-glass: 0 8px 32px rgba(15, 23, 42, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+$px-shadow-glass-dark: 0 8px 32px rgba(0, 0, 0, 0.32),
+                       inset 0 1px 0 rgba(148, 163, 184, 0.12);
+
+$px-shadow-floating: 0 12px 36px rgba(14, 115, 253, 0.18),
+                     0 4px 12px rgba(15, 23, 42, 0.08);
+
+$px-shadow-focus: 0 0 0 3px rgba(14, 115, 253, 0.18) !default;
+
+// --- Blur levels ---
+$px-blur-sm: blur(8px) !default;
+$px-blur-md: blur(16px) saturate(180%) !default;
+$px-blur-lg: blur(24px) saturate(200%) !default;
+$px-blur-xl: blur(32px) saturate(220%) !default;
+
+:root {
+  --px-shadow-xs: #{$px-shadow-xs};
+  --px-shadow-sm: #{$px-shadow-sm};
+  --px-shadow-md: #{$px-shadow-md};
+  --px-shadow-lg: #{$px-shadow-lg};
+  --px-shadow-xl: #{$px-shadow-xl};
+  --px-shadow-glass: #{$px-shadow-glass};
+  --px-shadow-floating: #{$px-shadow-floating};
+  --px-shadow-focus: #{$px-shadow-focus};
+
+  --px-blur-sm: #{$px-blur-sm};
+  --px-blur-md: #{$px-blur-md};
+  --px-blur-lg: #{$px-blur-lg};
+}
+
+[data-theme="dark"] {
+  --px-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --px-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --px-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --px-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --px-shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.7);
+  --px-shadow-glass: #{$px-shadow-glass-dark};
+  --px-shadow-floating: 0 12px 36px rgba(14, 115, 253, 0.4),
+                       0 4px 12px rgba(0, 0, 0, 0.5);
+}

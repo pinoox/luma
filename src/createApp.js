@@ -1,0 +1,165 @@
+/**
+ * Luma — `createApp` factory.
+ *
+ * Wires the entire app shell in one call. Apps just supply `themeConfig`,
+ * `routes`, and (optionally) a custom `AppRoot` and `pinia` instance.
+ *
+ *     import { createApp } from '@pinooxhq/luma';
+ *     import themeConfig from '../theme.config.js';
+ *     import { routes } from './config/routes.js';
+ *
+ *     createApp({ themeConfig, routes });
+ *
+ * `createApp` performs the following steps:
+ *   1. Apply runtime theme CSS variables (`applyThemeConfig`).
+ *   2. Populate `window.__PINOOX__` in dev mode (`applyDevBootstrap`).
+ *   3. Create the Vue app with the root shell layout (`RootShell` or user override).
+ *   4. Install PrimeVue, Pinia (active pinia set explicitly), and the router.
+ *   5. Wire the `useTheme()` composable globally.
+ *   6. Subscribe to `auth.on('unauthorized', ...)`.
+ *   7. Mount `#app`.
+ *
+ * Auth customization options (all optional):
+ *   - `themeConfig.auth`        — config block: `endpoints`, `skipMe`,
+ *                                  `autoLoginFromUrl`.
+ *   - `auth`                    — pinoox-auth options (passed straight to
+ *                                  `configureAuth()`). Overrides the defaults
+ *                                  read from `__PINOOX__`.
+ *   - `verifyAuth({ store, route })` — async hook called by the auth guard.
+ *                                  Return `true` to allow, `false` to redirect
+ *                                  to login. When provided, Luma skips its
+ *                                  built-in `me()` flow entirely.
+ */
+import { createApp as createVueApp } from 'vue';
+import { setActivePinia } from 'pinia';
+
+import { setActiveThemeConfig, resolveThemeConfig } from './ds/theme-config.js';
+import { applyThemeConfig } from './customization/applyThemeConfig.js';
+import { applyDevBootstrap } from './core/boot.js';
+import setupPrimeVue from './plugins/primevue.js';
+import { useTheme, initThemeEarly } from './ds/composables/use-theme.js';
+import {
+    auth,
+    useAuthStore,
+    configureAuth,
+    getActiveAuth,
+} from './core/auth/index.js';
+import { createAppRouter, redirectToLogin } from './router/guards.js';
+import RootShell from './layouts/RootShell.vue';
+
+const DEFAULT_MOUNT = '#app';
+
+let unauthorizedRedirectPending = false;
+
+function wireAuthRedirect() {
+    auth.on('unauthorized', async () => {
+        if (unauthorizedRedirectPending) return;
+        unauthorizedRedirectPending = true;
+        try {
+            const store = useAuthStore();
+            const valid = await store.canUserAccess(true);
+            if (!valid && !store.isAuth) {
+                redirectToLogin();
+            }
+        } finally {
+            unauthorizedRedirectPending = false;
+        }
+    });
+}
+
+/**
+ * Merge `themeConfig.auth.endpoints` into `authOptions.endpoints`. Apps that
+ * set `themeConfig.auth.endpoints` get them wired into pinoox-auth at boot.
+ * Apps that pass `auth` directly bypass the theme config so explicit options win.
+ */
+const resolveAuthBootOptions = (themeConfig, authOptions) => {
+    if (authOptions && Object.keys(authOptions).length > 0) {
+        return authOptions;
+    }
+    const endpoints = themeConfig?.auth?.endpoints;
+    if (endpoints && Object.keys(endpoints).length > 0) {
+        return { endpoints };
+    }
+    return {};
+};
+
+/**
+ * @param {{
+ *   themeConfig?: object,
+ *   routes?: Array<object>,
+ *   pinia?: object,
+ *   mount?: string,
+ *   AppRoot?: object,
+ *   auth?: object,
+ *   verifyAuth?: (ctx: { store, route, adoptedFromUrl }) => Promise<boolean>,
+ * }} options
+ */
+export async function createApp(options = {}) {
+    const {
+        themeConfig: userConfig,
+        routes = [],
+        pinia,
+        mount = DEFAULT_MOUNT,
+        AppRoot = RootShell,
+        auth: authOptions,
+        verifyAuth,
+    } = options;
+
+    // 0. Resolve theme config first so auth defaults can read `themeConfig.auth`.
+    const config = setActiveThemeConfig(userConfig);
+
+    // 0a. Apply auth overrides (must happen before the first router guard).
+    const authBoot = resolveAuthBootOptions(config, authOptions);
+    if (Object.keys(authBoot).length > 0) {
+        configureAuth(authBoot);
+        // The `wireAuthRedirect` listener was attached to the old instance.
+        // Re-attach on the new active instance.
+        wireAuthRedirect();
+    }
+
+    // 0b. Install the verifyAuth hook (read by the router guard).
+    if (typeof verifyAuth === 'function') {
+        globalThis.__LUMA_VERIFY_AUTH__ = verifyAuth;
+    }
+
+    // 1. Dev bootstrap & runtime theme.
+    applyDevBootstrap();
+    applyThemeConfig({
+        brand:  config.brand,
+        font:   config.font,
+        layout: config.layout,
+    });
+
+    // 2. Prime the theme before mounting to avoid flash.
+    initThemeEarly();
+
+    // 3. Wire auth-redirect listener (also called after configureAuth above).
+    wireAuthRedirect();
+
+    // 4. Build the Vue app.
+    const app = createVueApp(AppRoot);
+
+    setupPrimeVue(app);
+
+    // 5. Pinia — install + make active so router guards can use stores.
+    if (pinia) {
+        app.use(pinia);
+        setActivePinia(pinia);
+    }
+
+    // 6. Theme composable wired globally.
+    const theme = useTheme();
+    app.provide('theme', theme);
+    app.config.globalProperties.$theme = theme;
+
+    // 7. Router — created asynchronously (lazy-loads vue-router).
+    const router = await createAppRouter(routes);
+    app.use(router);
+
+    // 8. Mount.
+    app.mount(mount);
+
+    return { app, router, config, auth: getActiveAuth() };
+}
+
+export default createApp;

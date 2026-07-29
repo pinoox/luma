@@ -1,0 +1,25 @@
+// ============================================================
+// Pinoox Design System — Z-Index scale
+// ============================================================
+
+$px-z-base:    1 !default;
+$px-z-raised:  10 !default;
+$px-z-dropdown: 100 !default;
+$px-z-sticky:  200 !default;
+$px-z-overlay: 900 !default;
+$px-z-drawer:  950 !default;
+$px-z-modal:   1000 !default;
+$px-z-toast:   1100 !default;
+$px-z-tooltip: 1200 !default;
+
+:root {
+  --px-z-base: #{$px-z-base};
+  --px-z-raised: #{$px-z-raised};
+  --px-z-dropdown: #{$px-z-dropdown};
+  --px-z-sticky: #{$px-z-sticky};
+  --px-z-overlay: #{$px-z-overlay};
+  --px-z-drawer: #{$px-z-drawer};
+  --px-z-modal: #{$px-z-modal};
+  --px-z-toast: #{$px-z-toast};
+  --px-z-tooltip: #{$px-z-tooltip};
+}

@@ -1,0 +1,39 @@
+@use '../tokens/index.scss' as *;
+
+.p-button,
+.p-tab,
+.p-tabview-nav-link,
+.p-select-label,
+.p-multiselect-label,
+.p-checkbox-input,
+.p-radiobutton-input,
+.p-dialog-header-actions .p-button,
+.p-paginator .p-button {
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.tabs-container__tab,
+.p-data-table__link,
+.p-data-table__status-menu-trigger {
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.p-datatable-mask {
+  --px-mask-background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: var(--px-blur-sm);
+  -webkit-backdrop-filter: var(--px-blur-sm);
+  border-radius: var(--px-radius-md);
+
+  &.p-overlay-mask-enter-active,
+  &.p-overlay-mask-leave-active {
+    animation: none;
+  }
+}

@@ -66,9 +66,10 @@ can be replaced or extended without forking the package.
 
 - **Tokens** — colors, typography, spacing, radius, shadow, motion, and
   z-index. First-class light and dark themes.
-- **Components** — `PSidebar`, `PTopbar`, `PMobileNav`, `PCard`,
-  `PBadge`, `PEmptyState`, `PThemeToggle`, plus primitives `PIcon`,
-  `PView`, and `PHeader`.
+- **Components** — `LSidebar`, `LTopbar`, `LMobileNav`, `LCard`,
+  `LBadge`, `LEmptyPanel`, `LThemeToggle`, plus primitives
+  `LIcon`, `LView`, `LHeader`, `LButton`, `LField`, `LPageHeader`,
+  `LPageToolbar`, `LPageContainer`, `LSpinner`, `LToast`, and `LToolbar`.
 - **PrimeVue 4** — every component auto-registered with Luma's preset
   (DataTable, Forms, Calendar, Dialog, Toast, Charts, FileUpload, …).
   See the full table in [Usage examples](#available-primevue-components).
@@ -118,15 +119,16 @@ Luma is published on npm as a standard package:
 npm install @pinooxhq/luma
 ```
 
-You'll also want PrimeVue 4 (Luma's UI layer) and Pinia (state
-management). PrimeVue's theme tokens ship separately:
+You'll also want PrimeVue 4 (Luma's UI layer), Pinia (state management),
+Lucide (icons), and Sass (Luma's stylesheet is Sass):
 
 ```sh
-npm install primevue @primeuix/themes pinia vue-router axios
+npm install primevue @primeuix/themes pinia vue-router axios lucide-vue-next sass --save-dev
 ```
 
 That's it — no manual plugin wiring, no symlinks, no path hacks. Standard
-npm install just works.
+npm install just works. `sass` is only needed at build time, so it lives
+in `devDependencies` of your app.
 
 ### Optional — Pinia auth helper
 
@@ -421,13 +423,13 @@ createApp({
 });
 ```
 
-Individual Luma components (`PSidebar`, `PTopbar`, `PMobileNav`,
-`PCard`, …) can also be imported and composed into your own layouts
+Individual Luma components (`LSidebar`, `LTopbar`, `LMobileNav`,
+`LCard`, …) can also be imported and composed into your own layouts
 from their respective subpaths:
 
 ```js
-import { PSidebar, PTopbar, PMobileNav } from '@pinooxhq/luma/ds';
-import { PView, PHeader, PIcon } from '@pinooxhq/luma/ui';
+import { LSidebar, LTopbar, LMobileNav } from '@pinooxhq/luma/ds';
+import { LView, LHeader, LIcon } from '@pinooxhq/luma/ui';
 ```
 
 ### Runtime mutability
@@ -610,12 +612,12 @@ const statusSeverity = {
 </script>
 
 <template>
-  <PView>
-    <PHeader :title="pageTitle" :lead="pageLead">
+  <LView>
+    <LHeader :title="pageTitle" :lead="pageLead">
       <Button label="سفارش جدید" icon="plus" severity="primary" />
-    </PHeader>
+    </LHeader>
 
-    <PCard>
+    <LCard>
       <div class="orders-toolbar">
         <IconField>
           <InputIcon class="pi pi-search" />
@@ -643,8 +645,8 @@ const statusSeverity = {
         </Column>
         <Column field="createdAt" header="تاریخ" sortable />
       </DataTable>
-    </PCard>
-  </PView>
+    </LCard>
+  </LView>
 </template>
 ```
 
@@ -688,10 +690,10 @@ async function submit() {
 </script>
 
 <template>
-  <PView>
-    <PHeader title="محصول جدید" lead="یک محصول به کاتالوگ اضافه کنید" />
+  <LView>
+    <LHeader title="محصول جدید" lead="یک محصول به کاتالوگ اضافه کنید" />
 
-    <PCard>
+    <LCard>
       <form @submit.prevent="submit" class="product-form">
         <label>
           <span>نام محصول</span>
@@ -721,8 +723,8 @@ async function submit() {
           <Button type="submit" label="ذخیره" :loading="submitting" />
         </div>
       </form>
-    </PCard>
-  </PView>
+    </LCard>
+  </LView>
 </template>
 
 <style lang="scss" scoped>
@@ -795,13 +797,13 @@ function notify() {
 ```vue
 <script setup>
 import { useTheme } from '@pinooxhq/luma';
-import { PThemeToggle } from '@pinooxhq/luma/ds';
+import { LThemeToggle } from '@pinooxhq/luma/ds';
 
 const { isDark, toggleTheme } = useTheme();
 </script>
 
 <template>
-  <PThemeToggle :model-value="isDark" @update:model-value="toggleTheme" />
+  <LThemeToggle :model-value="isDark" @update:model-value="toggleTheme" />
 </template>
 ```
 
@@ -862,22 +864,37 @@ your brand's primary color — no extra theme setup needed.
 
 Beyond PrimeVue, Luma ships a small set of opinionated shell components:
 
-| Component | Purpose |
-|-----------|---------|
-| `PView` | Page wrapper with consistent padding and max-width. |
-| `PHeader` | Page header with `title`, `lead`, `badge`, and a slot for actions. |
-| `PCard` | Themed card with header/body slots. |
-| `PEmptyState` | "No data" placeholder with icon, title, description, and CTA. |
-| `PBadge` | Inline status badge. |
-| `PIcon` | Lucide icon wrapper (e.g. `<PIcon name="shopping-cart" />`). |
-| `PSidebar`, `PTopbar`, `PMobileNav`, `PThemeToggle` | Shell pieces — already used by `PageLayout`, but available if you build your own. |
+| Component | Subpath | Purpose |
+|-----------|---------|---------|
+| `LView` | `@pinooxhq/luma/ui` | Page wrapper with consistent padding and max-width. |
+| `LHeader` | `@pinooxhq/luma/ui` | Page header with `title`, `lead`, `badge`, and a slot for actions. |
+| `LPageHeader` | `@pinooxhq/luma/ui` | Modern page header with eyebrow, title, lead, and icon. |
+| `LPageToolbar` | `@pinooxhq/luma/ui` | Sticky toolbar for page-level actions (right-aligned slot). |
+| `LPageContainer` | `@pinooxhq/luma/ui` | Constrains a page to the configured `pageMaxWidth` and handles gutters. |
+| `LCard` | `@pinooxhq/luma/ui` | Themed card with header/body/footer slots. |
+| `LEmptyPanel` | `@pinooxhq/luma/ui` | "No data" placeholder with icon, title, description, and CTA. |
+| `LBadge` | `@pinooxhq/luma/ui` | Inline status badge with `variant` + `dot` props. |
+| `LButton` | `@pinooxhq/luma/ui` | Themed button with `variant` / `severity` / `size` / `shape` props. |
+| `LField` | `@pinooxhq/luma/ui` | Form field wrapper — label, hint, error, slot for any input. |
+| `LSpinner` | `@pinooxhq/luma/ui` | Loading spinner with `size` and `center` props. |
+| `LToast` | `@pinooxhq/luma/ui` | Per-page toast mount (global `<Toast>` is auto-mounted by `RootShell`). |
+| `LToolbar` | `@pinooxhq/luma/ui` | Horizontal toolbar for filter/action rows. |
+| `LIcon` | `@pinooxhq/luma/ui` | Lucide icon wrapper (e.g. `<LIcon name="shopping-cart" />`). |
+| `LSidebar` | `@pinooxhq/luma/ds` | Sidebar (used by `PageLayout`, available standalone). |
+| `LTopbar` | `@pinooxhq/luma/ds` | Topbar (used by `PageLayout`, available standalone). |
+| `LMobileNav` | `@pinooxhq/luma/ds` | Mobile bottom nav. |
+| `LThemeToggle` | `@pinooxhq/luma/ds` | Light/dark toggle. |
+| `LEmptyState` | `@pinooxhq/luma/ds` | **Deprecated alias** for `LEmptyPanel`. Kept for one release; will be removed in 0.4.0. |
 
 Import any of these alongside PrimeVue components in your pages:
 
 ```js
-import { PView, PHeader } from '@pinooxhq/luma/ui';
-import { PCard, PEmptyState } from '@pinooxhq/luma/ds';
+import { LView, LHeader, LButton, LField, LPageHeader } from '@pinooxhq/luma/ui';
+import { LCard, LEmptyPanel } from '@pinooxhq/luma/ui';
+import { LSidebar, LTopbar } from '@pinooxhq/luma/ds';
 ```
+
+> **Full reference (every prop, slot, example):** see [`docs/README.md`](./docs/README.md).
 
 ---
 
@@ -895,8 +912,8 @@ Or pick a smaller surface:
 | Path | What you get |
 |------|--------------|
 | `@pinooxhq/luma` | Full barrel (Node-safe, no `.vue` SFCs) |
-| `@pinooxhq/luma/ds` | `PSidebar`, `PTopbar`, `PMobileNav`, `PThemeToggle`, `PCard`, `PBadge`, `PEmptyState` |
-| `@pinooxhq/luma/ui` | `PIcon`, `PView`, `PHeader` |
+| `@pinooxhq/luma/ds` | `LSidebar`, `LTopbar`, `LMobileNav`, `LThemeToggle`, `LCard`, `LBadge`, `LEmptyState` (legacy alias for `LEmptyPanel`) |
+| `@pinooxhq/luma/ui` | `LButton`, `LBadge`, `LCard`, `LField`, `LHeader`, `LIcon`, `LPageContainer`, `LPageHeader`, `LPageToolbar`, `LSpinner`, `LToast`, `LToolbar`, `LView`, `LEmptyPanel` |
 | `@pinooxhq/luma/layouts` | `RootShell`, `PageLayout` |
 | `@pinooxhq/luma/composables` | `usePage` |
 | `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `redirectToLogin`, `buildAppPath`, `resolveHistoryBase` |
@@ -908,6 +925,9 @@ Or pick a smaller surface:
 | `@pinooxhq/luma/theme-config` | `flattenNavItems`, `findNavItemByRoute`, `findPageMeta`, `resolveThemeConfig`, `setActiveThemeConfig` |
 | `@pinooxhq/luma/createApp` | The `createApp` factory |
 | `@pinooxhq/luma/applyThemeConfig` | `applyThemeConfig` |
+| `@pinooxhq/luma/vite` | The Vite helper bundle |
+
+> **Full component catalog (props, slots, examples):** see [`docs/README.md`](./docs/README.md).
 
 ---
 

@@ -7,7 +7,7 @@
             @click="$emit('menu')"
         >
             <slot name="menu-button">
-                <PIcon name="menu" size="md" />
+                <LIcon name="menu" size="md" />
             </slot>
         </button>
 
@@ -19,7 +19,7 @@
         <div v-if="searchable" class="px-topbar__search">
             <IconField>
                 <InputIcon>
-                    <PIcon name="search" size="sm" />
+                    <LIcon name="search" size="sm" />
                 </InputIcon>
                 <InputText
                     :model-value="internalSearch"
@@ -33,7 +33,7 @@
         <div class="px-topbar__actions">
             <slot name="actions" />
 
-            <PThemeToggle />
+            <LThemeToggle />
 
             <button
                 v-if="user"
@@ -57,8 +57,8 @@ import Avatar from 'primevue/avatar';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
-import { PIcon } from '../../ui/index.js';
-import PThemeToggle from './theme-toggle.vue';
+import { LIcon } from '../../ui/index.js';
+import LThemeToggle from './l-theme-toggle.vue';
 
 const props = defineProps({
     title: { type: String, default: '' },
@@ -158,7 +158,7 @@ const userInitials = computed(() => {
         flex: 2;
         max-width: 480px;
 
-        .p-inputtext {
+        .l-inputtext {
             background: var(--px-surface-muted);
             border: 1px solid var(--px-border);
             border-radius: var(--px-radius-pill);

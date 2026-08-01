@@ -1,0 +1,128 @@
+// ============================================================
+// Luma UI — Layout utilities
+// ============================================================
+// Minimal, composable layout primitives — like Tailwind utilities
+// but only for layouts that recur in every app (grids, stacks,
+// clusters, definition lists, sections).
+
+@use '../tokens' as *;
+
+// ------------------------------------------------------------
+// Grid — auto-fit responsive columns
+// ------------------------------------------------------------
+// .luma-grid               — default 280px min
+// .luma-grid--sm           — 200px min (dense lists)
+// .luma-grid--md           — 320px min (cards)
+// .luma-grid--lg           — 400px min (hero cards)
+// .luma-grid--cols-{1..6}  — fixed column count
+.luma-grid {
+    display: grid;
+    gap: var(--px-space-4);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+
+    &--xs { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    &--sm { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    &--md { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+    &--lg { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
+    &--xl { grid-template-columns: repeat(auto-fill, minmax(520px, 1fr)); }
+
+    @for $i from 1 through 6 {
+        &--cols-#{$i} {
+            grid-template-columns: repeat(#{$i}, minmax(0, 1fr));
+        }
+    }
+
+    &--gap-1 { gap: var(--px-space-1); }
+    &--gap-2 { gap: var(--px-space-2); }
+    &--gap-3 { gap: var(--px-space-3); }
+    &--gap-4 { gap: var(--px-space-4); }
+    &--gap-5 { gap: var(--px-space-5); }
+    &--gap-6 { gap: var(--px-space-6); }
+}
+
+// ------------------------------------------------------------
+// Stack — vertical flex column with gap
+// ------------------------------------------------------------
+.luma-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--px-space-3);
+
+    &--gap-1 { gap: var(--px-space-1); }
+    &--gap-2 { gap: var(--px-space-2); }
+    &--gap-3 { gap: var(--px-space-3); }
+    &--gap-4 { gap: var(--px-space-4); }
+    &--gap-5 { gap: var(--px-space-5); }
+    &--gap-6 { gap: var(--px-space-6); }
+
+    &--center { align-items: center; justify-content: center; }
+    &--start  { align-items: flex-start; }
+    &--end    { align-items: flex-end; }
+}
+
+// ------------------------------------------------------------
+// Cluster — horizontal flex row with wrap + gap
+// ------------------------------------------------------------
+.luma-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--px-space-2);
+
+    &--gap-1 { gap: var(--px-space-1); }
+    &--gap-2 { gap: var(--px-space-2); }
+    &--gap-3 { gap: var(--px-space-3); }
+    &--gap-4 { gap: var(--px-space-4); }
+
+    &--end { justify-content: flex-end; }
+    &--between { justify-content: space-between; }
+    &--around { justify-content: space-around; }
+}
+
+// ------------------------------------------------------------
+// Definition list — semantic dl/dt/dd with auto label/value layout
+// ------------------------------------------------------------
+.luma-defs {
+    display: grid;
+    gap: var(--px-space-2);
+    margin: 0;
+
+    > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--px-space-3);
+        font-size: var(--px-text-sm);
+    }
+
+    dt {
+        margin: 0;
+        color: var(--px-text-muted);
+    }
+
+    dd {
+        margin: 0;
+        color: var(--px-text);
+        text-align: end;
+    }
+}
+
+// ------------------------------------------------------------
+// Section — small group with optional title + content
+// ------------------------------------------------------------
+.luma-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--px-space-2);
+    padding-top: var(--px-space-2);
+    border-top: 1px dashed var(--px-border);
+
+    &__title {
+        margin: 0;
+        font-size: var(--px-text-sm);
+        font-weight: $px-weight-semibold;
+        color: var(--px-text);
+    }
+
+    &--flush { padding-top: 0; border-top: 0; }
+}

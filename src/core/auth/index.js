@@ -25,10 +25,29 @@ const defaultAuth = createAuth({
 });
 
 let activeAuth = defaultAuth;
+let activeHttp = buildHttp(activeAuth);
 let isConfigured = false;
 
 /**
- * Replace the default auth instance. Call once, before `createApp()`.
+ * Build a fresh `http` (axios client) bound to the given auth instance.
+ *
+ * `createHttp({ auth })` closes over the auth instance so the
+ * `Authorization` interceptor and the `apiBase` resolution both read
+ * from this specific auth. We rebuild this whenever `configureAuth()`
+ * replaces the underlying auth so the exported `http` always tracks
+ * the active config.
+ */
+function buildHttp(authInstance) {
+    return createHttp({
+        auth: authInstance,
+        axios,
+        baseURL: env('VITE_API_PATH', '') || undefined,
+    });
+}
+
+/**
+ * Replace the default auth (and the matching `http`) instance. Call once,
+ * before `createApp()`.
  *
  * @example
  *   configureAuth({
@@ -40,6 +59,7 @@ export const configureAuth = (options = {}) => {
         debug: isDev(),
         ...options,
     });
+    activeHttp = buildHttp(activeAuth);
     isConfigured = true;
     return activeAuth;
 };
@@ -50,14 +70,29 @@ export const configureAuth = (options = {}) => {
 export const getActiveAuth = () => activeAuth;
 
 /**
+ * Currently-active `http` (axios) client. Replaced by `configureAuth()`
+ * so the `Authorization` interceptor and `baseURL` always match the active
+ * auth config.
+ */
+export const getActiveHttp = () => activeHttp;
+
+/**
  * Whether `configureAuth()` has been called at least once.
  */
 export const isAuthConfigured = () => isConfigured;
 
-export const http = createHttp({
-    auth: defaultAuth,
-    axios,
-    baseURL: env('VITE_API_PATH', '') || undefined,
+/**
+ * `http` is a Proxy that always reads through to the latest `activeHttp`.
+ * Reassigning `activeHttp` in `configureAuth()` automatically updates every
+ * caller that imported `http` at module load time — they keep the same
+ * identifier but pick up the new axios client on the next call.
+ */
+export const http = new Proxy({}, {
+    get: (_target, prop) => activeHttp[prop],
+    set: (_target, prop, value) => {
+        activeHttp[prop] = value;
+        return true;
+    },
 });
 
 export const useAuthStore = createPiniaAuthStore(defineStore, 'auth');

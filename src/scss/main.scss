@@ -5,6 +5,12 @@
 // Apps can `@use '@pinooxhq/luma/styles.scss' as *;` or import as a
 // side-effect (`import '@pinooxhq/luma/styles.scss';`) followed by their
 // own `app.scss` for overrides.
+//
+// The PrimeVue theme prefix is `l` (see `src/plugins/primevue.js`), so
+// all PrimeVue-generated classes use the `l-` namespace (e.g. `l-card`,
+// `l-button`, `l-inputtext`). Card and button chrome are owned by the
+// `luma-card` and `luma-btn` systems — there are no parallel `.l-card`
+// or `.l-button` overrides here.
 
 @use './tokens/index.scss';
 @use './vazir';
@@ -12,11 +18,5 @@
 @use './layouts/layout';
 @use './components/prime-overrides';
 @use './components/lucide-icon';
-
-.p-card {
-    border: 1px solid var(--px-border);
-}
-
-.p-button {
-    font-family: var(--px-font-sans);
-}
+@use './components/buttons';
+@use './components/utilities';

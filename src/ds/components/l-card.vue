@@ -7,7 +7,7 @@
         <header v-if="$slots.header || title" class="px-card__header">
             <div v-if="icon || $slots.icon" class="px-card__icon">
                 <slot name="icon">
-                    <PIcon v-if="icon" :name="icon" size="md" />
+                    <LIcon v-if="icon" :name="icon" size="md" />
                 </slot>
             </div>
             <div class="px-card__heading">
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { PIcon } from '../../ui/index.js';
+import { LIcon } from '../../ui/index.js';
 
 defineProps({
     variant: {

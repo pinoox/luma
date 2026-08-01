@@ -2,7 +2,7 @@ import {
     auth,
     useAuthStore,
 } from '../core/auth/index.js';
-import { getActiveThemeConfig } from '../ds/theme-config.js';
+import { getActiveThemeConfig, composeMetaTitle } from '../ds/theme-config.js';
 import { isDev } from '../core/env.js';
 
 let isFirstSession = false;
@@ -58,9 +58,7 @@ const adoptManagerTokenFromUrl = () => {
         } catch (_) {
             // best-effort
         }
-        url.searchParams.delete('__manager_token');
-        const next = url.pathname + (url.search ? url.search : '') + url.hash;
-        window.history.replaceState({}, '', next);
+      
         return true;
     } catch (_) {
         return false;
@@ -204,6 +202,24 @@ export const resolveHistoryBase = () => {
     return derived;
 };
 
+/**
+ * Resolve the `<title>` tag value for the current route.
+ * Reads from the active `themeConfig.pageMeta[routeName]` and falls back to brand.
+ * Returns the full composed title: "{page} · {brand}".
+ */
+const resolveDocumentTitle = (to) => {
+    try {
+        const config = getActiveThemeConfig();
+        const name = String(to?.name ?? '');
+        const meta = config?.pageMeta?.[name] ?? {};
+        const pagePart = meta.metaTitle ?? meta.title ?? '';
+        const brandPart = config?.brand?.title ?? '';
+        return composeMetaTitle(pagePart, brandPart);
+    } catch (_) {
+        return '';
+    }
+};
+
 export const createAppRouter = async (routes = []) => {
     const { createRouter, createWebHistory } = await import('vue-router');
     const base = resolveHistoryBase();
@@ -226,6 +242,23 @@ export const createAppRouter = async (routes = []) => {
     });
 
     router.beforeEach(authGuard);
+
+    // Auto-sync `document.title` from the route's pageMeta.
+    // Apps that want a custom title for a specific page can set
+    // `meta: { title: '...' }` on the route definition.
+    router.afterEach((to) => {
+        if (typeof document === 'undefined') return;
+        // Per-route override takes precedence (e.g. dynamic pages that
+        // set `meta: { title: '...' }` via `setPageTitle`).
+        const routeOverride = to?.meta?.title;
+        const resolved = typeof routeOverride === 'string' && routeOverride.trim() !== ''
+            ? routeOverride
+            : resolveDocumentTitle(to);
+        if (resolved) {
+            document.title = resolved;
+        }
+    });
+
     return router;
 };
 

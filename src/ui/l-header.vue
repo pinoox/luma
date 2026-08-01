@@ -2,7 +2,7 @@
   <header class="page-header">
     <div class="page-header__content">
       <div v-if="icon" class="page-header__icon">
-        <PIcon :name="icon" size="md" />
+        <LIcon :name="icon" size="md" />
       </div>
       <div class="page-header__text">
         <h1 class="page-header__title">{{ title }}</h1>
@@ -16,6 +16,8 @@
 </template>
 
 <script setup>
+import LIcon from './l-icon.vue';
+
 defineProps({
     title: {
         type: String,

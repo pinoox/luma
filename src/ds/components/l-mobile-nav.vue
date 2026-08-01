@@ -4,21 +4,30 @@
             :is="resolveLink(item)"
             v-for="item in items"
             :key="item.key"
-            :to="item.to ? { name: item.to } : undefined"
-            :href="item.href"
-            :class="['px-mobile-nav__item', { 'px-mobile-nav__item--active': isActive(item) }]"
+            :to="item.disabled || !item.to ? undefined : { name: item.to }"
+            :href="item.disabled ? undefined : item.href"
+            :aria-disabled="item.disabled ? 'true' : undefined"
+            :tabindex="item.disabled ? -1 : undefined"
+            :class="[
+                'px-mobile-nav__item',
+                {
+                    'px-mobile-nav__item--active': !item.disabled && isActive(item),
+                    'px-mobile-nav__item--disabled': item.disabled,
+                },
+            ]"
         >
             <span class="px-mobile-nav__icon">
-                <PIcon :name="item.icon" size="sm" />
+                <LIcon :name="item.icon" size="sm" />
             </span>
             <span class="px-mobile-nav__label">{{ item.label }}</span>
+            <span v-if="item.badge" class="px-mobile-nav__badge">{{ item.badge }}</span>
         </component>
     </nav>
 </template>
 
 <script setup>
 import { useRoute, RouterLink } from 'vue-router';
-import { PIcon } from '../../ui/index.js';
+import { LIcon } from '../../ui/index.js';
 
 defineProps({
     items: { type: Array, default: () => [] },
@@ -33,6 +42,7 @@ const isActive = (item) => {
 };
 
 const resolveLink = (item) => {
+    if (item.disabled) return 'span';
     if (item.to || item.match) return RouterLink;
     return 'a';
 };
@@ -85,6 +95,12 @@ const resolveLink = (item) => {
             color: var(--px-primary);
             font-weight: var(--px-weight-bold);
         }
+
+        &--disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
     }
 
     &__icon {
@@ -94,6 +110,13 @@ const resolveLink = (item) => {
     &__label {
         font-size: var(--px-text-xs);
         white-space: nowrap;
+    }
+
+    &__badge {
+        font-size: 9px;
+        font-weight: var(--px-weight-bold);
+        color: var(--px-text-muted);
+        line-height: 1.2;
     }
 
     @media (max-width: 768px) {

@@ -5,12 +5,12 @@ import preset from './preset.js';
 
 /**
  * Install PrimeVue with the Luma preset, toast service, and tooltip
- * directive. Also globally registers the `<PIcon>` component if the
+ * directive. Also globally registers the `<LIcon>` component if the
  * app passes one via the `IconComponent` option (recommended:
- * import `PIcon` from `@pinooxhq/luma/ui` and pass it through).
+ * import `LIcon` from `@pinooxhq/luma/ui` and pass it through).
  *
- * Apps that don't need the global `PIcon` registration can simply
- * skip the option — `<PIcon>` will resolve as an unregistered custom
+ * Apps that don't need the global `LIcon` registration can simply
+ * skip the option — `<LIcon>` will resolve as an unregistered custom
  * element if not globally registered.
  *
  * @param {import('vue').App} app
@@ -20,7 +20,7 @@ export default function setupPrimeVue(app, options = {}) {
     const { IconComponent } = options;
 
     if (IconComponent) {
-        app.component('PIcon', IconComponent);
+        app.component('LIcon', IconComponent);
     }
 
     app.use(PrimeVue, {
@@ -29,7 +29,7 @@ export default function setupPrimeVue(app, options = {}) {
         theme: {
             preset,
             options: {
-                prefix: 'p',
+                prefix: 'l',
                 darkModeSelector: '[data-theme="dark"]',
                 cssLayer: false,
             },

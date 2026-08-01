@@ -99,6 +99,7 @@ const resolveAuthBootOptions = (themeConfig, authOptions) => {
  *   AppRoot?: object,
  *   auth?: object,
  *   verifyAuth?: (ctx: { store, route, adoptedFromUrl }) => Promise<boolean>,
+ *   IconComponent?: object,
  * }} options
  *
  * Apps must supply `AppRoot` — usually the `RootShell` component
@@ -115,6 +116,7 @@ export async function createApp(options = {}) {
         AppRoot,
         auth: authOptions,
         verifyAuth,
+        IconComponent,
     } = options;
 
     if (!AppRoot) {
@@ -160,7 +162,7 @@ export async function createApp(options = {}) {
     // 4. Build the Vue app.
     const app = createVueApp(AppRoot);
 
-    setupPrimeVue(app);
+    setupPrimeVue(app, IconComponent ? { IconComponent } : undefined);
 
     // 5. Pinia — install + make active so router guards can use stores.
     if (pinia) {

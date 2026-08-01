@@ -23,12 +23,45 @@ export const findNavItemByRoute = (sections, routeName) =>
 
 /**
  * Resolve the page-meta entry for a route name with a safe fallback.
- * @param {Record<string, { title: string, lead: string, badge?: string }>} pageMeta
+ * @param {Record<string, { title: string, lead?: string, badge?: string, metaTitle?: string }>} pageMeta
  * @param {string} routeName
- * @param {{ title: string, lead: string, badge?: string }} fallback
+ * @param {{ title: string, lead: string, badge?: string, metaTitle?: string }} fallback
  */
 export const findPageMeta = (pageMeta, routeName, fallback) =>
     pageMeta?.[routeName] ?? fallback;
+
+/**
+ * Resolve the `<title>` tag value for a page.
+ *
+ * Priority:
+ *   1. pageMeta[routeName].metaTitle  — explicit override
+ *   2. pageMeta[routeName].title      — falls back to the visible title
+ *   3. brand.title                    — last-resort fallback
+ *
+ * The returned value is just the page part (e.g. "Dashboard").
+ * Use `composeMetaTitle()` to combine it with the brand suffix.
+ *
+ * @param {{ pageMeta?: object, routeName?: string, brand?: { title?: string } }} refs
+ */
+export const resolveMetaTitle = ({ pageMeta, routeName, brand } = {}) => {
+    const meta = pageMeta?.[routeName] ?? {};
+    return meta.metaTitle ?? meta.title ?? brand?.title ?? '';
+};
+
+/**
+ * Build the full `<title>` value: "{page} · {brand}".
+ * Returns just the brand title if the page part is empty.
+ *
+ * @param {string} page
+ * @param {string} brand
+ */
+export const composeMetaTitle = (page, brand) => {
+    const pagePart = (page ?? '').trim();
+    const brandPart = (brand ?? '').trim();
+    if (!pagePart) return brandPart;
+    if (!brandPart || pagePart === brandPart) return pagePart;
+    return `${pagePart} · ${brandPart}`;
+};
 
 /**
  * Compute the user display name from an auth profile object.
@@ -42,7 +75,7 @@ export const resolveUserDisplayName = (profile, fallback = '') => {
 };
 
 /**
- * Build a user-info object suitable for `PTopbar` from an auth profile.
+ * Build a user-info object suitable for `LTopbar` from an auth profile.
  * @param {object|null} profile
  * @param {string} roleLabel
  */

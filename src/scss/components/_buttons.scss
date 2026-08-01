@@ -1,0 +1,580 @@
+// ============================================================
+// Luma UI — Button System
+// ------------------------------------------------------------
+// A theme-aware, framework-grade button toolkit.
+//
+// Naming convention:
+//   luma-btn                    — required base
+//   luma-btn--{variant}         — visual treatment (solid, gradient,
+//                                 soft, outline, ghost, glass)
+//   luma-btn--{severity}        — color channel (primary, success,
+//                                 warn, danger, info, neutral)
+//   luma-btn--{size}            — xs / sm / md / lg / xl
+//   luma-btn--{shape}           — pill (default) / square / circle
+//   luma-btn--{modifier}        — icon-only, block, loading,
+//                                 spin-on-hover, icon-start, icon-end
+//
+// All colors come from semantic `--px-*` tokens so any theme can
+// re-skin every button by overriding those tokens — no markup or
+// component changes required.
+//
+// Examples:
+//   <button class="luma-btn luma-btn--gradient luma-btn--primary luma-btn--pill">
+//       <i class="pi pi-save luma-btn__icon"></i> Save
+//   </button>
+//
+//   <button class="luma-btn luma-btn--gradient luma-btn--primary
+//                  luma-btn--spin-on-hover"
+//           :class="{ 'luma-btn--loading': busy }">
+//       <i class="pi pi-refresh luma-btn__icon"></i>
+//       <ProgressSpinner class="luma-btn__spinner" />
+//       Sync
+//   </button>
+//
+//   <button class="luma-btn luma-btn--soft luma-btn--primary luma-btn--sm">
+//       Edit
+//   </button>
+//
+// Theme overrides:
+//   :root {
+//       --px-primary: #FF6B6B;
+//       --px-btn-radius: 12px;
+//       --px-btn-gradient-angle: 145deg;
+//   }
+// ============================================================
+
+@use '../tokens' as *;
+
+// ------------------------------------------------------------
+// Tokens — derived from semantic palette so themes can override
+// ------------------------------------------------------------
+:root {
+    // Shape
+    --px-btn-radius: 999px; // pill default
+    --px-btn-radius-sm: 8px;
+    --px-btn-radius-square: 6px;
+
+    // Sizing scale
+    --px-btn-height-xs: 26px;
+    --px-btn-height-sm: 30px;
+    --px-btn-height-md: 36px;
+    --px-btn-height-lg: 42px;
+    --px-btn-height-xl: 50px;
+
+    --px-btn-padding-x-xs: var(--px-space-2);
+    --px-btn-padding-x-sm: var(--px-space-3);
+    --px-btn-padding-x-md: var(--px-space-4);
+    --px-btn-padding-x-lg: var(--px-space-5);
+    --px-btn-padding-x-xl: var(--px-space-6);
+
+    --px-btn-font-size-xs: var(--px-text-xs);
+    --px-btn-font-size-sm: var(--px-text-xs);
+    --px-btn-font-size-md: var(--px-text-sm);
+    --px-btn-font-size-lg: var(--px-text-base);
+    --px-btn-font-size-xl: var(--px-text-md);
+
+    --px-btn-font-weight: #{$px-weight-semibold};
+    --px-btn-gap: var(--px-space-2);
+    --px-btn-gap-sm: var(--px-space-1);
+
+    // Gradient composition (themes can override angle or stops)
+    --px-btn-gradient-angle: 135deg;
+    --px-btn-gradient-from: var(--px-primary);
+    --px-btn-gradient-to: var(--px-primary-hover);
+
+    // Soft surface
+    --px-btn-soft-bg: color-mix(in srgb, var(--px-primary) 10%, transparent);
+    --px-btn-soft-bg-hover: color-mix(in srgb, var(--px-primary) 18%, transparent);
+    --px-btn-soft-bg-active: color-mix(in srgb, var(--px-primary) 24%, transparent);
+
+    // Outline
+    --px-btn-outline-border: color-mix(in srgb, var(--px-primary) 35%, transparent);
+    --px-btn-outline-border-hover: var(--px-primary);
+
+    // Shadow composition (used by solid & gradient variants)
+    --px-btn-shadow-rest:
+        0 6px 18px -8px color-mix(in srgb, var(--px-primary) 70%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    --px-btn-shadow-hover:
+        0 10px 24px -8px color-mix(in srgb, var(--px-primary) 80%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+
+    // Icon transition
+    --px-btn-icon-rotate-hover: 0deg; // override via --spin-on-hover modifier
+}
+
+// ------------------------------------------------------------
+// Base
+// ------------------------------------------------------------
+.luma-btn {
+    --_btn-height: var(--px-btn-height-md);
+    --_btn-padding-x: var(--px-btn-padding-x-md);
+    --_btn-font-size: var(--px-btn-font-size-md);
+    --_btn-gap: var(--px-btn-gap);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--_btn-gap);
+    height: var(--_btn-height);
+    padding: 0 var(--_btn-padding-x);
+    border: 0;
+    border-radius: var(--px-btn-radius);
+    font-family: var(--px-font-sans);
+    font-size: var(--_btn-font-size);
+    font-weight: var(--px-btn-font-weight);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    background: transparent;
+    color: inherit;
+    transition:
+        transform $px-duration-base $px-easing-standard,
+        box-shadow $px-duration-base $px-easing-standard,
+        background-color $px-duration-fast $px-easing-standard,
+        border-color $px-duration-fast $px-easing-standard,
+        color $px-duration-fast $px-easing-standard,
+        filter $px-duration-base $px-easing-standard;
+
+    &:disabled,
+    &[aria-disabled="true"] {
+        cursor: not-allowed;
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: var(--px-shadow-focus);
+    }
+
+    // --- Icon & spinner slots ---
+    .luma-btn__icon,
+    .luma-btn__spinner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: transform $px-duration-slow $px-easing-standard;
+    }
+
+    // --- Spin-on-hover modifier ---
+    &--spin-on-hover:hover:not(.luma-btn--loading):not(:disabled) .luma-btn__icon {
+        transform: rotate(var(--px-btn-icon-rotate-hover));
+    }
+
+    // --- Loading state: keep icon visible and continuously spin it.
+    //       If a custom .luma-btn__spinner is provided, swap the icon
+    //       out for that spinner instead. ---
+    &--loading {
+        cursor: progress;
+        opacity: 0.85;
+    }
+
+    &--loading .luma-btn__icon:not(.luma-btn__icon--static) {
+        animation: luma-btn-spin 1s linear infinite;
+    }
+
+    // Custom spinner slot — show in place of icon when both are provided.
+    &--loading:has(.luma-btn__spinner) .luma-btn__icon { display: none; }
+    &--loading .luma-btn__spinner { display: inline-flex; }
+    &:not(.luma-btn--loading) .luma-btn__spinner { display: none; }
+}
+
+// Continuous spin keyframe — used by --loading state and any
+// decorative spinner icon.
+@keyframes luma-btn-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+// ============================================================
+// Variants — visual treatment (composable with any severity)
+// ============================================================
+
+// --- Solid: single flat color, lifted shadow ---
+.luma-btn--solid {
+    color: var(--px-btn-on-accent, var(--px-primary-contrast));
+    background: var(--px-primary);
+    box-shadow: var(--px-btn-shadow-rest);
+
+    &:hover:not(:disabled) {
+        background: var(--px-primary-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--px-btn-shadow-hover);
+        filter: brightness(1.04);
+    }
+    &:active:not(:disabled) {
+        background: var(--px-primary-active);
+        transform: translateY(0);
+        filter: brightness(0.96);
+    }
+}
+
+// --- Gradient: 135deg hero pill, the premium look ---
+.luma-btn--gradient {
+    color: var(--px-btn-on-accent, var(--px-primary-contrast));
+    background: linear-gradient(
+        var(--px-btn-gradient-angle),
+        var(--px-btn-gradient-from) 0%,
+        var(--px-btn-gradient-to) 100%
+    );
+    box-shadow: var(--px-btn-shadow-rest);
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(
+            var(--px-btn-gradient-angle),
+            var(--px-btn-gradient-to) 0%,
+            var(--px-btn-gradient-from) 100%
+        );
+        transform: translateY(-1px);
+        box-shadow: var(--px-btn-shadow-hover);
+        filter: brightness(1.04);
+    }
+    &:active:not(:disabled) {
+        transform: translateY(0);
+        filter: brightness(0.96);
+    }
+}
+
+// --- Soft: tinted translucent fill ---
+.luma-btn--soft {
+    color: var(--px-btn-soft-fg);
+    background: var(--px-btn-soft-bg);
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+        color: var(--px-btn-soft-fg-hover);
+        background: var(--px-btn-soft-bg-hover);
+        transform: translateY(-1px);
+    }
+    &:active:not(:disabled) {
+        background: var(--px-btn-soft-bg-active);
+        transform: translateY(0);
+    }
+}
+
+// --- Outline: border only, fills on hover ---
+.luma-btn--outline {
+    color: var(--px-btn-soft-fg);
+    background: transparent;
+    border: 1px solid var(--px-btn-outline-border);
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+        color: var(--px-btn-soft-fg-hover);
+        background: var(--px-btn-soft-bg);
+        border-color: var(--px-btn-outline-border-hover);
+        transform: translateY(-1px);
+    }
+    &:active:not(:disabled) {
+        background: var(--px-btn-soft-bg-active);
+        transform: translateY(0);
+    }
+}
+
+// --- Ghost: text only, faint fill on hover ---
+.luma-btn--ghost {
+    color: var(--px-text-soft);
+    background: transparent;
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+        color: var(--px-text);
+        background: var(--px-btn-soft-bg);
+    }
+    &:active:not(:disabled) {
+        background: var(--px-btn-soft-bg-active);
+    }
+}
+
+// --- Glass: frosted glass surface ---
+.luma-btn--glass {
+    color: var(--px-text);
+    background: var(--px-glass-bg);
+    border: 1px solid var(--px-glass-border);
+    box-shadow: var(--px-glass-shadow);
+    backdrop-filter: var(--px-blur-md);
+    -webkit-backdrop-filter: var(--px-blur-md);
+
+    &:hover:not(:disabled) {
+        background: var(--px-glass-bg-strong);
+        transform: translateY(-1px);
+    }
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+// ============================================================
+// Severities — color channel (compose with any variant)
+// Default = primary. Setting a severity overrides the color
+// tokens so variants pick up the new color automatically.
+// ============================================================
+
+// Neutral — no brand color, gray/text foreground
+.luma-btn--neutral {
+    --px-primary: var(--px-text);
+    --px-primary-hover: var(--px-text);
+    --px-primary-active: var(--px-text);
+    --px-btn-soft-fg: var(--px-text);
+    --px-btn-soft-fg-hover: var(--px-text);
+}
+
+// Success
+.luma-btn--success {
+    --px-primary: var(--px-success);
+    --px-primary-hover: var(--px-success-600, var(--px-success));
+    --px-primary-active: var(--px-success-600, var(--px-success));
+    --px-btn-gradient-from: var(--px-success);
+    --px-btn-gradient-to: var(--px-success-600, var(--px-success));
+    --px-btn-soft-fg: var(--px-success-600, var(--px-success));
+    --px-btn-soft-fg-hover: var(--px-success-700, var(--px-success-600, var(--px-success)));
+}
+
+// Warn
+.luma-btn--warn {
+    --px-primary: var(--px-warning);
+    --px-primary-hover: var(--px-warning-600, var(--px-warning));
+    --px-primary-active: var(--px-warning-600, var(--px-warning));
+    --px-btn-gradient-from: var(--px-warning);
+    --px-btn-gradient-to: var(--px-warning-600, var(--px-warning));
+    --px-btn-soft-fg: var(--px-warning-600, var(--px-warning));
+    --px-btn-soft-fg-hover: var(--px-warning-700, var(--px-warning-600, var(--px-warning)));
+}
+
+// Danger
+.luma-btn--danger {
+    --px-primary: var(--px-danger);
+    --px-primary-hover: var(--px-danger-600, var(--px-danger));
+    --px-primary-active: var(--px-danger-600, var(--px-danger));
+    --px-btn-gradient-from: var(--px-danger);
+    --px-btn-gradient-to: var(--px-danger-600, var(--px-danger));
+    --px-btn-soft-fg: var(--px-danger-600, var(--px-danger));
+    --px-btn-soft-fg-hover: var(--px-danger-700, var(--px-danger-600, var(--px-danger)));
+}
+
+// Info
+.luma-btn--info {
+    --px-primary: var(--px-info);
+    --px-primary-hover: var(--px-info-500, var(--px-info));
+    --px-primary-active: var(--px-info-500, var(--px-info));
+    --px-btn-gradient-from: var(--px-info);
+    --px-btn-gradient-to: var(--px-info-500, var(--px-info));
+    --px-btn-soft-fg: var(--px-info-500, var(--px-info));
+    --px-btn-soft-fg-hover: var(--px-info-700, var(--px-info-500, var(--px-info)));
+}
+
+// Default hover fg for soft/outline/ghost (used when no severity is set)
+.luma-btn {
+    --px-btn-soft-fg: var(--px-primary);
+    --px-btn-soft-fg-hover: var(--px-primary-hover);
+}
+
+// ============================================================
+// Sizes
+// ============================================================
+.luma-btn--xs {
+    --_btn-height: var(--px-btn-height-xs);
+    --_btn-padding-x: var(--px-btn-padding-x-xs);
+    --_btn-font-size: var(--px-btn-font-size-xs);
+    --_btn-gap: var(--px-btn-gap-sm);
+}
+.luma-btn--sm {
+    --_btn-height: var(--px-btn-height-sm);
+    --_btn-padding-x: var(--px-btn-padding-x-sm);
+    --_btn-font-size: var(--px-btn-font-size-sm);
+    --_btn-gap: var(--px-btn-gap-sm);
+}
+.luma-btn--lg {
+    --_btn-height: var(--px-btn-height-lg);
+    --_btn-padding-x: var(--px-btn-padding-x-lg);
+    --_btn-font-size: var(--px-btn-font-size-lg);
+}
+.luma-btn--xl {
+    --_btn-height: var(--px-btn-height-xl);
+    --_btn-padding-x: var(--px-btn-padding-x-xl);
+    --_btn-font-size: var(--px-btn-font-size-xl);
+}
+
+// ============================================================
+// Shapes
+// ============================================================
+.luma-btn--pill {
+    --px-btn-radius: 999px;
+}
+.luma-btn--square {
+    --px-btn-radius: var(--px-btn-radius-square);
+}
+.luma-btn--rounded {
+    --px-btn-radius: var(--px-radius-md);
+}
+.luma-btn--circle {
+    --px-btn-radius: var(--px-radius-circle);
+}
+
+// ============================================================
+// Modifiers
+// ============================================================
+
+// --- Icon-only square (overrides padding) ---
+.luma-btn--icon-only {
+    width: var(--_btn-height);
+    padding: 0;
+    flex-shrink: 0;
+}
+
+// --- Block (full width) ---
+.luma-btn--block {
+    display: flex;
+    width: 100%;
+}
+
+// --- Spin-on-hover (icon rotates 180deg) ---
+.luma-btn--spin-on-hover {
+    --px-btn-icon-rotate-hover: 180deg;
+}
+
+// --- Icon position helpers ---
+.luma-btn--icon-start { flex-direction: row; }
+.luma-btn--icon-end   { flex-direction: row-reverse; }
+.luma-btn--icon-only  { flex-direction: row; }
+
+// ============================================================
+// PrimeVue bridge — apply Luma styling to PrimeVue <Button>
+// ============================================================
+// Use: <Button class="luma-btn luma-btn--gradient luma-btn--primary"
+//                label="Save" icon="pi pi-save" />
+// PrimeVue gives accessibility + Ripple; Luma gives the premium look.
+.l-button {
+    &.luma-btn,
+    &.luma-btn--solid,
+    &.luma-btn--gradient,
+    &.luma-btn--soft,
+    &.luma-btn--outline,
+    &.luma-btn--ghost,
+    &.luma-btn--glass {
+        height: var(--_btn-height);
+        padding: 0 var(--_btn-padding-x);
+        border: 0;
+        border-radius: var(--px-btn-radius);
+        color: inherit;
+        font-family: var(--px-font-sans);
+        font-size: var(--_btn-font-size);
+        font-weight: var(--px-btn-font-weight);
+        gap: var(--_btn-gap);
+
+        .l-button-icon {
+            transition: transform $px-duration-slow $px-easing-standard;
+        }
+
+        &:enabled:hover .l-button-icon {
+            transform: rotate(var(--px-btn-icon-rotate-hover));
+        }
+    }
+
+    &.luma-btn--solid,
+    &.luma-btn--gradient {
+        color: var(--px-primary-contrast);
+        box-shadow: var(--px-btn-shadow-rest);
+
+        &:enabled:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--px-btn-shadow-hover);
+            filter: brightness(1.04);
+        }
+        &:enabled:active {
+            transform: translateY(0);
+            filter: brightness(0.96);
+        }
+    }
+
+    &.luma-btn--solid {
+        background: var(--px-primary);
+        &:enabled:hover { background: var(--px-primary-hover); }
+        &:enabled:active { background: var(--px-primary-active); }
+    }
+
+    &.luma-btn--gradient {
+        background: linear-gradient(
+            var(--px-btn-gradient-angle),
+            var(--px-btn-gradient-from) 0%,
+            var(--px-btn-gradient-to) 100%
+        );
+        &:enabled:hover {
+            background: linear-gradient(
+                var(--px-btn-gradient-angle),
+                var(--px-btn-gradient-to) 0%,
+                var(--px-btn-gradient-from) 100%
+            );
+        }
+    }
+
+    &.luma-btn--soft {
+        color: var(--px-btn-soft-fg);
+        background: var(--px-btn-soft-bg);
+        box-shadow: none;
+        &:enabled:hover {
+            color: var(--px-btn-soft-fg-hover);
+            background: var(--px-btn-soft-bg-hover);
+            transform: translateY(-1px);
+        }
+    }
+
+    &.luma-btn--outline {
+        color: var(--px-btn-soft-fg);
+        background: transparent;
+        border: 1px solid var(--px-btn-outline-border);
+        box-shadow: none;
+        &:enabled:hover {
+            color: var(--px-btn-soft-fg-hover);
+            background: var(--px-btn-soft-bg);
+            border-color: var(--px-btn-outline-border-hover);
+            transform: translateY(-1px);
+        }
+    }
+
+    &.luma-btn--ghost {
+        color: var(--px-text-soft);
+        background: transparent;
+        box-shadow: none;
+        &:enabled:hover {
+            color: var(--px-text);
+            background: var(--px-btn-soft-bg);
+        }
+    }
+
+    &.luma-btn--glass {
+        color: var(--px-text);
+        background: var(--px-glass-bg);
+        border: 1px solid var(--px-glass-border);
+        box-shadow: var(--px-glass-shadow);
+        backdrop-filter: var(--px-blur-md);
+        -webkit-backdrop-filter: var(--px-blur-md);
+    }
+
+    &.luma-btn--icon-only {
+        width: var(--_btn-height);
+        padding: 0;
+    }
+
+    &.luma-btn--block {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+
+    &.luma-btn--pill       { --px-btn-radius: 999px; }
+    &.luma-btn--square     { --px-btn-radius: var(--px-btn-radius-square); }
+    &.luma-btn--rounded    { --px-btn-radius: var(--px-radius-md); }
+    &.luma-btn--circle     { --px-btn-radius: var(--px-radius-circle); }
+
+    // Size modifiers — pass through to PrimeVue's own size classes
+    &.luma-btn--xs { font-size: var(--px-btn-font-size-xs); padding: 0 var(--px-btn-padding-x-xs); }
+    &.luma-btn--sm { font-size: var(--px-btn-font-size-sm); padding: 0 var(--px-btn-padding-x-sm); }
+    &.luma-btn--lg { font-size: var(--px-btn-font-size-lg); padding: 0 var(--px-btn-padding-x-lg); }
+    &.luma-btn--xl { font-size: var(--px-btn-font-size-xl); padding: 0 var(--px-btn-padding-x-xl); }
+}

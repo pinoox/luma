@@ -1,10 +1,11 @@
 <template>
   <RouterView />
-  <Toast position="top-left" />
+  <!-- Position & dir resolve from app bootstrap (RTL → top-left). -->
+  <LToast />
 </template>
 
 <script setup>
-import Toast from 'primevue/toast';
+import { LToast } from '../ui/index.js';
 import { useTheme } from '../ds/composables/use-theme.js';
 
 const theme = useTheme();

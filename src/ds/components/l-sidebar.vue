@@ -4,7 +4,7 @@
             <slot name="brand">
                 <div class="px-sidebar__brand-default">
                     <div class="px-sidebar__brand-mark">
-                        <slot name="brand-logo">
+                        <slot name="px-sidebar__brand-markbrand-logo">
                             <img v-if="brandLogo" :src="brandLogo" :alt="brandTitle" />
                             <span v-else>{{ brandInitials }}</span>
                         </slot>
@@ -37,7 +37,7 @@
                     <span class="px-sidebar__section-label">
                         {{ collapsed ? '' : section.label }}
                     </span>
-                    <PIcon
+                    <LIcon
                         name="chevron-down"
                         size="xs"
                         class="px-sidebar__chevron"
@@ -53,12 +53,21 @@
                         :is="resolveLink(item)"
                         v-for="item in section.items"
                         :key="item.key"
-                        :to="item.to ? { name: item.to } : undefined"
-                        :href="item.href"
-                        :class="['px-sidebar__link', { 'px-sidebar__link--active': isActive(item) }]"
+                        :to="item.disabled || !item.to ? undefined : { name: item.to }"
+                        :href="item.disabled ? undefined : item.href"
+                        :aria-disabled="item.disabled ? 'true' : undefined"
+                        :tabindex="item.disabled ? -1 : undefined"
+                        :class="[
+                            'px-sidebar__link',
+                            {
+                                'px-sidebar__link--active': !item.disabled && isActive(item),
+                                'px-sidebar__link--disabled': item.disabled,
+                            },
+                        ]"
+                        @click="item.disabled ? $event.preventDefault() : undefined"
                     >
                         <span class="px-sidebar__link-icon">
-                            <PIcon :name="item.icon" size="sm" />
+                            <LIcon :name="item.icon" size="md" />
                         </span>
                         <span v-if="!collapsed" class="px-sidebar__link-text">{{ item.label }}</span>
                         <span v-if="!collapsed && item.badge" class="px-sidebar__link-badge">
@@ -78,7 +87,7 @@
 <script setup>
 import { computed, reactive } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
-import { PIcon } from '../../ui/index.js';
+import { LIcon } from '../../ui/index.js';
 
 const props = defineProps({
     brandTitle: { type: String, default: 'اپلیکیشن' },
@@ -115,6 +124,7 @@ const isActive = (item) => {
 };
 
 const resolveLink = (item) => {
+    if (item.disabled) return 'span';
     if (item.to || item.match) return RouterLink;
     return 'a';
 };
@@ -155,16 +165,16 @@ const resolveLink = (item) => {
     }
 
     &__brand-mark {
-        width: 42px;
-        height: 42px;
+        width: 48px;
+        height: 48px;
         border-radius: var(--px-radius-md);
-        background: linear-gradient(135deg, var(--px-primary), var(--px-primary-hover));
-        color: var(--px-primary-contrast);
+        background: transparent;
+        color: var(--px-primary);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-weight: var(--px-weight-bold);
-        font-size: var(--px-text-md);
+        font-size: var(--px-text-lg);
         flex-shrink: 0;
         overflow: hidden;
 
@@ -182,7 +192,7 @@ const resolveLink = (item) => {
         line-height: var(--px-leading-snug);
 
         strong {
-            font-size: var(--px-text-md);
+            font-size: var(--px-text-lg);
             font-weight: var(--px-weight-bold);
             color: var(--px-text);
             white-space: nowrap;
@@ -191,7 +201,7 @@ const resolveLink = (item) => {
         }
 
         span {
-            font-size: var(--px-text-xs);
+            font-size: var(--px-text-sm);
             color: var(--px-text-muted);
             white-space: nowrap;
             overflow: hidden;
@@ -210,7 +220,7 @@ const resolveLink = (item) => {
     &__section {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
 
         &--collapsed &__section-items {
             display: none;
@@ -267,11 +277,11 @@ const resolveLink = (item) => {
         display: flex;
         align-items: center;
         gap: var(--px-space-3);
-        padding: 9px 12px;
+        padding: 12px 14px;
         border-radius: var(--px-radius-md);
         color: var(--px-text-soft);
         font-family: var(--px-font-sans);
-        font-size: var(--px-text-sm);
+        font-size: var(--px-text-md);
         font-weight: var(--px-weight-semibold);
         text-decoration: none;
         cursor: pointer;
@@ -289,9 +299,26 @@ const resolveLink = (item) => {
             font-weight: var(--px-weight-bold);
         }
 
+        &--disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+            color: var(--px-text-muted);
+
+            &:hover {
+                background: transparent;
+                color: var(--px-text-muted);
+            }
+
+            .px-sidebar__link-badge {
+                background: var(--px-surface-muted);
+                color: var(--px-text-muted);
+            }
+        }
+
         &-icon {
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             display: inline-flex;
             align-items: center;
             justify-content: center;

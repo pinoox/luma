@@ -2,7 +2,7 @@
     <div class="px-empty-state">
         <div v-if="icon || $slots.icon" class="px-empty-state__icon">
             <slot name="icon">
-                <PIcon v-if="icon" :name="icon" size="lg" />
+                <LIcon v-if="icon" :name="icon" size="lg" />
             </slot>
         </div>
         <h3 v-if="title" class="px-empty-state__title">{{ title }}</h3>
@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { PIcon } from '../../ui/index.js';
+import { LIcon } from '../../ui/index.js';
 
 defineProps({
     icon: { type: String, default: '' },

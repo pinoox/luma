@@ -5,6 +5,50 @@ All notable changes to `@pinooxhq/luma` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-08-01
+
+### Added
+- **`LButton`** — themed button with `variant` (`solid` | `gradient` | `soft` | `outline` | `ghost` | `glass`), `severity` (`primary` | `neutral` | `success` | `warn` | `danger` | `info`), `size` (`xs` | `sm` | `md` | `lg` | `xl`), `shape` (`pill` | `square` | `rounded` | `circle`), and `icon-only` / `loading` / `spin-on-hover` modifiers. Pairs with PrimeVue's Button but with the Luma variant/severity/size system. Available from `@pinooxhq/luma/ui`.
+- **`LField`** — form-field wrapper with `label`, `hint`, `error`, and a default slot that accepts any input (PrimeVue or custom). Replaces the previous ad-hoc `<label>` + `<InputText>` pattern. Available from `@pinooxhq/luma/ui`.
+- **`LPageHeader`** — modern page header with `eyebrow`, `title`, `lead`, and `icon` props. Replaces the older `LHeader` for new pages. Available from `@pinooxhq/luma/ui`.
+- **`LPageToolbar`** — sticky toolbar for page-level actions. Right-aligned slot for buttons. Available from `@pinooxhq/luma/ui`.
+- **`LPageContainer`** — wraps a page in the configured `pageMaxWidth` token and handles gutters. Available from `@pinooxhq/luma/ui`.
+- **`LSpinner`** — loading spinner with `size` and `center` props, plus a `Loading states — composed` recipe for spinner+text+fullscreen variants. Available from `@pinooxhq/luma/ui`.
+- **`LToast`** — per-page toast mount. The global `<Toast>` is still auto-mounted by `RootShell`; `LToast` is for in-page toasts. Available from `@pinooxhq/luma/ui`.
+- **`LToolbar`** — horizontal toolbar for filter/action rows. Slots for leading/trailing content. Available from `@pinooxhq/luma/ui`.
+- **`LEmptyPanel`** — "no data" placeholder with icon, title, description, and CTA slot. Available from `@pinooxhq/luma/ui`. **Replaces `LEmptyState`.**
+- **New SCSS partials** — `src/scss/components/_buttons.scss` and `src/scss/components/_utilities.scss` extracted from the monolithic styles bundle. Luma's `.luma-btn--*` class system is now in its own file; utilities (`.luma-cluster`, `.luma-stack`, `.luma-section`, …) live alongside.
+- **`docs/README.md`** — full component catalog (983 lines) with per-component props, slots, examples, and "when to use what" decision tables. Linked from the root `README.md`.
+
+### Changed
+- **Breaking rename:** every `src/ui/*.vue` component gained the `l-` prefix. `src/ui/header.vue` → `src/ui/l-header.vue`, `src/ui/icon.vue` → `src/ui/l-icon.vue`, `src/ui/view.vue` → `src/ui/l-view.vue`. The `src/ds/components/*.vue` files mirror this with the same prefix (`badge.vue` → `l-badge.vue`, `card.vue` → `l-card.vue`, etc.). Apps that import by path (`@pinooxhq/luma/ui/header`) must update to `@pinooxhq/luma/ui/l-header`.
+- **Breaking rename:** `LEmptyState` → `LEmptyPanel`. The `LEmptyState` import from `@pinooxhq/luma/ds` continues to work as a deprecated alias for one release and will be removed in `0.4.0`. New code should import `LEmptyPanel` from `@pinooxhq/luma/ui`.
+- **Breaking rename:** `src/ds/components/empty-state.vue` → `src/ds/components/l-empty-state.vue`. Same deprecated-alias behaviour for the file path.
+- **`src/ds/index.js` and `src/ds/theme-config.js`** updated for the new component naming and the new `LEmptyPanel` export.
+- **README.md** — components table expanded to all 14 Luma components, subpath exports table updated, install command now includes `lucide-vue-next` and `sass --save-dev`. Added a pointer to `docs/README.md` for the full reference.
+- **Install hint** — `sass` is no longer a runtime dependency of Luma; apps must install it under `devDependencies` to compile `@pinooxhq/luma/styles`. The README install command reflects this.
+
+### Migration (from 0.2.0)
+
+```diff
+- import { LEmptyState } from '@pinooxhq/luma/ds';
++ import { LEmptyPanel } from '@pinooxhq/luma/ui';
+```
+
+```diff
+- import LHeader from '@pinooxhq/luma/ui/header.vue';
++ import { LHeader } from '@pinooxhq/luma/ui';   // barrel now exports it
+```
+
+```jsonc
+// package.json — your app
+{
+  "devDependencies": {
++   "sass": "^1.100.0"
+  }
+}
+```
+
 ## [0.2.0] — 2026-07-30
 
 ### Added

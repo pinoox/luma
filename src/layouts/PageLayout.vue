@@ -1,7 +1,7 @@
 <template>
     <div class="px-layout" dir="rtl">
         <aside class="px-layout__sidebar">
-            <PSidebar
+            <LSidebar
                 :brand-title="brand.title"
                 :brand-subtitle="brand.subtitle"
                 :brand-logo="brand.logo"
@@ -10,7 +10,7 @@
         </aside>
 
         <div class="px-layout__main">
-            <PTopbar
+            <LTopbar
                 :title="pageTitle"
                 :subtitle="pageLead"
                 :user="userInfo"
@@ -18,7 +18,7 @@
                 @user-click="handleUserClick"
             />
 
-            <PMobileNav class="px-layout__mobile-nav" :items="mobileNavItems" />
+            <LMobileNav class="px-layout__mobile-nav" :items="mobileNavItems" />
 
             <main class="px-layout__content">
                 <RouterView />
@@ -33,7 +33,7 @@
             <template #header>
                 <strong>{{ brand.title }}</strong>
             </template>
-            <PSidebar
+            <LSidebar
                 :brand-title="brand.title"
                 :brand-subtitle="brand.subtitle"
                 :brand-logo="brand.logo"
@@ -46,7 +46,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import Drawer from 'primevue/drawer';
-import { PSidebar, PTopbar, PMobileNav } from '../ds/index.js';
+import { LSidebar, LTopbar, LMobileNav } from '../ds/index.js';
 import { useAuthStore } from '../core/auth/index.js';
 import { usePage } from '../composables/use-page.js';
 import { getActiveThemeConfig, flattenNavItems, buildUserInfo } from '../ds/theme-config.js';

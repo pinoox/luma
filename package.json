@@ -1,6 +1,6 @@
 {
   "name": "@pinooxhq/luma",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Luma — A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
   "type": "module",
   "main": "./exports/index.js",
@@ -94,6 +94,16 @@
     "**/*.vue",
     "./src/fonts/vazir.js"
   ],
+  "peerDependencies": {
+    "@pinooxhq/auth": "^0.1.0",
+    "@primeuix/themes": "^1.2.1",
+    "axios": "^1.16.1",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^3.0.4",
+    "primevue": "^4.3.6",
+    "vue": "^3.5.35",
+    "vue-router": "^5.1.0"
+  },
   "dependencies": {
     "@pinooxhq/auth": "^0.1.0",
     "@primeuix/themes": "^1.2.1",
@@ -102,16 +112,6 @@
     "pinia": "^3.0.4",
     "primevue": "^4.3.6",
     "sass": "^1.100.0",
-    "vue": "^3.5.35",
-    "vue-router": "^5.1.0"
-  },
-  "peerDependencies": {
-    "@pinooxhq/auth": "^0.1.0",
-    "@primeuix/themes": "^1.2.1",
-    "axios": "^1.16.1",
-    "lucide-vue-next": "^1.0.0",
-    "pinia": "^3.0.4",
-    "primevue": "^4.3.6",
     "vue": "^3.5.35",
     "vue-router": "^5.1.0"
   },

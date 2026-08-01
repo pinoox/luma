@@ -9,7 +9,7 @@
     >
         <span class="px-theme-toggle__track">
             <span class="px-theme-toggle__thumb">
-                <PIcon :name="isDark ? 'moon' : 'sun'" size="sm" />
+                <LIcon :name="isDark ? 'moon' : 'sun'" size="sm" />
             </span>
         </span>
     </button>
@@ -17,7 +17,7 @@
 
 <script setup>
 import { computed, inject } from 'vue';
-import { PIcon } from '../../ui/index.js';
+import { LIcon } from '../../ui/index.js';
 
 const theme = inject('theme', null);
 

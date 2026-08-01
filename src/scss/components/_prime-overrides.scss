@@ -1,14 +1,14 @@
 @use '../tokens/index.scss' as *;
 
-.p-button,
-.p-tab,
-.p-tabview-nav-link,
-.p-select-label,
-.p-multiselect-label,
-.p-checkbox-input,
-.p-radiobutton-input,
-.p-dialog-header-actions .p-button,
-.p-paginator .p-button {
+.l-button,
+.l-tab,
+.l-tabview-nav-link,
+.l-select-label,
+.l-multiselect-label,
+.l-checkbox-input,
+.l-radiobutton-input,
+.l-dialog-header-actions .l-button,
+.l-paginator .l-button {
   &:focus,
   &:focus-visible {
     outline: none;
@@ -17,23 +17,153 @@
 }
 
 .tabs-container__tab,
-.p-data-table__link,
-.p-data-table__status-menu-trigger {
+.l-data-table__link,
+.l-data-table__status-menu-trigger {
   &:focus,
   &:focus-visible {
     outline: none;
   }
 }
 
-.p-datatable-mask {
+.l-datatable-mask {
   --px-mask-background: rgba(255, 255, 255, 0.72);
   background: rgba(255, 255, 255, 0.72) !important;
   backdrop-filter: var(--px-blur-sm);
   -webkit-backdrop-filter: var(--px-blur-sm);
   border-radius: var(--px-radius-md);
 
-  &.p-overlay-mask-enter-active,
-  &.p-overlay-mask-leave-active {
+  &.l-overlay-mask-enter-active,
+  &.l-overlay-mask-leave-active {
     animation: none;
   }
+}
+
+// PrimeVue ProgressSpinner — theme-aware default. Sets a sensible size,
+// centers inside its container, and sources its color from `--px-primary`
+// so it inherits the active brand. The PrimeVue Aura preset ships its own
+// `p-progressspinner-color` keyframe that cycles the stroke through 4
+// colors; CSS animations always win over static declarations while running,
+// so we neutralize the cycle by overriding `animation-name` to drop just
+// that keyframe (the rest of the animation stays intact).
+//
+// Note: `p-progressspinner-rotate` rotates the parent SVG
+// (`.p-progressspinner-spin`); it must NOT be applied to the circle or
+// the circle will double-rotate inside its parent and render broken —
+// we only keep the dash animation on the circle.
+//
+// We target BOTH the `p-` and `l-` prefixes because the configured theme
+// prefix (`l` in Luma) only renames CSS variables — PrimeVue's class
+// names and `@keyframes` references remain hardcoded with `p-`. The
+// selectors below cover both so the override sticks no matter which
+// Luma-internal rename pipeline is active.
+//
+// Override per-instance with the `.luma-spinner` modifier classes below.
+.p-progressspinner,
+.l-progressspinner {
+  // PrimeVue injects these styles at runtime via a `<style>` tag — that
+  // tag lands AFTER our Luma CSS, so without `!important` PrimeVue's
+  // 100×100 default reclaims the slot. Force brand sizing here.
+  width: var(--luma-spinner-size, 36px) !important;
+  height: var(--luma-spinner-size, 36px) !important;
+  margin: auto;
+  display: inline-block;
+}
+
+.p-progressspinner-circle,
+.l-progressspinner-circle {
+  // Keep ONLY the stroke-dash keyframe. Drop the color cycle so the brand
+  // color wins. Use longhand properties so we only override what we mean.
+  // The keyframe name itself is owned by PrimeVue and is unaffected by
+  // our theme prefix, so it still starts with `p-`.
+  animation-name: p-progressspinner-dash !important;
+  animation-duration: 1.5s !important;
+  animation-timing-function: ease-in-out !important;
+  animation-iteration-count: infinite !important;
+
+  stroke: var(--luma-spinner-color, var(--px-primary)) !important;
+  stroke-width: var(--luma-spinner-stroke, 4) !important;
+}
+
+// Sized variants — opt-in modifiers on the host element.
+.luma-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // Color tokens — set --luma-spinner-color to override.
+  &--primary  { --luma-spinner-color: var(--px-primary); }
+  &--neutral  { --luma-spinner-color: var(--px-text-muted); }
+  &--success  { --luma-spinner-color: var(--px-success); }
+  &--warn     { --luma-spinner-color: var(--px-warning); }
+  &--danger   { --luma-spinner-color: var(--px-danger); }
+  &--info     { --luma-spinner-color: var(--px-info); }
+
+  // Size tokens.
+  &--xs { --luma-spinner-size: 16px; --luma-spinner-stroke: 3; }
+  &--sm { --luma-spinner-size: 24px; --luma-spinner-stroke: 4; }
+  &--md { --luma-spinner-size: 36px; --luma-spinner-stroke: 4; }
+  &--lg { --luma-spinner-size: 56px; --luma-spinner-stroke: 5; }
+  &--xl { --luma-spinner-size: 80px; --luma-spinner-stroke: 6; }
+}
+
+// ============================================================
+// PrimeVue Button — keep Luma variants on top
+// ------------------------------------------------------------
+// Same root cause as the spinner: PrimeVue injects component CSS
+// at runtime AFTER Luma's bundle. LButton now also passes
+// `outlined` / `text` to PrimeVue, but we still force Luma's own
+// classes with `!important` so a missed prop or hover state can't
+// paint a solid primary fill over outline/ghost/soft/glass.
+// ============================================================
+
+.luma-btn--outline {
+  background: transparent !important;
+  border: 1px solid var(--px-btn-outline-border) !important;
+  color: var(--px-btn-soft-fg) !important;
+  box-shadow: none !important;
+
+  &:enabled:hover,
+  &:hover:not(:disabled) {
+    background: var(--px-btn-soft-bg) !important;
+    border-color: var(--px-btn-outline-border-hover) !important;
+    color: var(--px-btn-soft-fg-hover) !important;
+  }
+  &:enabled:active,
+  &:active:not(:disabled) {
+    background: var(--px-btn-soft-bg-active) !important;
+  }
+}
+
+.luma-btn--soft {
+  background: var(--px-btn-soft-bg) !important;
+  border-color: transparent !important;
+  color: var(--px-btn-soft-fg) !important;
+  box-shadow: none !important;
+}
+
+.luma-btn--ghost {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--px-text-soft) !important;
+  box-shadow: none !important;
+}
+
+.luma-btn--glass {
+  background: var(--px-glass-bg) !important;
+  border: 1px solid var(--px-glass-border) !important;
+  color: var(--px-text) !important;
+}
+
+// Also neutralize PrimeVue's own outlined/text classes when present.
+.p-button-outlined,
+.l-button-outlined {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.p-button-text,
+.l-button-text {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }

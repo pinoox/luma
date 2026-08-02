@@ -1,0 +1,50 @@
+// ============================================================
+// Token bridges — keep app / legacy CSS theme-aware with zero work.
+//
+// Luma owns surfaces via `--px-*` (flipped by `[data-theme="dark"]`).
+// PrimeVue is configured with prefix `l` (`--l-content-background`).
+// Many apps still write `var(--p-content-background, #fff)` which
+// silently falls back to white in dark mode.
+//
+// These aliases make `--p-*` (and a few common `--l-*` semantic
+// names) resolve through `--px-*`, so cards/panels follow theme
+// settings without per-template overrides.
+// ============================================================
+
+:root {
+  // Surfaces / content
+  --p-content-background: var(--px-surface-strong);
+  --p-content-hover-background: var(--px-surface-muted);
+  --p-content-border-color: var(--px-border);
+  --p-surface-ground: var(--px-bg);
+  --p-surface-section: var(--px-bg-alt);
+  --p-surface-card: var(--px-surface-strong);
+  --p-surface-overlay: var(--px-surface-strong);
+  --p-surface-border: var(--px-border);
+  --p-surface-hover: var(--px-surface-muted);
+
+  // Text
+  --p-text-color: var(--px-text);
+  --p-text-muted-color: var(--px-text-muted);
+  --p-text-hover-color: var(--px-text);
+  --p-text-secondary-color: var(--px-text-soft);
+
+  // Brand
+  --p-primary-color: var(--px-primary);
+  --p-primary-contrast-color: var(--px-primary-contrast);
+  --p-primary-50: var(--px-primary-soft);
+
+  // Status (PrimeVue semantic names used by apps)
+  --p-green-500: var(--px-success);
+  --p-red-500: var(--px-danger);
+  --p-yellow-500: var(--px-warning);
+  --p-blue-500: var(--px-info);
+
+  // Also keep `--l-*` content aliases aligned when theme tokens change
+  // at runtime via applyThemeConfig (PrimeVue still owns most `--l-*`).
+  --luma-panel-bg: var(--px-surface-strong);
+  --luma-panel-border: var(--px-border);
+  --luma-panel-fg: var(--px-text);
+  --luma-panel-muted: var(--px-text-muted);
+  --luma-panel-hover: var(--px-surface-muted);
+}

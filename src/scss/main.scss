@@ -13,6 +13,7 @@
 // or `.l-button` overrides here.
 
 @use './tokens/index.scss';
+@use './tokens/bridges';
 @use './vazir';
 @use './base';
 @use './layouts/layout';
@@ -20,3 +21,4 @@
 @use './components/lucide-icon';
 @use './components/buttons';
 @use './components/utilities';
+@use './components/surfaces';

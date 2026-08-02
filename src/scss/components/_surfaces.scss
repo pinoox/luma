@@ -1,0 +1,41 @@
+// Theme-aware surface utilities — follow `--px-*` in light/dark.
+
+.luma-panel,
+.luma-surface {
+    background: var(--luma-panel-bg, var(--px-surface-strong));
+    border: 1px solid var(--luma-panel-border, var(--px-border));
+    color: var(--luma-panel-fg, var(--px-text));
+    border-radius: var(--px-radius-lg);
+}
+
+.luma-panel--muted,
+.luma-surface--muted {
+    background: var(--px-surface-muted);
+}
+
+.luma-panel--glass,
+.luma-surface--glass {
+    background: var(--px-glass-bg);
+    border-color: var(--px-glass-border);
+    box-shadow: var(--px-glass-shadow);
+    backdrop-filter: var(--px-blur-md);
+    -webkit-backdrop-filter: var(--px-blur-md);
+}
+
+// Raw PrimeVue Card (apps that import Card directly, not LCard)
+.p-card,
+.l-card {
+    background: var(--px-surface-strong) !important;
+    border-color: var(--px-border) !important;
+    color: var(--px-text);
+}
+
+.p-card .p-card-title,
+.l-card .l-card-title {
+    color: var(--px-text);
+}
+
+.p-card .p-card-subtitle,
+.l-card .l-card-subtitle {
+    color: var(--px-text-muted);
+}

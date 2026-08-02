@@ -12,55 +12,64 @@
       <LIcon v-if="showIcon" name="calendar" size="sm" class="luma-datepicker__icon" />
     </button>
 
-    <div v-if="open" class="luma-datepicker__panel" role="dialog">
-      <template v-if="calendar === 'jalali'">
-        <div class="luma-datepicker__nav">
-          <button type="button" class="luma-datepicker__nav-btn" @click="shiftMonth(-1)">
-            <LIcon name="chevron-right" size="sm" />
-          </button>
-          <strong>{{ monthTitle }}</strong>
-          <button type="button" class="luma-datepicker__nav-btn" @click="shiftMonth(1)">
-            <LIcon name="chevron-left" size="sm" />
-          </button>
+    <Teleport to="body">
+      <div
+        v-if="open"
+        ref="panelEl"
+        class="luma-datepicker__panel"
+        :class="{ 'is-above': placement === 'above' }"
+        role="dialog"
+        :style="panelStyle"
+      >
+        <template v-if="calendar === 'jalali'">
+          <div class="luma-datepicker__nav">
+            <button type="button" class="luma-datepicker__nav-btn" @click="shiftMonth(-1)">
+              <LIcon name="chevron-right" size="sm" />
+            </button>
+            <strong>{{ monthTitle }}</strong>
+            <button type="button" class="luma-datepicker__nav-btn" @click="shiftMonth(1)">
+              <LIcon name="chevron-left" size="sm" />
+            </button>
+          </div>
+          <div class="luma-datepicker__weekdays">
+            <span v-for="d in JALALI_WEEKDAYS" :key="d">{{ d }}</span>
+          </div>
+          <div class="luma-datepicker__grid">
+            <button
+              v-for="(cell, idx) in grid"
+              :key="idx"
+              type="button"
+              class="luma-datepicker__day"
+              :class="{
+                'is-outside': !cell.inMonth,
+                'is-today': cell.isToday,
+                'is-selected': isSelected(cell.date),
+              }"
+              @click="selectDate(cell.date)"
+            >
+              {{ digit(cell.jd) }}
+            </button>
+          </div>
+        </template>
+        <div v-else class="luma-datepicker__gregorian">
+          <DatePicker
+            :model-value="modelValue"
+            inline
+            :manual-input="false"
+            @update:model-value="onGregorianPick"
+          />
         </div>
-        <div class="luma-datepicker__weekdays">
-          <span v-for="d in JALALI_WEEKDAYS" :key="d">{{ d }}</span>
+        <div class="luma-datepicker__footer">
+          <button type="button" class="luma-datepicker__link" @click="clear">پاک کردن</button>
+          <button type="button" class="luma-datepicker__link" @click="pickToday">امروز</button>
         </div>
-        <div class="luma-datepicker__grid">
-          <button
-            v-for="(cell, idx) in grid"
-            :key="idx"
-            type="button"
-            class="luma-datepicker__day"
-            :class="{
-              'is-outside': !cell.inMonth,
-              'is-today': cell.isToday,
-              'is-selected': isSelected(cell.date),
-            }"
-            @click="selectDate(cell.date)"
-          >
-            {{ digit(cell.jd) }}
-          </button>
-        </div>
-      </template>
-      <div v-else class="luma-datepicker__gregorian">
-        <DatePicker
-          :model-value="modelValue"
-          inline
-          :manual-input="false"
-          @update:model-value="onGregorianPick"
-        />
       </div>
-      <div class="luma-datepicker__footer">
-        <button type="button" class="luma-datepicker__link" @click="clear">پاک کردن</button>
-        <button type="button" class="luma-datepicker__link" @click="pickToday">امروز</button>
-      </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import DatePicker from 'primevue/datepicker';
 import LIcon from './l-icon.vue';
 import {
@@ -73,6 +82,10 @@ import {
     toJalali,
     toPersianDigits,
 } from '../core/format/jalali.js';
+
+const PANEL_GAP = 6;
+const PANEL_WIDTH = 280;
+const PANEL_EST_HEIGHT = 320;
 
 const props = defineProps({
     modelValue: { type: [Date, String, Number], default: null },
@@ -91,6 +104,9 @@ const emit = defineEmits(['update:modelValue']);
 
 const open = ref(false);
 const rootEl = ref(null);
+const panelEl = ref(null);
+const placement = ref('below');
+const panelStyle = ref({});
 const viewJy = ref(1404);
 const viewJm = ref(1);
 
@@ -125,10 +141,59 @@ const digit = (n) => (props.persianDigits ? toPersianDigits(n) : String(n));
 
 const isSelected = (date) => isSameDay(date, props.modelValue);
 
-const toggle = () => {
+const updatePosition = () => {
+    const trigger = rootEl.value;
+    if (!trigger) return;
+
+    const rect = trigger.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const panelHeight = panelEl.value?.offsetHeight || PANEL_EST_HEIGHT;
+    const panelWidth = Math.max(PANEL_WIDTH, rect.width);
+
+    const spaceBelow = vh - rect.bottom - PANEL_GAP;
+    const spaceAbove = rect.top - PANEL_GAP;
+    const preferAbove = spaceBelow < panelHeight && spaceAbove > spaceBelow;
+    placement.value = preferAbove ? 'above' : 'below';
+
+    let top = preferAbove
+        ? rect.top - PANEL_GAP - panelHeight
+        : rect.bottom + PANEL_GAP;
+
+    // Clamp vertically if still overflowing viewport
+    top = Math.min(Math.max(8, top), vh - Math.min(panelHeight, vh - 16) - 8);
+
+    // Prefer aligning to the inline-start of the trigger (RTL-aware via left/right)
+    const isRtl = getComputedStyle(document.documentElement).direction === 'rtl'
+        || getComputedStyle(trigger).direction === 'rtl';
+
+    let left;
+    if (isRtl) {
+        left = rect.right - panelWidth;
+    } else {
+        left = rect.left;
+    }
+    left = Math.min(Math.max(8, left), vw - panelWidth - 8);
+
+    panelStyle.value = {
+        position: 'fixed',
+        top: `${Math.round(top)}px`,
+        left: `${Math.round(left)}px`,
+        width: `${Math.round(panelWidth)}px`,
+        zIndex: 12000,
+    };
+};
+
+const toggle = async () => {
     if (props.disabled) return;
     open.value = !open.value;
-    if (open.value) syncViewFromValue();
+    if (open.value) {
+        syncViewFromValue();
+        await nextTick();
+        updatePosition();
+        // Re-measure after paint (real panel height)
+        requestAnimationFrame(updatePosition);
+    }
 };
 
 const shiftMonth = (delta) => {
@@ -174,13 +239,26 @@ const pickToday = () => {
 
 const onDocClick = (e) => {
     if (!open.value) return;
-    if (rootEl.value && !rootEl.value.contains(e.target)) {
-        open.value = false;
-    }
+    const t = e.target;
+    if (rootEl.value?.contains(t) || panelEl.value?.contains(t)) return;
+    open.value = false;
 };
 
-onMounted(() => document.addEventListener('mousedown', onDocClick));
-onBeforeUnmount(() => document.removeEventListener('mousedown', onDocClick));
+const onReposition = () => {
+    if (open.value) updatePosition();
+};
+
+onMounted(() => {
+    document.addEventListener('mousedown', onDocClick);
+    window.addEventListener('resize', onReposition);
+    window.addEventListener('scroll', onReposition, true);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('mousedown', onDocClick);
+    window.removeEventListener('resize', onReposition);
+    window.removeEventListener('scroll', onReposition, true);
+});
 </script>
 
 <style lang="scss">
@@ -220,16 +298,13 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onDocClick));
     }
 
     &__panel {
-        position: absolute;
-        z-index: 40;
-        inset-inline-start: 0;
-        top: calc(100% + 6px);
         min-width: 280px;
         padding: 0.75rem;
         border-radius: 16px;
         background: var(--px-surface-strong, #fff);
         border: 1px solid var(--px-border, #e2e8f0);
         box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+        box-sizing: border-box;
     }
 
     &__nav {

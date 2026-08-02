@@ -60,9 +60,12 @@ defineProps({
     align-items: flex-start;
     padding: var(--px-space-4) calc(var(--px-space-4) + 2px);
     border-radius: var(--px-radius-lg);
-    background: var(--px-surface-strong);
-    border: 1px solid var(--px-border);
+    background: color-mix(in srgb, var(--px-surface-strong) 78%, transparent);
+    border: 1px solid color-mix(in srgb, var(--px-border) 80%, transparent);
     color: var(--px-text);
+    backdrop-filter: blur(12px) saturate(1.15);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 28%, transparent);
     transition:
         transform $px-duration-base $px-easing-standard,
         box-shadow $px-duration-base $px-easing-standard,
@@ -115,8 +118,16 @@ defineProps({
         display: grid;
         place-items: center;
         flex-shrink: 0;
-        background: var(--luma-stat-accent);
-        color: var(--luma-stat-accent-fg);
+        color: var(--luma-stat-accent);
+        background: linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--luma-stat-accent) 22%, transparent),
+            color-mix(in srgb, var(--luma-stat-accent) 8%, var(--px-surface-strong))
+        );
+        border: 1px solid color-mix(in srgb, var(--luma-stat-accent) 24%, transparent);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent);
     }
 
     &__body {

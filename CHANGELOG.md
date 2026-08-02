@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Direction detection** — `resolveDirection()` / `applyDocumentDirection()` sync `<html dir>` and PrimeVue `rtl` from `themeConfig.direction` → `<html dir>` → `__PINOOX__.direction` → `ltr`. Teleported Select/DatePicker/Menu overlays inherit RTL via Luma SCSS (no per-app CSS needed).
+- **`LConfirmDialog` RTL** — teleported confirm card sets `dir` from `resolveDirection()` so icon/title/message/actions flip correctly in RTL apps.
 
 ### Changed
 - **`LSidebar` section labels** — section `label` is a static heading by default (matches overview-style grouping). Accordion behaviour is opt-in via `collapsible: true` (with optional `defaultCollapsed`).

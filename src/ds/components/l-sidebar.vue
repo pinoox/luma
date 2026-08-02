@@ -46,6 +46,13 @@
                 </button>
 
                 <div
+                    v-else-if="hasHeading(section)"
+                    class="px-sidebar__section-heading"
+                >
+                    {{ section.label }}
+                </div>
+
+                <div
                     v-show="!isCollapsible(section) || !collapsedSections[section.key]"
                     class="px-sidebar__section-items"
                 >
@@ -101,7 +108,7 @@ const route = useRoute();
 const collapsedSections = reactive({});
 
 props.sections.forEach((section) => {
-    if (section.defaultCollapsed && section.key) {
+    if (section.collapsible === true && section.defaultCollapsed && section.key) {
         collapsedSections[section.key] = true;
     }
 });
@@ -111,7 +118,10 @@ const brandInitials = computed(() => {
     return (source || 'PX').slice(0, 2);
 });
 
-const isCollapsible = (section) => section.collapsible !== false && Boolean(section.label);
+/** Opt-in: only collapse when `collapsible: true`. Otherwise the label is a static heading. */
+const isCollapsible = (section) => section.collapsible === true && Boolean(section.label);
+
+const hasHeading = (section) => Boolean(section.label) && !isCollapsible(section) && !props.collapsed;
 
 const toggleSection = (key) => {
     collapsedSections[key] = !collapsedSections[key];
@@ -213,7 +223,7 @@ const resolveLink = (item) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: var(--px-space-2);
+        gap: var(--px-space-4);
         min-height: 0;
     }
 
@@ -225,6 +235,16 @@ const resolveLink = (item) => {
         &--collapsed &__section-items {
             display: none;
         }
+    }
+
+    &__section-heading {
+        padding: 4px 12px 2px;
+        color: var(--px-text-muted);
+        font-family: var(--px-font-sans);
+        font-size: var(--px-text-xs);
+        font-weight: var(--px-weight-bold);
+        line-height: var(--px-leading-snug);
+        user-select: none;
     }
 
     &__section-toggle {

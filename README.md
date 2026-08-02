@@ -238,14 +238,14 @@ export const themeConfig = {
   nav: {
     sections: [
       {
-        key: 'overview', label: 'نمای کلی', collapsible: true,
+        key: 'overview', label: 'نمای کلی',
         items: [
           { key: 'dashboard', label: 'داشبورد', icon: 'layout-dashboard', route: 'shop.dashboard' },
           { key: 'reports',   label: 'گزارش‌ها', icon: 'line-chart',       route: 'shop.reports' },
         ],
       },
       {
-        key: 'catalog', label: 'کاتالوگ', collapsible: true,
+        key: 'catalog', label: 'کاتالوگ',
         items: [
           { key: 'products',   label: 'محصولات',      icon: 'package',     route: 'shop.products' },
           { key: 'categories', label: 'دسته‌بندی‌ها',  icon: 'folder-tree', route: 'shop.categories' },
@@ -253,7 +253,7 @@ export const themeConfig = {
         ],
       },
       {
-        key: 'sales', label: 'فروش', collapsible: true,
+        key: 'sales', label: 'فروش',
         items: [
           { key: 'orders',    label: 'سفارش‌ها', icon: 'shopping-cart', route: 'shop.orders' },
           { key: 'customers', label: 'مشتریان',  icon: 'users',         route: 'shop.customers' },
@@ -261,7 +261,7 @@ export const themeConfig = {
         ],
       },
       {
-        key: 'settings', label: 'تنظیمات', collapsible: true,
+        key: 'settings', label: 'تنظیمات',
         items: [
           { key: 'settings', label: 'عمومی', icon: 'settings', route: 'shop.settings' },
           { key: 'team',     label: 'تیم',   icon: 'user-cog', route: 'shop.team' },
@@ -393,7 +393,7 @@ The shape `createApp` expects:
 ```ts
 {
   brand:    { title, subtitle?, logo? },
-  nav:      { sections: Array<{ key, label, items, collapsible?, defaultCollapsed? }> },
+  nav:      { sections: Array<{ key, label, items, collapsible?, defaultCollapsed? }> }, // label is a static heading; set collapsible:true to enable accordion
   pageMeta: Record<string, { title, lead?, badge? }>,
   user:     { roleLabel },
   font?:    { sans?, mono? },

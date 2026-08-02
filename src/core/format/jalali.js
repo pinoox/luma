@@ -1,13 +1,8 @@
 /**
  * Jalali (Persian) calendar helpers for Luma.
- * Uses jalaali-js for conversions; week starts on Saturday.
+ * Uses moment-jalaali; week starts on Saturday.
  */
-import {
-    toJalaali as g2j,
-    toGregorian as j2g,
-    isValidJalaaliDate,
-    jalaaliMonthLength as monthLen,
-} from 'jalaali-js';
+import moment from 'moment-jalaali';
 
 const PERSIAN_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
 
@@ -30,9 +25,13 @@ export const fromPersianDigits = (input) =>
  * @returns {{ jy: number, jm: number, jd: number }|null}
  */
 export function toJalali(value) {
-    const d = toDate(value);
-    if (!d) return null;
-    return g2j(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    const m = toMoment(value);
+    if (!m) return null;
+    return {
+        jy: m.jYear(),
+        jm: m.jMonth() + 1,
+        jd: m.jDate(),
+    };
 }
 
 /**
@@ -42,14 +41,21 @@ export function toJalali(value) {
  * @returns {Date|null}
  */
 export function fromJalali(jy, jm, jd) {
-    if (!isValidJalaaliDate(jy, jm, jd)) return null;
-    const g = j2g(jy, jm, jd);
-    return new Date(g.gy, g.gm - 1, g.gd, 12, 0, 0, 0);
+    if (!Number.isFinite(jy) || !Number.isFinite(jm) || !Number.isFinite(jd)) return null;
+    if (jm < 1 || jm > 12 || jd < 1) return null;
+    const daysInMonth = jalaliMonthLength(jy, jm);
+    if (jd > daysInMonth) return null;
+    const m = moment(`${jy}/${jm}/${jd}`, 'jYYYY/jM/jD');
+    if (!m.isValid()) return null;
+    // noon avoids DST edge cases when converting to Date
+    m.hour(12).minute(0).second(0).millisecond(0);
+    return m.toDate();
 }
 
 /** Days in a Jalali month. */
 export function jalaliMonthLength(jy, jm) {
-    return monthLen(jy, jm);
+    // moment-jalaali jDaysInMonth expects 0-based month
+    return moment.jDaysInMonth(jy, jm - 1);
 }
 
 /**
@@ -58,7 +64,7 @@ export function jalaliMonthLength(jy, jm) {
  * Week starts Saturday.
  */
 export function buildJalaliMonthGrid(jy, jm) {
-    const daysInMonth = monthLen(jy, jm);
+    const daysInMonth = jalaliMonthLength(jy, jm);
     const first = fromJalali(jy, jm, 1);
     if (!first) return [];
 
@@ -72,7 +78,7 @@ export function buildJalaliMonthGrid(jy, jm) {
         prevJm = 12;
         prevJy -= 1;
     }
-    const prevLen = monthLen(prevJy, prevJm);
+    const prevLen = jalaliMonthLength(prevJy, prevJm);
     for (let i = startOffset - 1; i >= 0; i -= 1) {
         const jd = prevLen - i;
         const date = fromJalali(prevJy, prevJm, jd);
@@ -144,11 +150,16 @@ export function isSameDay(a, b) {
     );
 }
 
-function toDate(value) {
+function toMoment(value) {
     if (value == null || value === '') return null;
-    if (value instanceof Date) {
-        return Number.isNaN(value.getTime()) ? null : value;
-    }
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? null : d;
+    const m = value instanceof Date || typeof value === 'number' || typeof value === 'string'
+        ? moment(value)
+        : null;
+    if (!m || !m.isValid()) return null;
+    return m;
+}
+
+function toDate(value) {
+    const m = toMoment(value);
+    return m ? m.toDate() : null;
 }

@@ -1,17 +1,13 @@
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 import Tooltip from 'primevue/tooltip';
 import preset from './preset.js';
 
 /**
- * Install PrimeVue with the Luma preset, toast service, and tooltip
- * directive. Also globally registers the `<LIcon>` component if the
- * app passes one via the `IconComponent` option (recommended:
- * import `LIcon` from `@pinooxhq/luma/ui` and pass it through).
- *
- * Apps that don't need the global `LIcon` registration can simply
- * skip the option — `<LIcon>` will resolve as an unregistered custom
- * element if not globally registered.
+ * Install PrimeVue with the Luma preset, toast + confirm services, and
+ * tooltip directive. Also globally registers the `<LIcon>` component if
+ * the app passes one via the `IconComponent` option.
  *
  * @param {import('vue').App} app
  * @param {{ IconComponent?: object }} [options]
@@ -37,5 +33,6 @@ export default function setupPrimeVue(app, options = {}) {
     });
 
     app.use(ToastService);
+    app.use(ConfirmationService);
     app.directive('tooltip', Tooltip);
 }

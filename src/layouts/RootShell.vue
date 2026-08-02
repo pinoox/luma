@@ -2,10 +2,11 @@
   <RouterView />
   <!-- Position & dir resolve from app bootstrap (RTL → top-left). -->
   <LToast />
+  <LConfirmDialog />
 </template>
 
 <script setup>
-import { LToast } from '../ui/index.js';
+import { LToast, LConfirmDialog } from '../ui/index.js';
 import { useTheme } from '../ds/composables/use-theme.js';
 
 const theme = useTheme();

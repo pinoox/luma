@@ -29,4 +29,5 @@ export { default as LButton } from './l-button.vue';      // wraps PrimeVue Butt
 export { default as LDatePicker } from './l-date-picker.vue';
 export { default as LRichEditor } from './l-rich-editor.vue';
 export { default as LTabs } from './l-tabs.vue';
+export { default as LConfirmDialog } from './l-confirm-dialog.vue';
 

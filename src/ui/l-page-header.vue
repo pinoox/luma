@@ -158,6 +158,28 @@ const iconStyle = computed(() =>
         justify-content: flex-end;
         position: relative;
         z-index: 1;
+        min-height: 2.5rem;
+
+        // Keep search fields and outline/rect buttons on one baseline.
+        > * {
+            align-self: center;
+        }
+
+        .p-inputtext,
+        .p-input-icon-left,
+        .p-select,
+        .luma-btn {
+            min-height: 2.5rem;
+        }
+
+        .p-input-icon-left {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .p-inputtext {
+            border-radius: var(--px-radius-md);
+        }
     }
 }
 </style>

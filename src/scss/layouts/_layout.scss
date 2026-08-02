@@ -2,18 +2,20 @@
 
 .px-layout {
     position: relative;
-    display: grid;
-    grid-template-columns: var(--px-sidebar-width) minmax(0, 1fr);
-    gap: var(--px-space-3);
     min-height: 100vh;
+    // Reserve space for the fixed sidebar on the inline-start edge (right in RTL).
     padding: var(--px-space-3);
+    padding-inline-start: calc(var(--px-sidebar-width) + var(--px-space-3));
     background: var(--px-gradient-canvas);
 
     &__sidebar {
-        position: sticky;
-        top: var(--px-space-3);
-        height: calc(100vh - var(--px-space-6));
-        z-index: 2;
+        position: fixed;
+        inset-block: 0;
+        inset-inline-start: 0;
+        width: var(--px-sidebar-width);
+        height: 100vh;
+        height: 100dvh;
+        z-index: 20;
     }
 
     &__main {
@@ -23,6 +25,7 @@
         flex-direction: column;
         gap: var(--px-space-3);
         min-width: 0;
+        width: 100%;
     }
 
     &__mobile-nav {
@@ -40,7 +43,7 @@
 
 @media (max-width: 1024px) {
     .px-layout {
-        grid-template-columns: 1fr;
+        padding-inline-start: var(--px-space-3);
 
         &__sidebar {
             display: none;

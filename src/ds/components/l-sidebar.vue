@@ -154,7 +154,7 @@ const resolveLink = (item) => {
 @use '../../scss/tokens' as *;
 
 .px-sidebar {
-    width: var(--px-sidebar-width);
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -163,9 +163,11 @@ const resolveLink = (item) => {
     background: var(--px-glass-bg);
     backdrop-filter: var(--px-blur-lg);
     -webkit-backdrop-filter: var(--px-blur-lg);
-    border: 1px solid var(--px-glass-border);
-    border-radius: var(--px-radius-lg);
-    box-shadow: var(--px-shadow-glass);
+    // Docked rail: flush to viewport edges, divider only toward content.
+    border: 0;
+    border-inline-end: 1px solid var(--px-glass-border);
+    border-radius: 0;
+    box-shadow: none;
     transition: width var(--px-duration-base) var(--px-easing-emphasized);
     overflow-y: auto;
     overflow-x: hidden;

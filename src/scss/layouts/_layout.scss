@@ -30,11 +30,11 @@
     }
 
     &__content {
+        // Match topbar width — no pageMaxWidth centering (that inset the body past the toolbar).
+        // Use LPageContainer when a page needs a narrower reading measure.
         flex: 1;
         min-width: 0;
-        max-width: var(--px-page-max-width);
         width: 100%;
-        margin: 0 auto;
     }
 }
 

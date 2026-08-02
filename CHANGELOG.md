@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`LSidebar` section labels** — section `label` is a static heading by default (matches the “نمای کلی” grouping style). Accordion behaviour is opt-in via `collapsible: true` (with optional `defaultCollapsed`).
+- **`.px-layout__content`** — removed `max-width` / auto side margins so page body aligns with the full-width topbar. Narrow pages can still use `LPageContainer` + `pageMaxWidth`.
 
 ## [0.3.0] — 2026-08-01
 

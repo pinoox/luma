@@ -2,12 +2,18 @@
 // Luma UI is powered by PrimeVue: most components wrap PrimeVue
 // primitives (Card, Tag, Toolbar, Toast, FloatLabel, etc.) with
 // thin Luma styling on top. See /docs for the full mapping.
+//
+// Canonical page kit:
+//   LPage → (#actions / #toolbar) → LPanel / LEmptyPanel / LCard
+//   Tables: <LPanel flush><DataTable class="luma-table" /></LPanel>
 export { default as LIcon } from './l-icon.vue';
 export { default as LView } from './l-view.vue';
+export { default as LPage } from './l-page.vue';
 export { default as LHeader } from './l-header.vue';
 export { default as LPageHeader } from './l-page-header.vue';
 export { default as LPageToolbar } from './l-page-toolbar.vue';
 export { default as LPageContainer } from './l-page-container.vue';
+export { default as LPanel } from './l-panel.vue';
 export { default as LEmptyPanel } from './l-empty-panel.vue';
 
 // PrimeVue-backed primitives

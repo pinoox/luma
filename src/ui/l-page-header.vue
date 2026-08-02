@@ -1,5 +1,5 @@
 <template>
-  <header class="ppage-header">
+  <header class="ppage-header" :class="`ppage-header--${tone}`">
     <div v-if="icon" class="ppage-header__icon" :style="iconStyle">
       <LIcon :name="icon" size="lg" />
     </div>
@@ -26,6 +26,17 @@ const props = defineProps({
     eyebrow: { type: String, default: '' },
     icon: { type: String, default: '' },
     iconColor: { type: String, default: '' },
+    /**
+     * Visual treatment:
+     *   default — plain text header
+     *   glass   — frosted panel
+     *   gradient — glass + soft brand gradient
+     */
+    tone: {
+        type: String,
+        default: 'default',
+        validator: (v) => ['default', 'glass', 'gradient'].includes(v),
+    },
 });
 
 const iconStyle = computed(() =>
@@ -46,6 +57,31 @@ const iconStyle = computed(() =>
     padding: var(--px-space-2) var(--ppage-header-padding-x) var(--px-space-4);
     margin: 0;
     font-family: var(--px-font-sans);
+
+    &--glass,
+    &--gradient {
+        --ppage-header-padding-x: var(--px-space-4);
+        padding: var(--px-space-4);
+        border-radius: var(--px-radius-lg);
+        border: 1px solid var(--px-glass-border, var(--px-border));
+        background: var(--px-glass-bg, var(--px-surface-strong));
+        backdrop-filter: var(--px-blur-md);
+        -webkit-backdrop-filter: var(--px-blur-md);
+        box-shadow: var(--px-glass-shadow, var(--px-shadow-sm));
+        position: relative;
+        overflow: hidden;
+    }
+
+    &--gradient {
+        background:
+            linear-gradient(
+                135deg,
+                color-mix(in srgb, var(--px-primary) 16%, transparent) 0%,
+                color-mix(in srgb, var(--px-info, #0ea5e9) 8%, transparent) 45%,
+                color-mix(in srgb, var(--px-surface-strong) 88%, transparent) 100%
+            ),
+            var(--px-glass-bg, var(--px-surface-strong));
+    }
 
     &__icon {
         --ppage-header-icon-color: var(--ppage-header-accent);
@@ -70,6 +106,7 @@ const iconStyle = computed(() =>
         border: 1px solid color-mix(in srgb, var(--ppage-header-icon-color) 24%, transparent);
         transition: transform $px-duration-base $px-easing-standard,
                     box-shadow $px-duration-base $px-easing-standard;
+        z-index: 1;
     }
 
     &__text {
@@ -78,6 +115,8 @@ const iconStyle = computed(() =>
         gap: 2px;
         min-width: 0;
         flex: 1;
+        position: relative;
+        z-index: 1;
     }
 
     &__eyebrow {
@@ -117,12 +156,8 @@ const iconStyle = computed(() =>
         flex-shrink: 0;
         flex-wrap: wrap;
         justify-content: flex-end;
+        position: relative;
+        z-index: 1;
     }
 }
-
-// Button placeholder inside the actions slot — pulls from the
-// Luma button system. Consumers compose visual treatment + severity
-// + modifiers (e.g. `luma-btn--gradient luma-btn--primary
-// luma-btn--spin-on-hover`) to fit their use case without forking
-// this component.
 </style>

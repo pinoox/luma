@@ -1,0 +1,92 @@
+// Default table chrome for admin pages.
+// Use on native <table class="luma-table"> or wrap PrimeVue DataTable:
+//   <LPanel flush><DataTable class="luma-table" … /></LPanel>
+
+.luma-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--px-font-sans);
+    font-size: var(--px-text-sm);
+    color: var(--px-text);
+
+    thead th {
+        text-align: start;
+        padding: 0.75rem 1rem;
+        font-size: var(--px-text-xs);
+        font-weight: 700;
+        color: var(--px-text-muted);
+        background: var(--px-surface-muted);
+        border-bottom: 1px solid var(--px-border);
+        white-space: nowrap;
+    }
+
+    tbody td {
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid var(--px-border-soft, var(--px-border));
+        vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    tbody tr:hover td {
+        background: color-mix(in srgb, var(--px-primary) 5%, transparent);
+    }
+
+    &--zebra tbody tr:nth-child(even) td {
+        background: color-mix(in srgb, var(--px-surface-muted) 55%, transparent);
+    }
+
+    &--compact thead th,
+    &--compact tbody td {
+        padding: 0.55rem 0.75rem;
+    }
+}
+
+// PrimeVue DataTable inside Luma panel / page kit
+.luma-panel .p-datatable,
+.luma-table.p-datatable,
+.p-datatable.luma-table {
+    .p-datatable-thead > tr > th {
+        background: var(--px-surface-muted) !important;
+        color: var(--px-text-muted) !important;
+        border-color: var(--px-border) !important;
+        font-size: var(--px-text-xs);
+        font-weight: 700;
+        padding: 0.75rem 1rem;
+    }
+
+    .p-datatable-tbody > tr > td {
+        border-color: var(--px-border-soft, var(--px-border)) !important;
+        color: var(--px-text);
+        padding: 0.8rem 1rem;
+    }
+
+    .p-datatable-tbody > tr:hover > td {
+        background: color-mix(in srgb, var(--px-primary) 5%, transparent) !important;
+    }
+
+    .p-datatable-header,
+    .p-datatable-footer {
+        background: transparent !important;
+        border-color: var(--px-border) !important;
+        color: var(--px-text);
+    }
+}
+
+.luma-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--px-space-2);
+    flex-wrap: wrap;
+}
+
+.luma-actions--end {
+    justify-content: flex-end;
+}
+
+.luma-actions--between {
+    justify-content: space-between;
+    width: 100%;
+}

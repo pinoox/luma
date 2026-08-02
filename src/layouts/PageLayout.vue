@@ -14,8 +14,12 @@
                 :title="pageTitle"
                 :subtitle="pageLead"
                 :user="userInfo"
+                :spotlight="spotlightEnabled"
+                :spotlight-placeholder="spotlightPlaceholder"
+                :spotlight-shortcut="spotlightShortcut"
                 @menu="drawerOpen = true"
                 @user-click="handleUserClick"
+                @spotlight="openSpotlight()"
             />
 
             <LMobileNav class="px-layout__mobile-nav" :items="mobileNavItems" />
@@ -40,15 +44,30 @@
                 :sections="navSections"
             />
         </Drawer>
+
+        <LSpotlight
+            v-if="spotlightEnabled"
+            :items="spotlightNavItems"
+            :placeholder="spotlightPlaceholder"
+            :empty-text="spotlightEmptyText"
+            :show-shortcut-hint="spotlightShowHint"
+            :dir="layoutDir"
+        />
     </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import Drawer from 'primevue/drawer';
-import { LSidebar, LTopbar, LMobileNav } from '../ds/index.js';
+import { LSidebar, LTopbar, LMobileNav, LSpotlight } from '../ds/index.js';
 import { useAuthStore } from '../core/auth/index.js';
 import { usePage } from '../composables/use-page.js';
+import {
+    bindSpotlightShortcut,
+    openSpotlight,
+    spotlightShortcutLabel,
+    unbindSpotlightShortcut,
+} from '../composables/use-spotlight.js';
 import { getActiveThemeConfig, flattenNavItems, buildUserInfo } from '../ds/theme-config.js';
 
 const config = getActiveThemeConfig();
@@ -57,6 +76,26 @@ const { pageTitle, pageLead } = usePage();
 
 const brand = config.brand;
 const drawerOpen = ref(false);
+
+const spotlightCfg = computed(() => config.spotlight ?? {});
+const spotlightEnabled = computed(() => spotlightCfg.value.enabled !== false);
+const spotlightPlaceholder = computed(
+    () => spotlightCfg.value.placeholder || 'جستجو...',
+);
+const spotlightEmptyText = computed(
+    () => spotlightCfg.value.emptyText || 'نتیجه‌ای پیدا نشد',
+);
+const spotlightShowHint = computed(
+    () => spotlightCfg.value.showShortcutHint !== false,
+);
+const spotlightShortcut = computed(() =>
+    spotlightEnabled.value ? spotlightShortcutLabel() : '',
+);
+const layoutDir = computed(() =>
+    config.direction === 'ltr' || config.direction === 'rtl'
+        ? config.direction
+        : 'rtl',
+);
 
 const canPermission = (permission) => {
     if (!permission) return true;
@@ -79,6 +118,27 @@ const navSections = computed(() =>
 
 const userInfo = computed(() => buildUserInfo(authStore.user, config.user.roleLabel));
 const mobileNavItems = computed(() => flattenNavItems(navSections.value));
+
+const spotlightNavItems = computed(() => {
+    const group = spotlightCfg.value.navGroup || 'صفحات';
+    return flattenNavItems(navSections.value).map((item, index) => ({
+        id: `nav:${item.route || item.key || index}`,
+        title: item.label,
+        icon: item.icon || 'file',
+        group,
+        keywords: [item.label, item.key, item.route].filter(Boolean).join(' '),
+        route: item.route ? { name: item.route } : undefined,
+        to: item.to,
+    }));
+});
+
+onMounted(() => {
+    if (spotlightEnabled.value) bindSpotlightShortcut();
+});
+
+onUnmounted(() => {
+    unbindSpotlightShortcut();
+});
 
 const handleUserClick = () => {
     // Apps can wrap this layout in a parent and listen to user-click via the

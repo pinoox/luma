@@ -11,12 +11,24 @@
             </slot>
         </button>
 
-        <div class="px-topbar__title">
+        <button
+            v-if="spotlight"
+            type="button"
+            class="px-topbar__spotlight"
+            :aria-label="spotlightPlaceholder"
+            @click="$emit('spotlight')"
+        >
+            <LIcon name="search" size="sm" class="px-topbar__spotlight-icon" />
+            <span class="px-topbar__spotlight-text">{{ spotlightPlaceholder }}</span>
+            <kbd v-if="spotlightShortcut" class="px-topbar__spotlight-kbd">{{ spotlightShortcut }}</kbd>
+        </button>
+
+        <div v-else class="px-topbar__title">
             <strong>{{ title }}</strong>
             <span v-if="subtitle">{{ subtitle }}</span>
         </div>
 
-        <div v-if="searchable" class="px-topbar__search">
+        <div v-if="searchable && !spotlight" class="px-topbar__search">
             <IconField>
                 <InputIcon>
                     <LIcon name="search" size="sm" />
@@ -67,9 +79,13 @@ const props = defineProps({
     searchPlaceholder: { type: String, default: 'Search...' },
     searchValue: { type: String, default: '' },
     user: { type: Object, default: null },
+    /** Replace page title with Spotlight trigger (⌘K). */
+    spotlight: { type: Boolean, default: false },
+    spotlightPlaceholder: { type: String, default: 'Search...' },
+    spotlightShortcut: { type: String, default: '' },
 });
 
-const emit = defineEmits(['menu', 'user-click', 'update:searchValue']);
+const emit = defineEmits(['menu', 'user-click', 'update:searchValue', 'spotlight']);
 
 const internalSearch = ref(props.searchValue ?? '');
 watch(() => props.searchValue, (value) => {
@@ -154,6 +170,69 @@ const userInitials = computed(() => {
         }
     }
 
+    &__spotlight {
+        appearance: none;
+        flex: 1;
+        max-width: 420px;
+        min-width: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--px-space-2);
+        height: 40px;
+        padding: 0 12px 0 10px;
+        border-radius: var(--px-radius-pill);
+        border: 1px solid var(--px-border);
+        background: var(--px-surface-muted);
+        color: var(--px-text-muted);
+        cursor: pointer;
+        font-family: var(--px-font-sans);
+        text-align: start;
+        transition: border-color var(--px-duration-fast) var(--px-easing-standard),
+            background var(--px-duration-fast) var(--px-easing-standard),
+            box-shadow var(--px-duration-fast) var(--px-easing-standard);
+
+        &:hover {
+            background: var(--px-surface-strong);
+            border-color: color-mix(in srgb, var(--px-primary) 35%, var(--px-border));
+            color: var(--px-text-soft);
+        }
+
+        &:focus-visible {
+            outline: none;
+            border-color: var(--px-primary);
+            box-shadow: var(--px-shadow-focus);
+        }
+    }
+
+    &__spotlight-icon {
+        flex-shrink: 0;
+        color: var(--px-text-muted);
+    }
+
+    &__spotlight-text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: var(--px-text-sm);
+        font-weight: var(--px-weight-semibold);
+    }
+
+    &__spotlight-kbd {
+        flex-shrink: 0;
+        font-family: var(--px-font-mono, ui-monospace, monospace);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding: 0.15rem 0.4rem;
+        border-radius: 6px;
+        border: 1px solid color-mix(in srgb, var(--px-border) 85%, transparent);
+        background: color-mix(in srgb, var(--px-surface-strong) 80%, transparent);
+        color: var(--px-text-muted);
+        line-height: 1.2;
+    }
+
     &__search {
         flex: 2;
         max-width: 480px;
@@ -180,6 +259,7 @@ const userInitials = computed(() => {
         align-items: center;
         gap: var(--px-space-2);
         flex-shrink: 0;
+        margin-inline-start: auto;
     }
 
     &__user {
@@ -225,6 +305,14 @@ const userInitials = computed(() => {
         }
 
         &__search {
+            display: none;
+        }
+
+        &__spotlight {
+            max-width: none;
+        }
+
+        &__spotlight-kbd {
             display: none;
         }
 

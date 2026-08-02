@@ -6,5 +6,6 @@ export { default as LSidebar } from './components/l-sidebar.vue';
 export { default as LTopbar } from './components/l-topbar.vue';
 export { default as LMobileNav } from './components/l-mobile-nav.vue';
 export { default as LThemeToggle } from './components/l-theme-toggle.vue';
+export { default as LSpotlight } from './components/l-spotlight.vue';
 
 export { useTheme, initThemeEarly, getActiveTheme } from './composables/use-theme.js';

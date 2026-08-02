@@ -223,14 +223,14 @@ const resolveLink = (item) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: var(--px-space-4);
+        gap: var(--px-space-3);
         min-height: 0;
     }
 
     &__section {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 2px;
 
         &--collapsed &__section-items {
             display: none;
@@ -238,7 +238,7 @@ const resolveLink = (item) => {
     }
 
     &__section-heading {
-        padding: 4px 12px 2px;
+        padding: 8px 12px 2px;
         color: var(--px-text-muted);
         font-family: var(--px-font-sans);
         font-size: var(--px-text-xs);
@@ -290,18 +290,18 @@ const resolveLink = (item) => {
     &__section-items {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 0;
     }
 
     &__link {
         display: flex;
         align-items: center;
-        gap: var(--px-space-3);
-        padding: 12px 14px;
+        gap: var(--px-space-2);
+        padding: 7px 12px;
         border-radius: var(--px-radius-md);
         color: var(--px-text-soft);
         font-family: var(--px-font-sans);
-        font-size: var(--px-text-md);
+        font-size: var(--px-text-sm);
         font-weight: var(--px-weight-semibold);
         text-decoration: none;
         cursor: pointer;

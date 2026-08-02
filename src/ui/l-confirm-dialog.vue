@@ -5,7 +5,12 @@
     :pt="pt"
   >
     <template #container="{ message, acceptCallback, rejectCallback }">
-      <div class="luma-confirm__card" role="alertdialog" :aria-label="message.header || 'Confirm'">
+      <div
+        class="luma-confirm__card"
+        role="alertdialog"
+        :dir="resolvedDir"
+        :aria-label="message.header || 'Confirm'"
+      >
         <header class="luma-confirm__head">
           <div class="luma-confirm__icon" :class="`luma-confirm__icon--${severityOf(message)}`">
             <LIcon :name="iconOf(message)" size="md" />
@@ -38,13 +43,18 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import ConfirmDialog from 'primevue/confirmdialog';
+import { resolveDirection } from '../core/direction.js';
 import LIcon from './l-icon.vue';
 import LButton from './l-button.vue';
 
 /**
  * LConfirmDialog — Luma-styled PrimeVue confirm surface.
  * Mount once (RootShell). Trigger with `useConfirm().require({…})`.
+ *
+ * Direction follows Luma's resolve order (theme / `<html dir>` / boot),
+ * because ConfirmDialog teleports to `<body>` and would otherwise stay LTR.
  *
  *     const confirm = useConfirm();
  *     confirm.require({
@@ -59,6 +69,8 @@ const pt = {
     root: { class: 'luma-confirm__root' },
     mask: { class: 'luma-confirm__mask' },
 };
+
+const resolvedDir = computed(() => resolveDirection());
 
 const severityOf = (message) => {
     const s = message?.severity || message?.icon || '';
@@ -93,6 +105,7 @@ const iconOf = (message) => {
     box-shadow: var(--px-shadow-lg, 0 20px 40px rgba(15, 23, 42, 0.18));
     padding: 1.15rem 1.25rem 1rem;
     color: var(--px-text);
+    text-align: start;
 }
 
 .luma-confirm__head {

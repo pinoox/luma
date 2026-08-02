@@ -1,6 +1,6 @@
 <template>
   <header class="ppage-header">
-    <div class="ppage-header__icon" :style="iconStyle">
+    <div v-if="icon" class="ppage-header__icon" :style="iconStyle">
       <LIcon :name="icon" size="lg" />
     </div>
 
@@ -38,6 +38,7 @@ const iconStyle = computed(() =>
 
 .ppage-header {
     --ppage-header-accent: var(--px-primary);
+    --ppage-header-padding-x: var(--px-space-1);
 
     display: flex;
     align-items: center;

@@ -36,6 +36,7 @@ import { setActivePinia } from 'pinia';
 import { setActiveThemeConfig, resolveThemeConfig } from './ds/theme-config.js';
 import { applyThemeConfig } from './customization/applyThemeConfig.js';
 import { applyDevBootstrap } from './core/boot.js';
+import { applyDocumentDirection, resolveDirection } from './core/direction.js';
 import setupPrimeVue from './plugins/primevue.js';
 import { useTheme, initThemeEarly } from './ds/composables/use-theme.js';
 import {
@@ -153,13 +154,11 @@ export async function createApp(options = {}) {
         layout: config.layout,
     });
 
-    // Sync document direction so teleported UI (Toast, Confirm) inherits RTL/LTR.
-    if (typeof document !== 'undefined' && (config.direction === 'rtl' || config.direction === 'ltr')) {
-        document.documentElement.setAttribute('dir', config.direction);
-        if (globalThis.__PINOOX__) {
-            globalThis.__PINOOX__.direction = config.direction;
-        }
-    }
+    // Detect + sync direction so teleported UI (Select, Toast, Confirm) inherits RTL/LTR.
+    // Priority: themeConfig.direction → <html dir> → __PINOOX__.direction → ltr
+    const direction = resolveDirection(config.direction);
+    config.direction = direction;
+    applyDocumentDirection(direction);
 
     // 2. Prime the theme before mounting to avoid flash.
     initThemeEarly();
@@ -170,7 +169,10 @@ export async function createApp(options = {}) {
     // 4. Build the Vue app.
     const app = createVueApp(AppRoot);
 
-    setupPrimeVue(app, IconComponent ? { IconComponent } : undefined);
+    setupPrimeVue(app, {
+        ...(IconComponent ? { IconComponent } : {}),
+        rtl: direction === 'rtl',
+    });
 
     // 5. Pinia — install + make active so router guards can use stores.
     if (pinia) {

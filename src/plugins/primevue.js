@@ -10,10 +10,10 @@ import preset from './preset.js';
  * the app passes one via the `IconComponent` option.
  *
  * @param {import('vue').App} app
- * @param {{ IconComponent?: object }} [options]
+ * @param {{ IconComponent?: object, rtl?: boolean }} [options]
  */
 export default function setupPrimeVue(app, options = {}) {
-    const { IconComponent } = options;
+    const { IconComponent, rtl = false } = options;
 
     if (IconComponent) {
         app.component('LIcon', IconComponent);
@@ -21,7 +21,7 @@ export default function setupPrimeVue(app, options = {}) {
 
     app.use(PrimeVue, {
         ripple: true,
-        rtl: true,
+        rtl: !!rtl,
         theme: {
             preset,
             options: {

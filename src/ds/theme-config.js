@@ -127,6 +127,12 @@ export const DEFAULT_THEME_CONFIG = {
         showShortcutHint: true,
         navGroup: 'صفحات',
     },
+    /**
+     * Text direction for the shell + PrimeVue.
+     * Prefer leaving this unset so Luma can detect from `<html dir>` /
+     * `__PINOOX__.direction`. Set `'rtl'` / `'ltr'` only to force.
+     */
+    direction: null,
 };
 
 /**
@@ -152,6 +158,10 @@ export const resolveThemeConfig = (config = {}) => ({
         ...DEFAULT_THEME_CONFIG.spotlight,
         ...(config.spotlight ?? {}),
     },
+    // Pass through layout/font tokens used by applyThemeConfig.
+    font: config.font ?? DEFAULT_THEME_CONFIG.font ?? null,
+    layout: config.layout ?? DEFAULT_THEME_CONFIG.layout ?? null,
+    direction: config.direction ?? DEFAULT_THEME_CONFIG.direction,
 });
 
 /**

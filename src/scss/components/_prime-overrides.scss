@@ -168,3 +168,63 @@
   border-color: transparent !important;
   box-shadow: none !important;
 }
+
+// ============================================================
+// Teleported overlays (Select / DatePicker / Menu / …)
+// ------------------------------------------------------------
+// PrimeVue appends overlays to <body>. They do not inherit the
+// app shell's `dir`, so when `<html dir="rtl">` is set (by Luma
+// or Twig) we force RTL on the overlay surfaces themselves.
+// Apps should not re-ship this per project — Luma owns it.
+// ============================================================
+
+[dir='rtl'] .p-select-overlay,
+[dir='rtl'] .p-multiselect-overlay,
+[dir='rtl'] .p-datepicker-panel,
+[dir='rtl'] .p-popover,
+[dir='rtl'] .p-menu,
+[dir='rtl'] .l-select-overlay,
+[dir='rtl'] .l-multiselect-overlay,
+[dir='rtl'] .l-datepicker-panel,
+[dir='rtl'] .l-popover,
+[dir='rtl'] .l-menu {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir='rtl'] .p-select-list,
+[dir='rtl'] .p-select-option,
+[dir='rtl'] .p-select-empty-message,
+[dir='rtl'] .p-select-option-group,
+[dir='rtl'] .p-multiselect-list,
+[dir='rtl'] .p-multiselect-option,
+[dir='rtl'] .p-multiselect-empty-message,
+[dir='rtl'] .p-select-filter,
+[dir='rtl'] .p-multiselect-filter,
+[dir='rtl'] .l-select-list,
+[dir='rtl'] .l-select-option,
+[dir='rtl'] .l-select-empty-message,
+[dir='rtl'] .l-select-option-group,
+[dir='rtl'] .l-multiselect-list,
+[dir='rtl'] .l-multiselect-option,
+[dir='rtl'] .l-multiselect-empty-message,
+[dir='rtl'] .l-select-filter,
+[dir='rtl'] .l-multiselect-filter {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir='rtl'] .p-select-option,
+[dir='rtl'] .p-multiselect-option,
+[dir='rtl'] .l-select-option,
+[dir='rtl'] .l-multiselect-option {
+  justify-content: flex-start;
+}
+
+[dir='rtl'] .p-select-empty-message,
+[dir='rtl'] .p-multiselect-empty-message,
+[dir='rtl'] .l-select-empty-message,
+[dir='rtl'] .l-multiselect-empty-message {
+  display: block;
+  width: 100%;
+}

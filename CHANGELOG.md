@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Direction detection** — `resolveDirection()` / `applyDocumentDirection()` sync `<html dir>` and PrimeVue `rtl` from `themeConfig.direction` → `<html dir>` → `__PINOOX__.direction` → `ltr`. Teleported Select/DatePicker/Menu overlays inherit RTL via Luma SCSS (no per-app CSS needed).
+
 ### Changed
 - **`LSidebar` section labels** — section `label` is a static heading by default (matches overview-style grouping). Accordion behaviour is opt-in via `collapsible: true` (with optional `defaultCollapsed`).
 - **`.px-layout__content`** — removed `max-width` / auto side margins so page body aligns with the full-width topbar. Narrow pages can still use `LPageContainer` + `pageMaxWidth`.

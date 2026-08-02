@@ -21,3 +21,4 @@ export {
 } from './format/jalali.js';
 export { resolveMediaUrl } from './media/url.js';
 export { env, isDev, isProd } from './env.js';
+export { resolveDirection, applyDocumentDirection } from './direction.js';

@@ -93,3 +93,4 @@ export { default as createApp } from '../src/createApp.js';
 // Safe accessors for `import.meta.env`. Re-exported here so apps can
 // read the same Vite variables in a Node-safe way without crashing.
 export { env, isDev, isProd } from '../src/core/env.js';
+export { resolveDirection, applyDocumentDirection } from '../src/core/direction.js';

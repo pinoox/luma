@@ -1,4 +1,4 @@
-const DEFAULT_LOCALE = 'fa-IR';
+const DEFAULT_LOCALE = 'en-US';
 
 /**
  * @param {string|number|Date|null|undefined} value

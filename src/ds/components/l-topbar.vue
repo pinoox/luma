@@ -64,7 +64,7 @@ const props = defineProps({
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
     searchable: { type: Boolean, default: false },
-    searchPlaceholder: { type: String, default: 'جستجو...' },
+    searchPlaceholder: { type: String, default: 'Search...' },
     searchValue: { type: String, default: '' },
     user: { type: Object, default: null },
 });

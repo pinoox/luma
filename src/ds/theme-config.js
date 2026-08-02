@@ -101,7 +101,7 @@ export const buildUserInfo = (profile, roleLabel) => ({
 export const DEFAULT_THEME_CONFIG = {
     brand: {
         title: 'Luma',
-        subtitle: 'داشبورد مدیریتی',
+        subtitle: 'Admin dashboard',
         logo: null,
     },
     nav: {
@@ -109,7 +109,7 @@ export const DEFAULT_THEME_CONFIG = {
     },
     pageMeta: {},
     user: {
-        roleLabel: 'مدیر',
+        roleLabel: 'Admin',
     },
     auth: {
         endpoints: null,        // { me?, login?, logout? }

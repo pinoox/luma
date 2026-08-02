@@ -19,8 +19,8 @@ import { getBoot } from '../core/boot.js';
  *
  * Toast is portaled to <body>, so it does NOT inherit `dir` from
  * PageLayout. We set `dir` on the toast root from the app bootstrap
- * (or an explicit prop) so Persian/Arabic text, flex order, and the
- * close-button offset all flip correctly for RTL.
+ * (or an explicit prop) so RTL text, flex order, and the
+ * close-button offset all flip correctly.
  *
  * Use the `useToast()` composable from PrimeVue to trigger toasts.
  *
@@ -41,8 +41,8 @@ const resolvedDir = computed(() => {
         const htmlDir = document.documentElement?.getAttribute('dir');
         if (htmlDir === 'rtl' || htmlDir === 'ltr') return htmlDir;
     }
-    // Luma apps are Persian-first; PageLayout hard-codes rtl.
-    return 'rtl';
+    // Fallback when boot/document dir is unset (apps typically set dir at boot).
+    return 'ltr';
 });
 
 const resolvedPosition = computed(() => {

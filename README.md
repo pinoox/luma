@@ -231,57 +231,57 @@ import logo from '@/assets/images/brand.svg';
 
 export const themeConfig = {
   brand: {
-    title: 'فروشگاه',
-    subtitle: 'پنل مدیریت فروش',
+    title: 'Acme Shop',
+    subtitle: 'Sales admin',
     logo,
   },
   nav: {
     sections: [
       {
-        key: 'overview', label: 'نمای کلی',
+        key: 'overview', label: 'Overview',
         items: [
-          { key: 'dashboard', label: 'داشبورد', icon: 'layout-dashboard', route: 'shop.dashboard' },
-          { key: 'reports',   label: 'گزارش‌ها', icon: 'line-chart',       route: 'shop.reports' },
+          { key: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard', route: 'shop.dashboard' },
+          { key: 'reports',   label: 'Reports',   icon: 'line-chart',       route: 'shop.reports' },
         ],
       },
       {
-        key: 'catalog', label: 'کاتالوگ',
+        key: 'catalog', label: 'Catalog',
         items: [
-          { key: 'products',   label: 'محصولات',      icon: 'package',     route: 'shop.products' },
-          { key: 'categories', label: 'دسته‌بندی‌ها',  icon: 'folder-tree', route: 'shop.categories' },
-          { key: 'inventory',  label: 'موجودی',       icon: 'warehouse',   route: 'shop.inventory' },
+          { key: 'products',   label: 'Products',   icon: 'package',     route: 'shop.products' },
+          { key: 'categories', label: 'Categories', icon: 'folder-tree', route: 'shop.categories' },
+          { key: 'inventory',  label: 'Inventory',  icon: 'warehouse',   route: 'shop.inventory' },
         ],
       },
       {
-        key: 'sales', label: 'فروش',
+        key: 'sales', label: 'Sales',
         items: [
-          { key: 'orders',    label: 'سفارش‌ها', icon: 'shopping-cart', route: 'shop.orders' },
-          { key: 'customers', label: 'مشتریان',  icon: 'users',         route: 'shop.customers' },
-          { key: 'discounts', label: 'تخفیف‌ها',  icon: 'percent',       route: 'shop.discounts' },
+          { key: 'orders',    label: 'Orders',    icon: 'shopping-cart', route: 'shop.orders' },
+          { key: 'customers', label: 'Customers', icon: 'users',         route: 'shop.customers' },
+          { key: 'discounts', label: 'Discounts', icon: 'percent',       route: 'shop.discounts' },
         ],
       },
       {
-        key: 'settings', label: 'تنظیمات',
+        key: 'settings', label: 'Settings',
         items: [
-          { key: 'settings', label: 'عمومی', icon: 'settings', route: 'shop.settings' },
-          { key: 'team',     label: 'تیم',   icon: 'user-cog', route: 'shop.team' },
+          { key: 'settings', label: 'General', icon: 'settings', route: 'shop.settings' },
+          { key: 'team',     label: 'Team',    icon: 'user-cog', route: 'shop.team' },
         ],
       },
     ],
   },
   pageMeta: {
-    'shop.dashboard':  { title: 'داشبورد',    lead: 'مرور کلی عملکرد فروش',         badge: 'زنده' },
-    'shop.reports':    { title: 'گزارش‌ها',   lead: 'روند فروش، درآمد و سود',       badge: 'تحلیلی' },
-    'shop.products':   { title: 'محصولات',    lead: 'مدیریت محصولات فروشگاه',         badge: 'کاتالوگ' },
-    'shop.categories': { title: 'دسته‌بندی‌ها', lead: 'ساختار درختی محصولات',         badge: 'کاتالوگ' },
-    'shop.inventory':  { title: 'موجودی',     lead: 'پیگیری انبار و سطح موجودی',      badge: 'کاتالوگ' },
-    'shop.orders':     { title: 'سفارش‌ها',   lead: 'سفارش‌های در جریان و تکمیل‌شده', badge: 'فروش' },
-    'shop.customers':  { title: 'مشتریان',    lead: 'پایگاه مشتریان و تاریخچه خرید', badge: 'فروش' },
-    'shop.discounts':  { title: 'تخفیف‌ها',    lead: 'کدهای تخفیف و کمپین‌ها',         badge: 'فروش' },
-    'shop.settings':   { title: 'تنظیمات',    lead: 'تنظیمات عمومی فروشگاه',          badge: 'تنظیمات' },
-    'shop.team':       { title: 'تیم',        lead: 'مدیریت اعضا و دسترسی‌ها',        badge: 'تنظیمات' },
+    'shop.dashboard':  { title: 'Dashboard',  lead: 'Sales performance overview',     badge: 'Live' },
+    'shop.reports':    { title: 'Reports',    lead: 'Revenue and profit trends',      badge: 'Analytics' },
+    'shop.products':   { title: 'Products',   lead: 'Manage catalog items',           badge: 'Catalog' },
+    'shop.categories': { title: 'Categories', lead: 'Product tree structure',         badge: 'Catalog' },
+    'shop.inventory':  { title: 'Inventory',  lead: 'Stock levels and warehouses',    badge: 'Catalog' },
+    'shop.orders':     { title: 'Orders',     lead: 'Open and completed orders',      badge: 'Sales' },
+    'shop.customers':  { title: 'Customers',  lead: 'Customer base and purchase history', badge: 'Sales' },
+    'shop.discounts':  { title: 'Discounts',  lead: 'Promo codes and campaigns',      badge: 'Sales' },
+    'shop.settings':   { title: 'Settings',   lead: 'Store preferences',             badge: 'Settings' },
+    'shop.team':       { title: 'Team',       lead: 'Members and permissions',       badge: 'Settings' },
   },
-  user: { roleLabel: 'مدیر فروشگاه' },
+  user: { roleLabel: 'Store manager' },
 };
 
 export default themeConfig;
@@ -596,9 +596,9 @@ import { usePage } from '@pinooxhq/luma';
 const { pageTitle, pageLead } = usePage();
 
 const orders = ref([
-  { id: 1001, customer: 'علی رضایی', total: 1_250_000, status: 'paid',     createdAt: '۱۴۰۴/۰۵/۱۰' },
-  { id: 1002, customer: 'مریم حسینی', total:   890_000, status: 'pending',  createdAt: '۱۴۰۴/۰۵/۱۱' },
-  { id: 1003, customer: 'محسن کریمی', total: 2_310_000, status: 'shipped',  createdAt: '۱۴۰۴/۰۵/۱۲' },
+  { id: 1001, customer: 'Alex Rivera', total: 1250, status: 'paid',     createdAt: '2026-05-10' },
+  { id: 1002, customer: 'Sam Chen',    total:  890, status: 'pending',  createdAt: '2026-05-11' },
+  { id: 1003, customer: 'Jordan Lee',  total: 2310, status: 'shipped',  createdAt: '2026-05-12' },
 ]);
 
 const filters = ref({ global: '' });
@@ -614,14 +614,14 @@ const statusSeverity = {
 <template>
   <LView>
     <LHeader :title="pageTitle" :lead="pageLead">
-      <Button label="سفارش جدید" icon="plus" severity="primary" />
+      <Button label="New order" icon="plus" severity="primary" />
     </LHeader>
 
     <LCard>
       <div class="orders-toolbar">
         <IconField>
           <InputIcon class="pi pi-search" />
-          <InputText v-model="filters.global" placeholder="جستجو…" />
+          <InputText v-model="filters.global" placeholder="Search…" />
         </IconField>
       </div>
 
@@ -631,19 +631,18 @@ const statusSeverity = {
         :global-filter-fields="['customer', 'status']"
         paginator :rows="10"
         striped-rows
-        dir="rtl"
       >
-        <Column field="id" header="شناسه" sortable />
-        <Column field="customer" header="مشتری" sortable />
-        <Column field="total" header="مبلغ" sortable>
-          <template #body="{ data }">{{ data.total.toLocaleString('fa-IR') }} تومان</template>
+        <Column field="id" header="ID" sortable />
+        <Column field="customer" header="Customer" sortable />
+        <Column field="total" header="Total" sortable>
+          <template #body="{ data }">{{ data.total.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}</template>
         </Column>
-        <Column field="status" header="وضعیت">
+        <Column field="status" header="Status">
           <template #body="{ data }">
             <Tag :value="data.status" :severity="statusSeverity[data.status]" />
           </template>
         </Column>
-        <Column field="createdAt" header="تاریخ" sortable />
+        <Column field="createdAt" header="Date" sortable />
       </DataTable>
     </LCard>
   </LView>

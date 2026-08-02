@@ -41,7 +41,7 @@ import { usePage } from '../composables/use-page.js';
  *
  *     <LPage icon="users">
  *       <template #actions>
- *         <LButton icon="plus">افزودن</LButton>
+ *         <LButton icon="plus">Add</LButton>
  *       </template>
  *       <LPanel>…</LPanel>
  *     </LPage>

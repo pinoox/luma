@@ -329,7 +329,7 @@ A themed wrapper around [PrimeVue ProgressSpinner](https://primevue.org/progress
 |---|---|---|---|
 | `size` | `xs` \| `sm` \| `md` \| `lg` \| `xl` | `md` (36px) | `xs`=16, `sm`=24, `md`=36, `lg`=56, `xl`=80. |
 | `severity` | `primary` \| `neutral` \| `success` \| `warn` \| `danger` \| `info` | `primary` | Color channel driven by `--px-*` tokens. |
-| `center` | `boolean` | `false` | Wraps the spinner in a flex block that fills its parent and centers itself. Replaces the one-off `.sms-providers__loading`/`.loading-state` CSS most pages end up writing. |
+| `center` | `boolean` | `false` | Wraps the spinner in a flex block that fills its parent and centers itself. Replaces one-off `.loading-state` CSS most pages end up writing. |
 
 #### Loading states — composed
 
@@ -343,7 +343,7 @@ A spinner is rarely used alone. Most pages need a "loading" version of a card, p
 </LCard>
 
 <!-- Empty state can flip between "loading" and "no results" without changing layout -->
-<LEmptyPanel :loading="fetching" icon="webhook" title="No providers yet">
+<LEmptyPanel :loading="fetching" icon="inbox" title="No items yet">
   ...
 </LEmptyPanel>
 ```
@@ -527,15 +527,12 @@ Luma-only. Composed of: icon tile + eyebrow + title + lead + actions slot.
 
 ```vue
 <LPageHeader
-  eyebrow="SMS"
-  title="Providers"
-  lead="Manage SMS gateway integrations."
-  icon="webhook"
+  eyebrow="Catalog"
+  title="Items"
+  lead="Create and manage records."
+  icon="folder"
 >
-  <Button class="luma-btn luma-btn--gradient luma-btn--primary luma-btn--spin-on-hover">
-    <LIcon name="refresh-cw" size="sm" class="luma-btn__icon" />
-    Sync
-  </Button>
+  <LButton variant="outline" shape="rounded" icon="plus">Add</LButton>
 </LPageHeader>
 ```
 
@@ -562,9 +559,9 @@ Luma-only. Lightweight toolbar row below the header.
 ```vue
 <LPageToolbar>
   <template #info>
-    <span>Showing 12 providers · 3 active</span>
+    <span>Showing 12 items · 3 active</span>
   </template>
-  <Button class="luma-btn luma-btn--soft luma-btn--warn luma-btn--sm">Mode: Live</Button>
+  <LButton variant="soft" severity="warn" size="sm" shape="rounded">Live</LButton>
 </LPageToolbar>
 ```
 
@@ -593,12 +590,12 @@ Luma-only. Centered empty state with icon, title, message, and actions.
 
 ```vue
 <LEmptyPanel
-  icon="plug"
-  title="No providers yet"
-  message="Click Sync to discover available providers."
+  icon="inbox"
+  title="No items yet"
+  message="Create the first item to get started."
 >
   <template #actions>
-    <LButton>Sync now</LButton>
+    <LButton variant="outline" shape="rounded" icon="plus">Add</LButton>
   </template>
 </LEmptyPanel>
 ```
@@ -621,7 +618,7 @@ Luma-only. Centered empty state with icon, title, message, and actions.
 The `loading` prop lets the same panel stand in for two states without rewriting layout — useful for "fetching data, no result yet" vs. "we have a definitive empty answer". Switch between them by flipping the prop:
 
 ```vue
-<LEmptyPanel :loading="fetching" icon="webhook" title="Providers" />
+<LEmptyPanel :loading="fetching" icon="inbox" title="No items yet" />
 ```
 
 ---
@@ -752,14 +749,14 @@ import icon from './assets/app-icon.png';
 
 export const themeConfig = {
   brand: {
-    title: 'Acme SMS',                  // also used as suffix in <title>
-    subtitle: 'Admin dashboard',
+    title: 'Acme Admin',                // also used as suffix in <title>
+    subtitle: 'Operations console',
     logo: icon,
   },
   nav: { sections: [/* ... sidebar items ... */] },
   pageMeta: {
     'app.dashboard': { title: 'Dashboard', lead: 'System overview', badge: 'Live', metaTitle: 'Admin Dashboard' },
-    'app.providers': { title: 'Providers', lead: 'Active gateways' },
+    'app.items': { title: 'Items', lead: 'Active records' },
   },
   user: { roleLabel: 'Admin' },
 };
@@ -797,7 +794,7 @@ metaTitle  →  title  →  brand.title
 The router auto-syncs `document.title` to `"<page> · <brand>"` after every navigation, so pages don't need to call anything — just declare the values in `themeConfig.pageMeta`. Example end result:
 
 ```
-<title>Admin Dashboard · Acme SMS</title>
+<title>Admin Dashboard · Acme Admin</title>
 ```
 
 #### Per-route override (dynamic titles)
@@ -806,10 +803,10 @@ For pages that need a fully dynamic title (e.g. an edit page that shows the enti
 
 ```js
 router.addRoute({
-  path: '/providers/:id/edit',
-  name: 'providers.edit',
-  component: EditProvider,
-  meta: { title: 'Edit Provider' },
+  path: '/items/:id/edit',
+  name: 'items.edit',
+  component: EditItem,
+  meta: { title: 'Edit Item' },
 });
 
 // Or set it after mount for entity-name binding:

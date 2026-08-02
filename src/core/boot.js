@@ -11,9 +11,9 @@
  *
  *   VITE_SERVER_URL   — PHP origin (e.g. http://127.0.0.1:8000)
  *   VITE_PROJECT_PATH — project mount path under server
- *   VITE_APP_PATH     — app route segment (e.g. "/sms")
+ *   VITE_APP_PATH     — app route segment (e.g. "/app")
  *   VITE_API_PATH     — explicit API base (overrides derived `<app>/api/`)
- *   VITE_LOCALE       — fallback locale (e.g. "fa")
+ *   VITE_LOCALE       — fallback locale (e.g. "en")
  *   VITE_DIRECTION    — "rtl" | "ltr"
  *   VITE_TITLE        — fallback document title
  */

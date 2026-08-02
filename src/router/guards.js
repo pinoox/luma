@@ -233,7 +233,7 @@ export const createAppRouter = async (routes = []) => {
     const base = resolveHistoryBase();
 
     // Remote-auth apps without their own /login get a bounce stub.
-    // Local-auth apps (e.g. TaskBan PageLogin) must own `/login` themselves —
+    // Local-auth apps that define a `/login` route keep ownership of that path —
     // registering the stub first would abort navigation and break login.
     const resolvedRoutes = routeDefinesLogin(routes)
         ? [...routes]

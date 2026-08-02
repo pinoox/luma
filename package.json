@@ -35,12 +35,16 @@
       "import": "./src/scss/*"
     },
     "./styles": {
+      "import": "./src/scss/_styles.scss",
       "sass": "./src/scss/_styles.scss",
-      "style": "./src/scss/_styles.scss"
+      "style": "./src/scss/_styles.scss",
+      "default": "./src/scss/_styles.scss"
     },
     "./styles/_main": {
+      "import": "./src/scss/_main.scss",
       "sass": "./src/scss/_main.scss",
-      "style": "./src/scss/_main.scss"
+      "style": "./src/scss/_main.scss",
+      "default": "./src/scss/_main.scss"
     },
     "./tokens/*": {
       "sass": "./src/scss/tokens/*",
@@ -48,12 +52,16 @@
       "import": "./src/scss/tokens/*"
     },
     "./tokens": {
+      "import": "./src/scss/tokens/_index.scss",
       "sass": "./src/scss/tokens/_index.scss",
-      "style": "./src/scss/tokens/_index.scss"
+      "style": "./src/scss/tokens/_index.scss",
+      "default": "./src/scss/tokens/_index.scss"
     },
     "./tokens/_index": {
+      "import": "./src/scss/tokens/_index.scss",
       "sass": "./src/scss/tokens/_index.scss",
-      "style": "./src/scss/tokens/_index.scss"
+      "style": "./src/scss/tokens/_index.scss",
+      "default": "./src/scss/tokens/_index.scss"
     },
     "./fonts": "./src/fonts/vazir.js",
     "./fonts/*": "./src/fonts/*",
@@ -61,12 +69,16 @@
       "import": "./exports/preset.js"
     },
     "./tokens.scss": {
+      "import": "./exports/tokens.scss",
       "sass": "./exports/tokens.scss",
-      "style": "./exports/tokens.scss"
+      "style": "./exports/tokens.scss",
+      "default": "./exports/tokens.scss"
     },
     "./styles.scss": {
+      "import": "./exports/styles.scss",
       "sass": "./exports/styles.scss",
-      "style": "./exports/styles.scss"
+      "style": "./exports/styles.scss",
+      "default": "./exports/styles.scss"
     },
     "./createApp": {
       "import": "./src/createApp.js"

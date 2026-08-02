@@ -28,7 +28,7 @@ import { computed } from 'vue';
 /**
  * LPanel — default content surface for lists, forms, and tables.
  *
- *     <LPanel title="کاربران" tone="glass">
+ *     <LPanel title="Items" tone="glass">
  *       <DataTable class="luma-table" … />
  *     </LPanel>
  */

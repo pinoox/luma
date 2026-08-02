@@ -24,4 +24,4 @@ export { default as LField } from './l-field.vue';        // wraps FloatLabel
 export { default as LToolbar } from './l-toolbar.vue';    // wraps PrimeVue Toolbar
 export { default as LToast } from './l-toast.vue';        // wraps PrimeVue Toast
 export { default as LSpinner } from './l-spinner.vue';    // wraps PrimeVue ProgressSpinner
-export { default as LButton } from './l-button.vue';      // wraps PrimeVue Button
+export { default as LButton } from './l-button.vue';      // wraps PrimeVue Buttonexport { default as LDatePicker } from './l-date-picker.vue';

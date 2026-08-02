@@ -14,14 +14,33 @@ import preset from './preset.js';
  */
 export default function setupPrimeVue(app, options = {}) {
     const { IconComponent, rtl = false } = options;
+    const isRtl = !!rtl;
 
     if (IconComponent) {
         app.component('LIcon', IconComponent);
     }
 
+    // Teleported Select/MultiSelect overlays leave the app shell's `dir`,
+    // so stamp `dir` on the overlay itself when the app is RTL.
+    const rtlOverlayPt = isRtl
+        ? {
+              select: {
+                  overlay: { dir: 'rtl' },
+                  list: { dir: 'rtl' },
+                  option: { style: { textAlign: 'right' } },
+              },
+              multiSelect: {
+                  overlay: { dir: 'rtl' },
+                  list: { dir: 'rtl' },
+                  option: { style: { textAlign: 'right' } },
+              },
+          }
+        : undefined;
+
     app.use(PrimeVue, {
         ripple: true,
-        rtl: !!rtl,
+        rtl: isRtl,
+        ...(rtlOverlayPt ? { pt: rtlOverlayPt } : {}),
         theme: {
             preset,
             options: {

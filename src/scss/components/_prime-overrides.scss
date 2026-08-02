@@ -172,9 +172,10 @@
 // ============================================================
 // Teleported overlays (Select / DatePicker / Menu / …)
 // ------------------------------------------------------------
-// PrimeVue appends overlays to <body>. They do not inherit the
-// app shell's `dir`, so when `<html dir="rtl">` is set (by Luma
-// or Twig) we force RTL on the overlay surfaces themselves.
+// PrimeVue appends overlays to <body>. They do not inherit a
+// Dialog/shell `dir`, so we force RTL when:
+//   1. `<html dir="rtl">` (or any ancestor), OR
+//   2. the overlay itself carries `dir="rtl"` (PrimeVue PT).
 // Apps should not re-ship this per project — Luma owns it.
 // ============================================================
 
@@ -187,7 +188,17 @@
 [dir='rtl'] .l-multiselect-overlay,
 [dir='rtl'] .l-datepicker-panel,
 [dir='rtl'] .l-popover,
-[dir='rtl'] .l-menu {
+[dir='rtl'] .l-menu,
+.p-select-overlay[dir='rtl'],
+.p-multiselect-overlay[dir='rtl'],
+.p-datepicker-panel[dir='rtl'],
+.p-popover[dir='rtl'],
+.p-menu[dir='rtl'],
+.l-select-overlay[dir='rtl'],
+.l-multiselect-overlay[dir='rtl'],
+.l-datepicker-panel[dir='rtl'],
+.l-popover[dir='rtl'],
+.l-menu[dir='rtl'] {
   direction: rtl;
   text-align: right;
 }
@@ -209,7 +220,25 @@
 [dir='rtl'] .l-multiselect-option,
 [dir='rtl'] .l-multiselect-empty-message,
 [dir='rtl'] .l-select-filter,
-[dir='rtl'] .l-multiselect-filter {
+[dir='rtl'] .l-multiselect-filter,
+.p-select-overlay[dir='rtl'] .p-select-list,
+.p-select-overlay[dir='rtl'] .p-select-option,
+.p-select-overlay[dir='rtl'] .p-select-empty-message,
+.p-select-overlay[dir='rtl'] .p-select-option-group,
+.p-select-overlay[dir='rtl'] .p-select-filter,
+.p-multiselect-overlay[dir='rtl'] .p-multiselect-list,
+.p-multiselect-overlay[dir='rtl'] .p-multiselect-option,
+.p-multiselect-overlay[dir='rtl'] .p-multiselect-empty-message,
+.p-multiselect-overlay[dir='rtl'] .p-multiselect-filter,
+.l-select-overlay[dir='rtl'] .l-select-list,
+.l-select-overlay[dir='rtl'] .l-select-option,
+.l-select-overlay[dir='rtl'] .l-select-empty-message,
+.l-select-overlay[dir='rtl'] .l-select-option-group,
+.l-select-overlay[dir='rtl'] .l-select-filter,
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-list,
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-option,
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-empty-message,
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-filter {
   direction: rtl;
   text-align: right;
 }
@@ -217,14 +246,22 @@
 [dir='rtl'] .p-select-option,
 [dir='rtl'] .p-multiselect-option,
 [dir='rtl'] .l-select-option,
-[dir='rtl'] .l-multiselect-option {
+[dir='rtl'] .l-multiselect-option,
+.p-select-overlay[dir='rtl'] .p-select-option,
+.p-multiselect-overlay[dir='rtl'] .p-multiselect-option,
+.l-select-overlay[dir='rtl'] .l-select-option,
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-option {
   justify-content: flex-start;
 }
 
 [dir='rtl'] .p-select-empty-message,
 [dir='rtl'] .p-multiselect-empty-message,
 [dir='rtl'] .l-select-empty-message,
-[dir='rtl'] .l-multiselect-empty-message {
+[dir='rtl'] .l-multiselect-empty-message,
+.p-select-overlay[dir='rtl'] .p-select-empty-message,
+.p-multiselect-overlay[dir='rtl'] .p-multiselect-empty-message,
+.l-select-overlay[dir='rtl'] .l-select-empty-message,
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-empty-message {
   display: block;
   width: 100%;
 }

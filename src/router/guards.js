@@ -220,13 +220,24 @@ const resolveDocumentTitle = (to) => {
     }
 };
 
+const routeDefinesLogin = (list = []) =>
+    list.some((route) => {
+        const path = String(route?.path ?? '');
+        if (path === '/login' || path === 'login') return true;
+        if (Array.isArray(route?.children) && routeDefinesLogin(route.children)) return true;
+        return false;
+    });
+
 export const createAppRouter = async (routes = []) => {
     const { createRouter, createWebHistory } = await import('vue-router');
     const base = resolveHistoryBase();
 
-    const router = createRouter({
-        history: createWebHistory(base),
-        routes: [
+    // Remote-auth apps without their own /login get a bounce stub.
+    // Local-auth apps (e.g. TaskBan PageLogin) must own `/login` themselves —
+    // registering the stub first would abort navigation and break login.
+    const resolvedRoutes = routeDefinesLogin(routes)
+        ? [...routes]
+        : [
             {
                 path: '/login',
                 beforeEnter: () => {
@@ -235,7 +246,11 @@ export const createAppRouter = async (routes = []) => {
                 },
             },
             ...routes,
-        ],
+        ];
+
+    const router = createRouter({
+        history: createWebHistory(base),
+        routes: resolvedRoutes,
         scrollBehavior() {
             return { top: 0 };
         },

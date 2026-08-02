@@ -179,7 +179,7 @@ const onClick = (item, event) => {
         }
 
         .luma-tabs__tab {
-            flex: 1 1 auto;
+            flex: 0 0 auto;
             min-width: max-content;
             border-inline-end: 1px solid var(--luma-tabs-border);
             border-bottom: 2px solid transparent;

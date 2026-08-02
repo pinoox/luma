@@ -48,6 +48,15 @@
       </button>
       <button
         type="button"
+        :class="{ active: editor.isActive('taskList') }"
+        :disabled="disabled"
+        title="Checklist"
+        @click="editor.chain().focus().toggleTaskList().run()"
+      >
+        <LIcon name="list-checks" size="xs" />
+      </button>
+      <button
+        type="button"
         :class="{ active: editor.isActive('code') }"
         :disabled="disabled"
         title="Code"
@@ -69,6 +78,7 @@ import { EditorContent, useEditor } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import { TaskItem, TaskList } from '@tiptap/extension-list';
 import LIcon from './l-icon.vue';
 
 /**
@@ -96,6 +106,8 @@ const editor = useEditor({
         StarterKit,
         Link.configure({ openOnClick: false }),
         Placeholder.configure({ placeholder: props.placeholder }),
+        TaskList,
+        TaskItem.configure({ nested: true }),
     ],
     onUpdate: ({ editor: ed }) => {
         const html = ed.getHTML();
@@ -207,6 +219,37 @@ onBeforeUnmount(() => editor.value?.destroy());
             ul,
             ol {
                 padding-inline-start: 1.25rem;
+            }
+
+            ul[data-type='taskList'] {
+                list-style: none;
+                padding-inline-start: 0;
+                margin: 0.35rem 0;
+
+                li {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.45rem;
+                    margin: 0.2rem 0;
+
+                    > label {
+                        flex-shrink: 0;
+                        margin-top: 0.2rem;
+                        display: inline-flex;
+                    }
+
+                    > div {
+                        flex: 1;
+                        min-width: 0;
+                    }
+
+                    input[type='checkbox'] {
+                        width: 0.95rem;
+                        height: 0.95rem;
+                        accent-color: var(--px-primary);
+                        cursor: pointer;
+                    }
+                }
             }
 
             a {

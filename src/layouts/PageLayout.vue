@@ -55,13 +55,30 @@ const config = getActiveThemeConfig();
 const authStore = useAuthStore();
 const { pageTitle, pageLead } = usePage();
 
-const navSections = config.nav.sections ?? [];
 const brand = config.brand;
-
 const drawerOpen = ref(false);
 
+const canPermission = (permission) => {
+    if (!permission) return true;
+    const user = authStore.user || {};
+    const group = user.group_key;
+    if (group === 'admin' || group === 'superadmin') return true;
+    const abilities = user.abilities || [];
+    if (abilities.includes('*')) return true;
+    return abilities.includes(permission);
+};
+
+const navSections = computed(() =>
+    (config.nav?.sections ?? [])
+        .map((section) => ({
+            ...section,
+            items: (section.items ?? []).filter((item) => canPermission(item.permission)),
+        }))
+        .filter((section) => (section.items ?? []).length > 0),
+);
+
 const userInfo = computed(() => buildUserInfo(authStore.user, config.user.roleLabel));
-const mobileNavItems = computed(() => flattenNavItems(navSections));
+const mobileNavItems = computed(() => flattenNavItems(navSections.value));
 
 const handleUserClick = () => {
     // Apps can wrap this layout in a parent and listen to user-click via the

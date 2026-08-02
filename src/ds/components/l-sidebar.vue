@@ -4,7 +4,7 @@
             <slot name="brand">
                 <div class="px-sidebar__brand-default">
                     <div class="px-sidebar__brand-mark">
-                        <slot name="px-sidebar__brand-markbrand-logo">
+                        <slot name="brand-logo">
                             <img v-if="brandLogo" :src="brandLogo" :alt="brandTitle" />
                             <span v-else>{{ brandInitials }}</span>
                         </slot>
@@ -160,12 +160,10 @@ const resolveLink = (item) => {
     flex-direction: column;
     gap: var(--px-space-2);
     padding: var(--px-space-4) var(--px-space-3);
-    background: var(--px-glass-bg);
-    backdrop-filter: var(--px-blur-lg);
-    -webkit-backdrop-filter: var(--px-blur-lg);
-    // Docked rail: flush to viewport edges, divider only toward content.
+    // Own surface — decoupled from the page canvas, still flush to the rail edges.
+    background: var(--px-surface-strong, var(--px-surface));
     border: 0;
-    border-inline-end: 1px solid var(--px-glass-border);
+    border-inline-end: 1px solid var(--px-border);
     border-radius: 0;
     box-shadow: none;
     transition: width var(--px-duration-base) var(--px-easing-emphasized);
@@ -178,6 +176,10 @@ const resolveLink = (item) => {
 
     &__brand {
         padding: var(--px-space-2);
+        padding-bottom: var(--px-space-3);
+        margin-bottom: var(--px-space-1);
+        border-bottom: 1px solid color-mix(in srgb, var(--px-border) 70%, transparent);
+        flex-shrink: 0;
     }
 
     &__brand-default {

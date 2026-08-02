@@ -174,7 +174,8 @@
         opacity: 0.85;
     }
 
-    &--loading .luma-btn__icon:not(.luma-btn__icon--static) {
+    &--loading .luma-btn__icon:not(.luma-btn__icon--static),
+    &--loading .luma-btn__icon--spin {
         animation: luma-btn-spin 1s linear infinite;
     }
 
@@ -280,6 +281,7 @@
 .luma-btn--ghost {
     color: var(--px-text-soft);
     background: transparent;
+    border: 0;
     box-shadow: none;
 
     &:hover:not(:disabled) {

@@ -9,7 +9,13 @@
         v-bind="passthroughAttrs"
     >
         <LIcon
-            v-if="icon && !loading"
+            v-if="loading"
+            name="loader-circle"
+            :size="iconSize"
+            class="luma-btn__icon luma-btn__icon--spin"
+        />
+        <LIcon
+            v-else-if="icon"
             :name="icon"
             :size="iconSize"
             class="luma-btn__icon"

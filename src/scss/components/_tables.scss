@@ -14,6 +14,7 @@
         padding: 0.75rem 1rem;
         font-size: var(--px-text-xs);
         font-weight: 700;
+        letter-spacing: 0.01em;
         color: var(--px-text-muted);
         background: var(--px-surface-muted);
         border-bottom: 1px solid var(--px-border);
@@ -21,7 +22,7 @@
     }
 
     tbody td {
-        padding: 0.8rem 1rem;
+        padding: 0.85rem 1rem;
         border-bottom: 1px solid var(--px-border-soft, var(--px-border));
         vertical-align: middle;
     }
@@ -42,37 +43,115 @@
     &--compact tbody td {
         padding: 0.55rem 0.75rem;
     }
+
+    &--clickable tbody tr {
+        cursor: pointer;
+    }
 }
 
 // PrimeVue DataTable inside Luma panel / page kit
 .luma-panel .p-datatable,
 .luma-table.p-datatable,
 .p-datatable.luma-table {
+    font-family: var(--px-font-sans);
+    font-size: var(--px-text-sm);
+    border: 0 !important;
+    background: transparent !important;
+
+    .p-datatable-table-container,
+    .p-datatable-wrapper {
+        border: 0;
+    }
+
+    .p-datatable-table {
+        border-collapse: collapse;
+    }
+
     .p-datatable-thead > tr > th {
         background: var(--px-surface-muted) !important;
         color: var(--px-text-muted) !important;
-        border-color: var(--px-border) !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--px-border) !important;
+        border-inline-end: 1px solid var(--px-border-soft, var(--px-border)) !important;
         font-size: var(--px-text-xs);
         font-weight: 700;
-        padding: 0.75rem 1rem;
+        letter-spacing: 0.01em;
+        padding: 0.8rem 1rem !important;
+
+        &:last-child {
+            border-inline-end: 0 !important;
+        }
     }
 
     .p-datatable-tbody > tr > td {
-        border-color: var(--px-border-soft, var(--px-border)) !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--px-border-soft, var(--px-border)) !important;
+        border-inline-end: 1px solid color-mix(in srgb, var(--px-border) 55%, transparent) !important;
         color: var(--px-text);
-        padding: 0.8rem 1rem;
+        padding: 0.85rem 1rem !important;
+        background: transparent !important;
+
+        &:last-child {
+            border-inline-end: 0 !important;
+        }
+    }
+
+    .p-datatable-tbody > tr:last-child > td {
+        border-bottom: 0 !important;
     }
 
     .p-datatable-tbody > tr:hover > td {
         background: color-mix(in srgb, var(--px-primary) 5%, transparent) !important;
     }
 
+    .p-datatable-tbody > tr.p-datatable-row-selected > td,
+    .p-datatable-tbody > tr[data-p-selected='true'] > td {
+        background: color-mix(in srgb, var(--px-primary) 10%, transparent) !important;
+    }
+
+    // Striped rows (PrimeVue stripedRows)
+    .p-datatable-tbody > tr:nth-child(even) > td {
+        background: color-mix(in srgb, var(--px-surface-muted) 40%, transparent);
+    }
+
+    .p-datatable-tbody > tr:nth-child(even):hover > td {
+        background: color-mix(in srgb, var(--px-primary) 6%, var(--px-surface-muted)) !important;
+    }
+
     .p-datatable-header,
     .p-datatable-footer {
         background: transparent !important;
-        border-color: var(--px-border) !important;
+        border: 0 !important;
+        border-top: 1px solid var(--px-border) !important;
         color: var(--px-text);
+        padding: 0.65rem 1rem !important;
     }
+
+    .p-datatable-header {
+        border-top: 0 !important;
+        border-bottom: 1px solid var(--px-border) !important;
+    }
+
+    .p-paginator {
+        background: transparent !important;
+        border: 0 !important;
+        border-top: 1px solid var(--px-border) !important;
+        padding: 0.55rem 0.75rem !important;
+        color: var(--px-text-muted);
+    }
+
+    .p-datatable-emptymessage > td {
+        padding: 2rem 1rem !important;
+        text-align: center;
+        color: var(--px-text-muted);
+        border: 0 !important;
+    }
+}
+
+// Clickable table rows (pair with @row-click)
+.luma-table--clickable.p-datatable .p-datatable-tbody > tr,
+.p-datatable.luma-table--clickable .p-datatable-tbody > tr {
+    cursor: pointer;
 }
 
 .luma-actions {

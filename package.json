@@ -119,6 +119,10 @@
   "dependencies": {
     "@pinooxhq/auth": "^0.1.0",
     "@primeuix/themes": "^1.2.1",
+    "@tiptap/extension-link": "^3.29.2",
+    "@tiptap/extension-placeholder": "^3.29.2",
+    "@tiptap/starter-kit": "^3.29.2",
+    "@tiptap/vue-3": "^3.29.2",
     "axios": "^1.16.1",
     "lucide-vue-next": "^1.0.0",
     "moment": "^2.30.1",

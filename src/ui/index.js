@@ -6,6 +6,7 @@
 // Canonical page kit:
 //   LPage → (#actions / #toolbar) → LPanel / LEmptyPanel / LCard
 //   Tables: <LPanel flush><DataTable class="luma-table" /></LPanel>
+//   Tabs:   <LTabs variant="table" :items="[…]" />
 export { default as LIcon } from './l-icon.vue';
 export { default as LView } from './l-view.vue';
 export { default as LPage } from './l-page.vue';
@@ -26,4 +27,6 @@ export { default as LToast } from './l-toast.vue';        // wraps PrimeVue Toas
 export { default as LSpinner } from './l-spinner.vue';    // wraps PrimeVue ProgressSpinner
 export { default as LButton } from './l-button.vue';      // wraps PrimeVue Button
 export { default as LDatePicker } from './l-date-picker.vue';
+export { default as LRichEditor } from './l-rich-editor.vue';
+export { default as LTabs } from './l-tabs.vue';
 

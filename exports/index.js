@@ -56,6 +56,19 @@ export {
 
 export { usePage } from '../src/composables/use-page.js';
 
+export {
+    registerSpotlightProvider,
+    useSpotlightProvider,
+    useSpotlight,
+    openSpotlight,
+    closeSpotlight,
+    toggleSpotlight,
+    bindSpotlightShortcut,
+    unbindSpotlightShortcut,
+    runSpotlightProviders,
+    spotlightShortcutLabel,
+} from '../src/composables/use-spotlight.js';
+
 // Dev-mode bootstrap helpers (no-op in production).
 export {
     applyDevBootstrap,

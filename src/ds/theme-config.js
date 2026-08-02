@@ -71,7 +71,7 @@ export const composeMetaTitle = (page, brand) => {
 export const resolveUserDisplayName = (profile, fallback = '') => {
     const p = profile ?? {};
     const fullName = [p.fname, p.lname].filter(Boolean).join(' ').trim();
-    return fullName || p.username || p.email || fallback;
+    return fullName || p.name || p.username || p.email || fallback;
 };
 
 /**
@@ -116,6 +116,17 @@ export const DEFAULT_THEME_CONFIG = {
         skipMe: false,          // if true, never call auth.me() — trust token presence
         autoLoginFromUrl: false, // if true, adopt ?__manager_token=... and treat as logged-in
     },
+    /**
+     * Spotlight (⌘K / Ctrl+K) command palette.
+     * Apps can register async providers via `registerSpotlightProvider()`.
+     */
+    spotlight: {
+        enabled: true,
+        placeholder: 'جستجو...',
+        emptyText: 'نتیجه‌ای پیدا نشد',
+        showShortcutHint: true,
+        navGroup: 'صفحات',
+    },
 };
 
 /**
@@ -136,6 +147,10 @@ export const resolveThemeConfig = (config = {}) => ({
             ...(DEFAULT_THEME_CONFIG.auth.endpoints ?? {}),
             ...((config.auth && config.auth.endpoints) ?? {}),
         },
+    },
+    spotlight: {
+        ...DEFAULT_THEME_CONFIG.spotlight,
+        ...(config.spotlight ?? {}),
     },
 });
 

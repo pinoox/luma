@@ -153,6 +153,14 @@ export async function createApp(options = {}) {
         layout: config.layout,
     });
 
+    // Sync document direction so teleported UI (Toast, Confirm) inherits RTL/LTR.
+    if (typeof document !== 'undefined' && (config.direction === 'rtl' || config.direction === 'ltr')) {
+        document.documentElement.setAttribute('dir', config.direction);
+        if (globalThis.__PINOOX__) {
+            globalThis.__PINOOX__.direction = config.direction;
+        }
+    }
+
     // 2. Prime the theme before mounting to avoid flash.
     initThemeEarly();
 

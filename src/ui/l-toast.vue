@@ -13,6 +13,7 @@
 import { computed } from 'vue';
 import Toast from 'primevue/toast';
 import { getBoot } from '../core/boot.js';
+import { getActiveThemeConfig } from '../ds/theme-config.js';
 
 /**
  * LToast — themed wrapper around PrimeVue Toast.
@@ -29,35 +30,39 @@ import { getBoot } from '../core/boot.js';
 const props = defineProps({
     /** PrimeVue Toast position. When omitted, picks start-side for the active direction. */
     position: { type: String, default: '' },
-    /** Override text direction. Defaults to `__PINOOX__.direction` → `document.dir` → `ltr`. */
+    /** Override text direction. Defaults to theme → `__PINOOX__.direction` → `document.dir` → `ltr`. */
     dir: { type: String, default: '', validator: (v) => !v || ['rtl', 'ltr'].includes(v) },
 });
 
 const resolvedDir = computed(() => {
     if (props.dir) return props.dir;
+    const themeDir = getActiveThemeConfig()?.direction;
+    if (themeDir === 'rtl' || themeDir === 'ltr') return themeDir;
     const bootDir = getBoot()?.direction;
     if (bootDir === 'rtl' || bootDir === 'ltr') return bootDir;
     if (typeof document !== 'undefined') {
         const htmlDir = document.documentElement?.getAttribute('dir');
         if (htmlDir === 'rtl' || htmlDir === 'ltr') return htmlDir;
     }
-    // Fallback when boot/document dir is unset (apps typically set dir at boot).
     return 'ltr';
 });
 
 const resolvedPosition = computed(() => {
     if (props.position) return props.position;
-    // Start-side of the viewport: right in RTL, left in LTR.
+    // Prefer the side opposite the RTL sidebar (right): keep toasts top-left in RTL.
     return resolvedDir.value === 'rtl' ? 'top-left' : 'top-right';
 });
-
 const toastPt = computed(() => ({
     root: {
-        class: ['luma-toast', 'luma-toast__root'],
+        class: ['luma-toast', 'luma-toast__root', `luma-toast--${resolvedDir.value}`],
         dir: resolvedDir.value,
+        style: { direction: resolvedDir.value },
     },
     message: { class: 'luma-toast__message' },
-    messageContent: { class: 'luma-toast__content' },
+    messageContent: {
+        class: 'luma-toast__content',
+        style: { direction: resolvedDir.value },
+    },
     messageIcon: { class: 'luma-toast__icon' },
     messageText: { class: 'luma-toast__text' },
     summary: { class: 'luma-toast__summary' },
@@ -125,10 +130,20 @@ const toastPt = computed(() => ({
     align-items: flex-start;
     gap: var(--px-space-3);
     padding: var(--px-space-3) var(--px-space-4);
-    // Flex + dir=rtl on the root flips icon → text → close into:
-    //   [close] [text…] [icon]   (visual LTR order)
-    // which is the natural RTL toast layout.
     direction: inherit;
+}
+
+// Explicit row order under dir=rtl: icon (start/right) → text → close (end/left).
+.luma-toast--rtl .luma-toast__content.l-toast-message-content,
+.luma-toast--rtl .l-toast-message-content.luma-toast__content {
+    flex-direction: row;
+}
+
+.luma-toast__close-wrap {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    margin-inline-start: auto;
 }
 
 .luma-toast__icon.l-toast-message-icon,
@@ -166,14 +181,6 @@ const toastPt = computed(() => ({
     color: var(--px-text-muted);
     white-space: pre-line;
     word-break: break-word;
-}
-
-.luma-toast__close-wrap {
-    flex-shrink: 0;
-    display: flex;
-    align-items: flex-start;
-    // Sit on the trailing edge (left in RTL, right in LTR).
-    margin-inline-start: auto;
 }
 
 .luma-toast__close.l-toast-close-button,

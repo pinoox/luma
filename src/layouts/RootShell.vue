@@ -1,6 +1,6 @@
 <template>
   <RouterView />
-  <!-- Position & dir resolve from app bootstrap (RTL → top-left). -->
+  <!-- Position & dir resolve from theme / document (RTL apps → top-left). -->
   <LToast />
   <LConfirmDialog />
 </template>

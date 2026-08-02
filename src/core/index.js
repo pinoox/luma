@@ -7,12 +7,15 @@ export {
 } from './icons/lucide.js';
 export { formatDate } from './format/date.js';
 export {
+    jalaliMoment,
     toJalali,
     fromJalali,
     formatJalaliDisplay,
     buildJalaliMonthGrid,
     jalaliMonthLength,
     toPersianDigits,
+    fromPersianDigits,
+    isSameDay,
     JALALI_MONTHS,
     JALALI_WEEKDAYS,
 } from './format/jalali.js';

@@ -60,7 +60,7 @@
                         :is="resolveLink(item)"
                         v-for="item in section.items"
                         :key="item.key"
-                        :to="item.disabled || !item.to ? undefined : { name: item.to }"
+                        :to="linkTo(item)"
                         :href="item.disabled ? undefined : item.href"
                         :aria-disabled="item.disabled ? 'true' : undefined"
                         :tabindex="item.disabled ? -1 : undefined"
@@ -74,7 +74,7 @@
                         @click="item.disabled ? $event.preventDefault() : undefined"
                     >
                         <span class="px-sidebar__link-icon">
-                            <LIcon :name="item.icon" size="md" />
+                            <LIcon :name="item.icon" size="lg" />
                         </span>
                         <span v-if="!collapsed" class="px-sidebar__link-text">{{ item.label }}</span>
                         <span v-if="!collapsed && item.badge" class="px-sidebar__link-badge">
@@ -128,14 +128,24 @@ const toggleSection = (key) => {
 };
 
 const isActive = (item) => {
-    if (item.to) return route.name === item.to;
+    const name = routeName(item);
+    if (name) return route.name === name;
     if (item.match) return item.match(route);
     return false;
 };
 
+/** Apps may use `route` (theme config) or `to` (RouterLink-style). */
+const routeName = (item) => item?.route || item?.to || null;
+
+const linkTo = (item) => {
+    if (item.disabled) return undefined;
+    const name = routeName(item);
+    return name ? { name } : undefined;
+};
+
 const resolveLink = (item) => {
     if (item.disabled) return 'span';
-    if (item.to || item.match) return RouterLink;
+    if (routeName(item) || item.match) return RouterLink;
     return 'a';
 };
 </script>
@@ -191,7 +201,8 @@ const resolveLink = (item) => {
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            display: block;
         }
     }
 
@@ -223,14 +234,14 @@ const resolveLink = (item) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: var(--px-space-3);
+        gap: var(--px-space-4);
         min-height: 0;
     }
 
     &__section {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 0.75rem;
 
         &--collapsed &__section-items {
             display: none;
@@ -290,23 +301,25 @@ const resolveLink = (item) => {
     &__section-items {
         display: flex;
         flex-direction: column;
-        gap: 0;
+        gap: 0.2rem;
     }
 
     &__link {
         display: flex;
         align-items: center;
-        gap: var(--px-space-2);
-        padding: 7px 12px;
+        gap: var(--px-space-3);
+        padding: 0.7rem 0.9rem;
         border-radius: var(--px-radius-md);
         color: var(--px-text-soft);
         font-family: var(--px-font-sans);
-        font-size: var(--px-text-sm);
+        font-size: var(--px-text-md);
         font-weight: var(--px-weight-semibold);
+        line-height: var(--px-leading-snug);
         text-decoration: none;
         cursor: pointer;
         transition: background var(--px-duration-fast) var(--px-easing-standard),
-                    color var(--px-duration-fast) var(--px-easing-standard);
+                    color var(--px-duration-fast) var(--px-easing-standard),
+                    transform var(--px-duration-fast) var(--px-easing-standard);
 
         &:hover {
             background: var(--px-primary-soft);
@@ -337,8 +350,8 @@ const resolveLink = (item) => {
         }
 
         &-icon {
-            width: 22px;
-            height: 22px;
+            width: 26px;
+            height: 26px;
             display: inline-flex;
             align-items: center;
             justify-content: center;

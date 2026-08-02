@@ -4,7 +4,7 @@
             :is="resolveLink(item)"
             v-for="item in items"
             :key="item.key"
-            :to="item.disabled || !item.to ? undefined : { name: item.to }"
+            :to="linkTo(item)"
             :href="item.disabled ? undefined : item.href"
             :aria-disabled="item.disabled ? 'true' : undefined"
             :tabindex="item.disabled ? -1 : undefined"
@@ -17,7 +17,7 @@
             ]"
         >
             <span class="px-mobile-nav__icon">
-                <LIcon :name="item.icon" size="sm" />
+                <LIcon :name="item.icon" size="md" />
             </span>
             <span class="px-mobile-nav__label">{{ item.label }}</span>
             <span v-if="item.badge" class="px-mobile-nav__badge">{{ item.badge }}</span>
@@ -35,15 +35,24 @@ defineProps({
 
 const route = useRoute();
 
+const routeName = (item) => item?.route || item?.to || null;
+
+const linkTo = (item) => {
+    if (item.disabled) return undefined;
+    const name = routeName(item);
+    return name ? { name } : undefined;
+};
+
 const isActive = (item) => {
-    if (item.to) return route.name === item.to;
+    const name = routeName(item);
+    if (name) return route.name === name;
     if (item.match) return item.match(route);
     return false;
 };
 
 const resolveLink = (item) => {
     if (item.disabled) return 'span';
-    if (item.to || item.match) return RouterLink;
+    if (routeName(item) || item.match) return RouterLink;
     return 'a';
 };
 </script>

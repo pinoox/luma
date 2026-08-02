@@ -11,8 +11,6 @@
 
         <div class="px-layout__main">
             <LTopbar
-                :title="pageTitle"
-                :subtitle="pageLead"
                 :user="userInfo"
                 :spotlight="spotlightEnabled"
                 :spotlight-placeholder="spotlightPlaceholder"
@@ -72,12 +70,11 @@ import { getActiveThemeConfig, flattenNavItems, buildUserInfo } from '../ds/them
 
 const config = getActiveThemeConfig();
 const authStore = useAuthStore();
-const { pageTitle, pageLead } = usePage();
 
 const brand = config.brand;
 const drawerOpen = ref(false);
 
-const spotlightCfg = computed(() => config.spotlight ?? {});
+const spotlightCfg = computed(() => getActiveThemeConfig().spotlight ?? {});
 const spotlightEnabled = computed(() => spotlightCfg.value.enabled !== false);
 const spotlightPlaceholder = computed(
     () => spotlightCfg.value.placeholder || 'جستجو...',
@@ -91,11 +88,13 @@ const spotlightShowHint = computed(
 const spotlightShortcut = computed(() =>
     spotlightEnabled.value ? spotlightShortcutLabel() : '',
 );
-const layoutDir = computed(() =>
-    config.direction === 'ltr' || config.direction === 'rtl'
-        ? config.direction
-        : 'rtl',
-);
+const layoutDir = computed(() => {
+    const dir = getActiveThemeConfig().direction;
+    return dir === 'ltr' || dir === 'rtl' ? dir : 'rtl';
+});
+
+// Title/lead kept for document.title sync via usePage(); topbar shows Spotlight instead.
+usePage();
 
 const canPermission = (permission) => {
     if (!permission) return true;

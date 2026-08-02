@@ -1,9 +1,9 @@
 <template>
     <header class="px-topbar">
         <button
-            v-if="$slots['menu-button']"
             type="button"
             class="px-topbar__menu-btn"
+            aria-label="Menu"
             @click="$emit('menu')"
         >
             <slot name="menu-button">
@@ -179,7 +179,8 @@ const userInitials = computed(() => {
         align-items: center;
         gap: var(--px-space-2);
         height: 40px;
-        padding: 0 12px 0 10px;
+        padding-block: 0;
+        padding-inline: 12px 10px;
         border-radius: var(--px-radius-pill);
         border: 1px solid var(--px-border);
         background: var(--px-surface-muted);

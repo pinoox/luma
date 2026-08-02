@@ -3,6 +3,10 @@ import Aura from '@primeuix/themes/aura';
 
 // Pinoox Design System — PrimeVue preset
 // Primary: #0E73FD, sky alias chain.
+//
+// Dark `surface` scale MUST follow Aura’s convention (higher = darker).
+// Aura maps card/content backgrounds to `{surface.900}` in dark mode —
+// inverting the scale makes every Card/Panel appear white in dark theme.
 
 const ConsolePreset = definePreset(Aura, {
     semantic: {
@@ -53,18 +57,18 @@ const ConsolePreset = definePreset(Aura, {
             },
             dark: {
                 surface: {
-                    0: '#050811',
-                    50: '#0B1220',
-                    100: '#111827',
-                    200: '#1F2937',
-                    300: '#273449',
-                    400: '#334155',
-                    500: '#475569',
-                    600: '#64748B',
-                    700: '#94A3B8',
-                    800: '#CBD5E1',
-                    900: '#E2E8F0',
-                    950: '#F8FAFC',
+                    0: '#ffffff',
+                    50: '#E2E8F0',
+                    100: '#CBD5E1',
+                    200: '#94A3B8',
+                    300: '#64748B',
+                    400: '#475569',
+                    500: '#334155',
+                    600: '#273449',
+                    700: '#1F2937',
+                    800: '#111827',
+                    900: '#0B1220',
+                    950: '#050811',
                 },
             },
         },

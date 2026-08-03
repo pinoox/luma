@@ -7,12 +7,34 @@
 .l-multiselect-label,
 .l-checkbox-input,
 .l-radiobutton-input,
-.l-dialog-header-actions .l-button,
 .l-paginator .l-button {
   &:focus,
   &:focus-visible {
     outline: none;
     box-shadow: none;
+  }
+}
+
+// Dialog close (X) — PrimeVue autofocuses it on open with focusVisible:true.
+// Theme `prefix: 'l'` only renames CSS variables; class names stay `p-*`.
+// Kill both the Aura focus-ring vars and any leftover outline/shadow.
+.p-dialog-header-actions .p-button,
+.l-dialog-header-actions .l-button,
+.p-dialog-close-button,
+.l-dialog-close-button,
+.p-dialog-header .p-button.p-button-text,
+.l-dialog-header .l-button.l-button-text {
+  --p-focus-ring-width: 0;
+  --p-focus-ring-shadow: none;
+  --l-focus-ring-width: 0;
+  --l-focus-ring-shadow: none;
+
+  &:focus,
+  &:focus-visible,
+  &.p-focus,
+  &.l-focus {
+    outline: none !important;
+    box-shadow: none !important;
   }
 }
 

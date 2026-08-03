@@ -94,26 +94,17 @@ const readVerifyAuthHook = () => {
 };
 
 /**
- * Default session verification: if a token exists, trust it; only fall back
- * to the cross-app `me()` call when no token is present. Apps that need a
- * stricter verification can pass a `verifyAuth` hook to `createApp()`.
+ * Default session verification for local JWT / cookie apps.
+ *
+ * Always hydrates the user profile via `me()` (auth/get) so abilities and
+ * group_key are available after a refresh. A stored JWT alone is not enough —
+ * without the profile, permission-gated nav stays hidden.
+ *
+ * Opt out with `themeConfig.auth.skipMe: true` (manager-proxied tokens).
  */
 const defaultVerifySession = async (store) => {
-    if (store.token) {
-        // Token already present (cookie, localStorage, or adopted from URL).
-        // Mark the store as authenticated without re-validating against the
-        // server. Apps that need server validation can pass `verifyAuth`.
-        try {
-            store.login(store.token, store.user ?? { manager_proxied: true });
-        } catch (_) {
-            // best-effort
-        }
-        return true;
-    }
-
-    // No token at all → call me() to check if there's a server-side session.
     await store.canUserAccess(true);
-    return store.isAuth;
+    return !!store.isAuth;
 };
 
 /**

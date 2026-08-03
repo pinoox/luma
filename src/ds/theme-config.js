@@ -89,8 +89,8 @@ export const buildUserInfo = (profile, roleLabel) => ({
  * `user.roleLabel`. Anything left out falls back to these safe values.
  *
  * `auth` is opt-in: leave it empty to use Luma's defaults (read endpoints
- * from `__PINOOX__.auth.endpoints`, run `canUserAccess(true)` on first nav).
- * Override any of the following to customize:
+ * from `__PINOOX__.auth.endpoints`, hydrate the profile via me()/auth.get
+ * on first nav). Override any of the following to customize:
  *
  *   auth: {
  *     endpoints: { me, login, logout }, // override individual URLs
@@ -113,7 +113,7 @@ export const DEFAULT_THEME_CONFIG = {
     },
     auth: {
         endpoints: null,        // { me?, login?, logout? }
-        skipMe: false,          // if true, never call auth.me() — trust token presence
+        skipMe: false,          // if true, never call auth.me() — trust token presence (manager proxy)
         autoLoginFromUrl: false, // if true, adopt ?__manager_token=... and treat as logged-in
     },
     /**

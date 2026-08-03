@@ -1,6 +1,6 @@
 {
     "name": "@pinooxhq/luma",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "description": "Luma \u2014 A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
     "type": "module",
     "main": "./exports/index.js",

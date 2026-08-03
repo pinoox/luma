@@ -4,20 +4,23 @@
     position: relative;
     min-height: 100vh;
     min-height: 100dvh;
-    // Main canvas padding only — sidebar is a separate fixed rail on the edge.
-    padding: var(--px-space-3);
-    padding-inline-start: calc(var(--px-sidebar-width) + var(--px-space-3));
+    // Canvas gutter — matches the floating sidebar / topbar inset.
+    --px-layout-gutter: var(--px-space-3);
+    padding: var(--px-layout-gutter);
+    // sidebar outer inset + rail width + gap before main column
+    padding-inline-start: calc(
+        var(--px-layout-gutter) + var(--px-sidebar-width) + var(--px-layout-gutter)
+    );
     background: var(--px-gradient-canvas);
 
     &__sidebar {
         position: fixed;
-        inset-block: 0;
-        inset-inline-start: 0;
+        // Float inside the same gutter as the topbar — not flush to the viewport.
+        inset-block: var(--px-layout-gutter);
+        inset-inline-start: var(--px-layout-gutter);
         width: var(--px-sidebar-width);
-        height: 100vh;
-        height: 100dvh;
+        height: auto;
         z-index: 20;
-        // Keep the rail decoupled: its own stacking context, flush to edges.
         display: flex;
         flex-direction: column;
         pointer-events: auto;
@@ -28,7 +31,7 @@
         z-index: 1;
         display: flex;
         flex-direction: column;
-        gap: var(--px-space-3);
+        gap: var(--px-layout-gutter);
         min-width: 0;
         width: 100%;
     }
@@ -48,7 +51,7 @@
 
 @media (max-width: 1024px) {
     .px-layout {
-        padding-inline-start: var(--px-space-3);
+        padding-inline-start: var(--px-layout-gutter);
 
         &__sidebar {
             display: none;

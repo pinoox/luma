@@ -160,12 +160,13 @@ const resolveLink = (item) => {
     flex-direction: column;
     gap: var(--px-space-2);
     padding: var(--px-space-4) var(--px-space-3);
-    // Own surface — decoupled from the page canvas, still flush to the rail edges.
-    background: var(--px-surface-strong, var(--px-surface));
-    border: 0;
-    border-inline-end: 1px solid var(--px-border);
-    border-radius: 0;
-    box-shadow: none;
+    // Floating panel — same glass treatment as LTopbar.
+    background: var(--px-glass-bg);
+    backdrop-filter: var(--px-blur-lg);
+    -webkit-backdrop-filter: var(--px-blur-lg);
+    border: 1px solid var(--px-glass-border);
+    border-radius: var(--px-radius-lg);
+    box-shadow: var(--px-shadow-glass);
     transition: width var(--px-duration-base) var(--px-easing-emphasized);
     overflow-y: auto;
     overflow-x: hidden;

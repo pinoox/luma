@@ -15,7 +15,11 @@ const getBase = () => {
     if (typeof globalThis === 'undefined') return '/';
     const boot = globalThis.__PINOOX__;
     const base = boot?.url?.BASE;
-    return typeof base === 'string' && base !== '' ? base.replace(/\/$/, '') : '/';
+    if (typeof base !== 'string' || base.trim() === '') {
+        return '/';
+    }
+    const trimmed = base.replace(/\/$/, '');
+    return trimmed === '' ? '/' : trimmed;
 };
 
 /**
@@ -26,11 +30,17 @@ export const buildAppPath = (routePath) => {
     const base = getBase();
 
     if (typeof routePath === 'string' && routePath !== '' && routePath !== '/') {
-        if (routePath.startsWith(base)) return routePath;
+        if (base !== '/' && routePath.startsWith(base)) return routePath;
+        if (base === '/') {
+            return routePath.startsWith('/') ? routePath : `/${routePath}`;
+        }
         return `${base}${routePath.startsWith('/') ? routePath : `/${routePath}`}`;
     }
 
     const current = `${window.location.pathname}${window.location.search}`;
+    if (base === '/') {
+        return current.startsWith('/') ? current : `/${current}`;
+    }
     return current.startsWith(base) ? current : `${base}/`;
 };
 
@@ -183,7 +193,7 @@ const deriveBaseFromLocation = () => {
 
 export const resolveHistoryBase = () => {
     const base = getBase();
-    if (typeof base === 'string' && base !== '' && base !== '/') {
+    if (typeof base === 'string' && base !== '') {
         return base;
     }
     const derived = deriveBaseFromLocation();

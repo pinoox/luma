@@ -11,35 +11,39 @@
             </slot>
         </button>
 
-        <button
-            v-if="spotlight"
-            type="button"
-            class="px-topbar__spotlight"
-            :aria-label="spotlightPlaceholder"
-            @click="$emit('spotlight')"
-        >
-            <LIcon name="search" size="sm" class="px-topbar__spotlight-icon" />
-            <span class="px-topbar__spotlight-text">{{ spotlightPlaceholder }}</span>
-            <kbd v-if="spotlightShortcut" class="px-topbar__spotlight-kbd">{{ spotlightShortcut }}</kbd>
-        </button>
+        <div class="px-topbar__primary">
+            <slot name="leading" />
 
-        <div v-else class="px-topbar__title">
-            <strong>{{ title }}</strong>
-            <span v-if="subtitle">{{ subtitle }}</span>
-        </div>
+            <button
+                v-if="spotlight"
+                type="button"
+                class="px-topbar__spotlight"
+                :aria-label="spotlightPlaceholder"
+                @click="$emit('spotlight')"
+            >
+                <LIcon name="search" size="sm" class="px-topbar__spotlight-icon" />
+                <span class="px-topbar__spotlight-text">{{ spotlightPlaceholder }}</span>
+                <kbd v-if="spotlightShortcut" class="px-topbar__spotlight-kbd">{{ spotlightShortcut }}</kbd>
+            </button>
 
-        <div v-if="searchable && !spotlight" class="px-topbar__search">
-            <IconField>
-                <InputIcon>
-                    <LIcon name="search" size="sm" />
-                </InputIcon>
-                <InputText
-                    :model-value="internalSearch"
-                    :placeholder="searchPlaceholder"
-                    class="px-topbar__search-input"
-                    @input="onSearchInput"
-                />
-            </IconField>
+            <div v-else class="px-topbar__title">
+                <strong>{{ title }}</strong>
+                <span v-if="subtitle">{{ subtitle }}</span>
+            </div>
+
+            <div v-if="searchable && !spotlight" class="px-topbar__search">
+                <IconField>
+                    <InputIcon>
+                        <LIcon name="search" size="sm" />
+                    </InputIcon>
+                    <InputText
+                        :model-value="internalSearch"
+                        :placeholder="searchPlaceholder"
+                        class="px-topbar__search-input"
+                        @input="onSearchInput"
+                    />
+                </IconField>
+            </div>
         </div>
 
         <div class="px-topbar__actions">
@@ -51,7 +55,7 @@
                 v-if="user"
                 type="button"
                 class="px-topbar__user"
-                @click="$emit('user-click', user)"
+                @click="$emit('user-click', $event, user)"
             >
                 <Avatar :label="userInitials" shape="circle" />
                 <div class="px-topbar__user-meta">
@@ -142,6 +146,14 @@ const userInitials = computed(() => {
             background: var(--px-primary-soft);
             color: var(--px-primary);
         }
+    }
+
+    &__primary {
+        display: flex;
+        align-items: center;
+        gap: var(--px-space-2);
+        flex: 1;
+        min-width: 0;
     }
 
     &__title {

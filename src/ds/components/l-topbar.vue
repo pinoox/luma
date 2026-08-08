@@ -57,7 +57,18 @@
                 class="px-topbar__user"
                 @click="$emit('user-click', $event, user)"
             >
-                <Avatar :label="userInitials" shape="circle" />
+                <Avatar
+                    v-if="user.image"
+                    :image="user.image"
+                    shape="circle"
+                    class="px-topbar__avatar"
+                />
+                <Avatar
+                    v-else
+                    :label="userInitials"
+                    shape="circle"
+                    class="px-topbar__avatar"
+                />
                 <div class="px-topbar__user-meta">
                     <strong>{{ user.name }}</strong>
                     <span>{{ user.role || '' }}</span>
@@ -105,7 +116,13 @@ const onSearchInput = (event) => {
 
 const userInitials = computed(() => {
     if (!props.user) return '';
-    return (props.user.name || '').trim().charAt(0) || 'U';
+    const f = String(props.user.fname || '').trim();
+    const l = String(props.user.lname || '').trim();
+    if (f && l) return `${f.charAt(0)}${l.charAt(0)}`;
+    const parts = String(props.user.name || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return `${parts[0].charAt(0)}${parts[1].charAt(0)}`;
+    const single = parts[0] || 'U';
+    return single.slice(0, 2);
 });
 </script>
 
@@ -289,6 +306,19 @@ const userInitials = computed(() => {
 
         &:hover {
             background: var(--px-primary-soft);
+        }
+    }
+
+    &__avatar {
+        width: 2.25rem;
+        height: 2.25rem;
+        flex-shrink: 0;
+
+        .p-avatar-image,
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     }
 

@@ -79,10 +79,16 @@ export const resolveUserDisplayName = (profile, fallback = '') => {
  * @param {object|null} profile
  * @param {string} roleLabel
  */
-export const buildUserInfo = (profile, roleLabel) => ({
-    name: resolveUserDisplayName(profile, roleLabel),
-    role: roleLabel,
-});
+export const buildUserInfo = (profile, roleLabel) => {
+    const p = profile ?? {};
+    return {
+        name: resolveUserDisplayName(p, roleLabel),
+        role: roleLabel,
+        image: p.avatar_url || p.avatar || p.image || p.photo || '',
+        fname: p.fname || '',
+        lname: p.lname || '',
+    };
+};
 
 /**
  * Default shape — apps normally override `brand`, `nav.sections`, `pageMeta`,

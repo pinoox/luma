@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Direction detection** — `resolveDirection()` / `applyDocumentDirection()` sync `<html dir>` and PrimeVue `rtl` from `themeConfig.direction` → `<html dir>` → `__PINOOX__.direction` → `ltr`. Teleported Select/DatePicker/Menu overlays inherit RTL via Luma SCSS (no per-app CSS needed).
 - **`LConfirmDialog` RTL** — teleported confirm card sets `dir` from `resolveDirection()` so icon/title/message/actions flip correctly in RTL apps.
+- **PrimeUI license wiring** — `createApp({ license })` / `setupPrimeVue({ license })`, with fallbacks to `__PINOOX__.primevueLicense` and `PRIMEUI_LICENSE` / `VITE_PRIMEUI_LICENSE`.
 
 ### Changed
+- **Peers / deps (breaking)** — `primevue` `^5`, `@primeuix/themes` `^3`, `pinia` `^4`, plus `@vue/devtools-api` `^8` (required by Pinia 4).
 - **`LSidebar` section labels** — section `label` is a static heading by default (matches overview-style grouping). Accordion behaviour is opt-in via `collapsible: true` (with optional `defaultCollapsed`).
 - **`.px-layout__content`** — removed `max-width` / auto side margins so page body aligns with the full-width topbar. Narrow pages can still use `LPageContainer` + `pageMaxWidth`.
 - **`LSidebar` density** — tighter link padding, smaller item font, and reduced gaps between nav items/sections.

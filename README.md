@@ -1,175 +1,72 @@
 # @pinooxhq/luma
 
-A full-featured, highly customizable Vue 3 framework for building
-dashboard-style web applications on the Pinoox platform. Powered by
-PrimeVue 4.
+Vue 3 dashboard framework for [Pinoox](https://github.com/pinoox) apps — routing, Pinia, auth, layouts, theming, and a PrimeVue 4 UI layer in one package.
 
-Luma is more than a design system. It's the entire front-end foundation
-of a Pinoox app — routing, state management, authentication, layouts,
-theming, dev tooling, and the visual language — packaged together so
-teams can ship a polished, production-ready admin dashboard in hours
-instead of weeks.
-
-Every layer is a customization point. Theme tokens, layouts, the router,
-the auth flow, individual components, and even the boot factory itself
-can be replaced or extended without forking the package.
-
-> **Built for the Pinoox platform.**
-> Luma is the canonical front-end stack for any app running on Pinoox,
-> from e-commerce admin panels and CRM dashboards to internal tools and
-> multi-tenant SaaS consoles.
+Luma is more than a component kit. It is the front-end foundation of a Pinoox admin app: boot the shell with `createApp()`, drop in `PageLayout`, and ship pages with PrimeVue + Luma wrappers. Every layer (tokens, layouts, router, auth, components) can be replaced without forking.
 
 ---
 
 ## Table of contents
 
-1. [What's inside](#whats-inside)
-2. [Why Luma](#why-luma)
-3. [Install](#install)
+1. [Requirements](#requirements)
+2. [Install](#install)
+3. [Vite plugin](#vite-plugin)
 4. [Quick start](#quick-start)
-5. [Customization](#customization)
-   - [Visual tokens](#visual-tokens--themeconfigjs)
-   - [Sass overrides](#sass-overrides--stylesappscss)
-   - [Runtime app content](#runtime-app-content--themeconfig)
-   - [Components and layouts](#components-and-layouts)
-   - [Runtime mutability](#runtime-mutability)
-6. [Authentication](#authentication)
-7. [Usage examples](#usage-examples)
-8. [Subpath exports](#subpath-exports)
-9. [Upgrading](#upgrading)
-   - [Migrating from 0.3.x → 0.4.x](#migrating-from-03x--04x)
-10. [License](#license)
+5. [`createApp` options](#createapp-options)
+6. [Direction (RTL / LTR)](#direction-rtl--ltr)
+7. [Customization](#customization)
+8. [Authentication](#authentication)
+9. [Usage examples](#usage-examples)
+10. [Components](#components)
+11. [Subpath exports](#subpath-exports)
+12. [Upgrading](#upgrading)
+13. [License](#license)
+
+Full prop / slot reference for Luma UI: [`docs/README.md`](./docs/README.md) · release notes: [`CHANGELOG.md`](./CHANGELOG.md)
 
 ---
 
-## What's inside
+## Requirements
 
-**App framework**
+| Package | Version | Role |
+|---------|---------|------|
+| `vue` | `^3.5` | Runtime |
+| `primevue` | `^4.5` | UI components |
+| `@primeuix/themes` | `^2` | Aura-based theming (Luma Console preset) |
+| `pinia` | `^4` | State |
+| `@vue/devtools-api` | `^8` | Required by Pinia 4 |
+| `vue-router` | `^5` | Routing |
+| `axios` | `^1` | HTTP (used by auth / `http`) |
+| `lucide-vue-next` | `^1` | Icons for `<LIcon>` |
+| `sass` | `^1` | Compile `@pinooxhq/luma/styles` (devDependency) |
+| `@pinooxhq/auth` | `^0.1` | Optional — bundled auth helpers |
 
-- **`createApp()` factory** — wires PrimeVue, Pinia, the router, the
-  auth redirect handler, the dev bootstrap, and the theme system in a
-  single call.
-- **`createAppRouter()` + `authGuard()`** — auth-aware Vue Router with
-  `window.__PINOOX__` history-base resolution.
-- **Pinia** — explicit active-pinia setup so stores work inside router
-  guards out of the box.
-- **Auth integration** — `auth`, `http`, `useAuthStore` (via
-  `@pinooxhq/auth`), and an unauthorized-redirect handler.
-
-**Layouts**
-
-- **`RootShell`** — minimal outer wrapper with global Toast and resets.
-- **`PageLayout`** — production-ready dashboard shell: collapsible
-  sidebar, topbar, mobile bottom navigation, side drawer, brand block,
-  and user menu. Drop it into a route and you're done.
-
-**Design system**
-
-- **Tokens** — colors, typography, spacing, radius, shadow, motion, and
-  z-index. First-class light and dark themes.
-- **Components** — `LSidebar`, `LTopbar`, `LMobileNav`, `LCard`,
-  `LBadge`, `LEmptyPanel`, `LThemeToggle`, plus primitives
-  `LIcon`, `LView`, `LHeader`, `LButton`, `LField`, `LPageHeader`,
-  `LPageToolbar`, `LPageContainer`, `LSpinner`, `LToast`, and `LToolbar`.
-- **PrimeVue 4** — every core component available with Luma's preset
-  (DataTable, Forms, DatePicker, Dialog, Toast, FileUpload, …).
-  See the full table in [Usage examples](#available-primevue-components).
-- **Glassmorphism** and a fully responsive mobile experience out of
-  the box.
-
-**Theming**
-
-- **`useTheme()`** — reactive light/dark switching with persistence.
-- **`applyThemeConfig()`** — runtime brand, font, and layout overrides
-  written as CSS custom properties. No rebuild required.
-- **`themeConfig`** — one object carries the brand, navigation, page
-  metadata, role label, and visual tokens through the entire app.
-
-**Tooling**
-
-- **PrimeVue 4** preset derived from Aura, preconfigured for RTL, dark
-  mode, and glassmorphism.
-- **Vazir** web font, base resets, layout primitives, and Lucide icon
-  overrides.
-- **Dev bootstrap** — `applyDevBootstrap()` reads env vars and builds
-  `window.__PINOOX__` for Vite dev runs (no-op in production).
-
----
-
-## Why Luma
-
-- **Opinionated, not rigid.** Sensible defaults so teams ship fast, and
-  a clean customization layer so the design language never has to be
-  rewritten.
-- **Single source of truth.** Brand colors, navigation, page metadata,
-  and visual tokens all flow through one `themeConfig` object — change
-  it once, update everywhere.
-- **Production-ready foundations.** Authentication, route guards, dark
-  mode, responsive layouts, and toast notifications are wired in, not
-  left to each app to implement.
-- **Library-grade.** Semantic versioning, subpath exports, a stable
-  public API, and a documented upgrade path.
+Node **≥ 18**. Luma targets **PrimeVue 4.x** (latest 4.5 line) with `@primeuix/themes` **2.x**.
 
 ---
 
 ## Install
 
-Luma is published on npm as a standard package:
-
 ```sh
 npm install @pinooxhq/luma
 ```
 
-You'll also want PrimeVue 4 (Luma's UI layer), Pinia 4 (state management),
-Lucide (icons), and Sass (Luma's stylesheet is Sass):
+Peers (and Sass for styles):
 
 ```sh
-npm install primevue@^4 @primeuix/themes@^2 pinia@^4 @vue/devtools-api@^8 vue-router axios lucide-vue-next sass --save-dev
+npm install primevue@^4 @primeuix/themes@^2 pinia@^4 @vue/devtools-api@^8 vue-router axios lucide-vue-next
+npm install -D sass
 ```
 
-`@vue/devtools-api` is required by Pinia 4. `sass` is only needed at
-build time, so it lives in `devDependencies` of your app.
-
-That's it — no manual plugin wiring, no symlinks, no path hacks. Standard
-npm install just works.
-
-### Optional — Pinia auth helper
-
-Luma's auth composables (`useAuthStore`, `configureAuth`) build on
-`@pinooxhq/auth`. Install it alongside Luma if you'll use the bundled
-auth flow:
+Optional auth package (needed for `useAuthStore` / `configureAuth` flows):
 
 ```sh
 npm install @pinooxhq/auth
 ```
 
-If you skip this step, `createApp` still boots; pages that don't require
-auth render normally, but `requiresAuth` routes will always redirect.
+Without `@pinooxhq/auth`, `createApp` still boots and public pages work; `requiresAuth` routes redirect.
 
-### Vite config
-
-A minimal Vite config for a Luma app:
-
-```js
-import { fileURLToPath, URL } from 'node:url';
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      // Add your app-internal aliases as needed.
-    },
-  },
-});
-```
-
-No `optimizeDeps` tweaks, no `ssr.noExternal`, no `server.fs.allow`
-workarounds. Luma is a normal npm package and resolves like one.
-
-Import the stylesheet once from your app's main stylesheet:
+Import styles once in your app entry SCSS:
 
 ```scss
 @use '@pinooxhq/luma/styles';
@@ -177,29 +74,55 @@ Import the stylesheet once from your app's main stylesheet:
 
 ---
 
+## Vite plugin
+
+Use the official plugin so peer packages are deduped and `file:`-linked Luma hot-reloads correctly:
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import luma from '@pinooxhq/luma/vite';
+
+export default defineConfig({
+  plugins: [luma(), vue()],
+  resolve: {
+    alias: {
+      // app aliases…
+    },
+  },
+});
+```
+
+What `luma()` does by default:
+
+1. **Dedupes** peers (`primevue`, `pinia`, `vue-router`, …) against the consumer `node_modules` — avoids duplicate PrimeVue inject keys (e.g. broken `useToast()`).
+2. **Allows** the Luma package root through `server.fs.allow` and enables watch polling for `file:` / symlink installs.
+3. Keeps Luma out of `optimizeDeps` pre-bundle so source edits HMR cleanly.
+
+Optional overrides: `dedupe`, `excludeFromOptimize`, `fsAllow`, `watchPolling`. See comments in [`vite.js`](./vite.js).
+
+---
+
 ## Quick start
 
-A minimal Luma app is four small files.
+Minimal layout:
 
 ```
 your-app/
 ├── package.json
 ├── vite.config.js
-├── theme.config.js         ← visual overrides (colors, fonts, layout)
+├── theme.config.js          ← visual tokens (colors, fonts, layout)
 └── src/
-    ├── main.js             ← calls createApp(...)
+    ├── main.js              ← createApp(...)
     └── config/
-        ├── theme.js        ← brand + nav + pageMeta
-        └── routes.js       ← route map
+        ├── theme.js         ← brand, nav, pageMeta
+        └── routes.js
 ```
 
-The example below is for an e-commerce admin dashboard — it would be
-just as natural for a CRM, an analytics console, or an internal tool.
+### `theme.config.js` — visual tokens
 
-### `theme.config.js`
-
-Visual tokens. `createApp` writes these to `:root` as CSS variables, so
-rebranding never requires a Sass rebuild.
+Written to `:root` as CSS variables at boot (no Sass rebuild to rebrand):
 
 ```js
 export default {
@@ -222,12 +145,13 @@ export default {
     pageMaxWidth:          '1280px',
     radius:                'lg',
   },
+  // Optional:
+  // direction: 'rtl',
+  // auth: { endpoints: { me, login, logout }, skipMe, autoLoginFromUrl },
 };
 ```
 
-### `src/config/theme.js`
-
-Brand identity, navigation structure, and per-route page metadata.
+### `src/config/theme.js` — brand, nav, page meta
 
 ```js
 import logo from '@/assets/images/brand.svg';
@@ -241,48 +165,18 @@ export const themeConfig = {
   nav: {
     sections: [
       {
-        key: 'overview', label: 'Overview',
+        key: 'overview',
+        label: 'Overview', // static heading; set collapsible: true for accordion
         items: [
           { key: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard', route: 'shop.dashboard' },
-          { key: 'reports',   label: 'Reports',   icon: 'line-chart',       route: 'shop.reports' },
-        ],
-      },
-      {
-        key: 'catalog', label: 'Catalog',
-        items: [
-          { key: 'products',   label: 'Products',   icon: 'package',     route: 'shop.products' },
-          { key: 'categories', label: 'Categories', icon: 'folder-tree', route: 'shop.categories' },
-          { key: 'inventory',  label: 'Inventory',  icon: 'warehouse',   route: 'shop.inventory' },
-        ],
-      },
-      {
-        key: 'sales', label: 'Sales',
-        items: [
-          { key: 'orders',    label: 'Orders',    icon: 'shopping-cart', route: 'shop.orders' },
-          { key: 'customers', label: 'Customers', icon: 'users',         route: 'shop.customers' },
-          { key: 'discounts', label: 'Discounts', icon: 'percent',       route: 'shop.discounts' },
-        ],
-      },
-      {
-        key: 'settings', label: 'Settings',
-        items: [
-          { key: 'settings', label: 'General', icon: 'settings', route: 'shop.settings' },
-          { key: 'team',     label: 'Team',    icon: 'user-cog', route: 'shop.team' },
+          { key: 'orders',    label: 'Orders',    icon: 'shopping-cart',    route: 'shop.orders' },
         ],
       },
     ],
   },
   pageMeta: {
-    'shop.dashboard':  { title: 'Dashboard',  lead: 'Sales performance overview',     badge: 'Live' },
-    'shop.reports':    { title: 'Reports',    lead: 'Revenue and profit trends',      badge: 'Analytics' },
-    'shop.products':   { title: 'Products',   lead: 'Manage catalog items',           badge: 'Catalog' },
-    'shop.categories': { title: 'Categories', lead: 'Product tree structure',         badge: 'Catalog' },
-    'shop.inventory':  { title: 'Inventory',  lead: 'Stock levels and warehouses',    badge: 'Catalog' },
-    'shop.orders':     { title: 'Orders',     lead: 'Open and completed orders',      badge: 'Sales' },
-    'shop.customers':  { title: 'Customers',  lead: 'Customer base and purchase history', badge: 'Sales' },
-    'shop.discounts':  { title: 'Discounts',  lead: 'Promo codes and campaigns',      badge: 'Sales' },
-    'shop.settings':   { title: 'Settings',   lead: 'Store preferences',             badge: 'Settings' },
-    'shop.team':       { title: 'Team',       lead: 'Members and permissions',       badge: 'Settings' },
+    'shop.dashboard': { title: 'Dashboard', lead: 'Sales overview', badge: 'Live' },
+    'shop.orders':    { title: 'Orders',    lead: 'Open and completed', badge: 'Sales' },
   },
   user: { roleLabel: 'Store manager' },
 };
@@ -307,16 +201,10 @@ export const routes = [
         component: () => import('@pages/dashboard/page-dashboard.vue'),
       },
       {
-        path: 'products',
-        name: 'shop.products',
-        component: () => import('@pages/products/page-products.vue'),
-      },
-      {
         path: 'orders',
         name: 'shop.orders',
         component: () => import('@pages/orders/page-orders.vue'),
       },
-      // …
     ],
   },
 ];
@@ -336,16 +224,18 @@ createApp({
   AppRoot: RootShell,
   themeConfig: {
     ...appThemeConfig,
-    brand:  { ...appThemeConfig.brand,  ...themeConfig.brand },
+    brand:  { ...appThemeConfig.brand, ...themeConfig.brand },
     font:   themeConfig.font,
     layout: themeConfig.layout,
+    direction: themeConfig.direction,
+    auth: themeConfig.auth,
   },
   routes,
   pinia,
 });
 ```
 
-Pages read the active page metadata with `usePage()`:
+In pages:
 
 ```js
 import { usePage } from '@pinooxhq/luma';
@@ -354,28 +244,64 @@ const { pageTitle, pageLead, pageBadge } = usePage();
 
 ---
 
+## `createApp` options
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `AppRoot` | yes | Top-level Vue component — usually `RootShell` from `@pinooxhq/luma/layouts` |
+| `themeConfig` | no | Brand, nav, pageMeta, tokens, `direction`, `auth` |
+| `routes` | no | Vue Router route table (default `[]`) |
+| `pinia` | no | Pinia instance; installed and set active for guards |
+| `mount` | no | Mount selector (default `#app`) |
+| `auth` | no | Options passed to `configureAuth()` (overrides `themeConfig.auth`) |
+| `verifyAuth` | no | Async hook — full control over session checks (skips built-in `me()`) |
+| `IconComponent` | no | Global `<LIcon>` registration (e.g. pass Luma’s `LIcon`) |
+
+`AppRoot` is required so the Node-safe root barrel never pulls `.vue` SFCs into smoke tests / tooling.
+
+---
+
+## Direction (RTL / LTR)
+
+`createApp` resolves direction and syncs `<html dir>` + PrimeVue `rtl`:
+
+1. `themeConfig.direction` (`'rtl'` \| `'ltr'`)
+2. Existing `<html dir>` / `<body dir>`
+3. `window.__PINOOX__.direction` (boot payload / `VITE_DIRECTION`)
+4. Fallback: `'ltr'`
+
+Teleported overlays (Select, DatePicker, menus, confirm) inherit direction via Luma SCSS — no per-app overlay CSS required for the common cases.
+
+```js
+// theme.config.js
+export default {
+  direction: 'rtl',
+  // …
+};
+```
+
+---
+
 ## Customization
 
-Every layer of Luma is a customization point. The hooks below are listed
-in the order you'll typically reach for them.
+### Visual tokens
 
-### Visual tokens — `theme.config.js`
+| Group | Keys |
+|-------|------|
+| `brand` | `primary`, `primaryHover`, `primaryActive`, `primarySoft`, `bgLight`, `bgDark` |
+| `font` | `sans`, `mono` |
+| `layout` | `sidebarWidth`, `sidebarCollapsedWidth`, `topbarHeight`, `pageMaxWidth`, `radius` |
 
-`applyThemeConfig()` writes CSS custom properties to `:root`, so brand,
-font, and layout changes don't require a Sass rebuild.
+`createApp` calls `applyThemeConfig()` for you. You can also call it at runtime (white-label / multi-tenant):
 
-| Group  | Keys |
-|--------|------|
-| brand  | `primary`, `primaryHover`, `primaryActive`, `primarySoft`, `bgLight`, `bgDark` |
-| font   | `sans`, `mono` |
-| layout | `sidebarWidth`, `sidebarCollapsedWidth`, `topbarHeight`, `pageMaxWidth`, `radius` |
+```js
+import { applyThemeConfig, useTheme } from '@pinooxhq/luma';
 
-You rarely call this yourself — `createApp` does it from the config you
-pass in.
+applyThemeConfig({ brand: { primary: '#10b981' } });
+const { toggleTheme, isDark } = useTheme();
+```
 
-### Sass overrides — `styles/app.scss`
-
-For deeper changes (component internals, custom utilities):
+### Sass overrides
 
 ```scss
 @use '@pinooxhq/luma/styles';
@@ -384,207 +310,125 @@ For deeper changes (component internals, custom utilities):
   --px-primary-soft: rgba(14, 115, 253, 0.08);
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --px-bg: #0a0a14;
 }
 ```
 
-### Runtime app content — `themeConfig`
-
-The shape `createApp` expects:
+### `themeConfig` shape
 
 ```ts
 {
-  brand:    { title, subtitle?, logo? },
-  nav:      { sections: Array<{ key, label, items, collapsible?, defaultCollapsed? }> }, // label is a static heading; set collapsible:true to enable accordion
+  brand:    { title, subtitle?, logo?, primary?, /* visual brand keys */ },
+  nav:      { sections: Array<{ key, label, items, collapsible?, defaultCollapsed? }> },
   pageMeta: Record<string, { title, lead?, badge? }>,
-  user:     { roleLabel },
+  user?:    { roleLabel? },
   font?:    { sans?, mono? },
   layout?:  { sidebarWidth?, sidebarCollapsedWidth?, topbarHeight?, pageMaxWidth?, radius? },
+  direction?: 'rtl' | 'ltr',
+  auth?:    { endpoints?, skipMe?, autoLoginFromUrl? },
 }
 ```
 
-Any field you omit falls back to a Luma default.
+Omitted fields fall back to Luma defaults. Nav section `label` is a static heading; set `collapsible: true` for accordion sections.
 
-### Components and layouts
+### Layouts
 
-`createApp()` does NOT default `AppRoot` — you must pass it explicitly.
-The most common pattern is to use `RootShell` as the app-wide shell and
-`PageLayout` as a per-route layout, but either can be replaced:
+Typical pattern: `RootShell` as `AppRoot`, `PageLayout` as the authenticated route layout (sidebar, topbar, mobile nav, drawer).
 
 ```js
-import { RootShell } from '@pinooxhq/luma/layouts';
-
-createApp({
-  AppRoot: RootShell,  // required — the top-level Vue component
-  themeConfig: …,
-  routes: [
-    { path: '/', component: PageLayout, meta: { requiresAuth: true }, children: […] },
-  ],
-  pinia: …,
-  mount: '#app',       // default
-});
-```
-
-Individual Luma components (`LSidebar`, `LTopbar`, `LMobileNav`,
-`LCard`, …) can also be imported and composed into your own layouts
-from their respective subpaths:
-
-```js
+import { RootShell, PageLayout } from '@pinooxhq/luma/layouts';
 import { LSidebar, LTopbar, LMobileNav } from '@pinooxhq/luma/ds';
 import { LView, LHeader, LIcon } from '@pinooxhq/luma/ui';
 ```
 
-### Runtime mutability
-
-Theme and config can be changed at runtime — useful for white-labeling,
-multi-tenant themes, and admin previews:
-
-```js
-import { useTheme, applyThemeConfig } from '@pinooxhq/luma';
-
-const { toggleTheme, isDark } = useTheme();
-toggleTheme();
-
-applyThemeConfig({ brand: { primary: '#10b981' } });
-```
+Compose DS / UI pieces into a custom layout when `PageLayout` is too opinionated — `RootShell` only provides the outer wrapper, global Toast, and theme CSS variables.
 
 ---
 
 ## Authentication
 
-Luma ships with sensible Pinoox-flavored defaults so apps don't need any
-auth wiring to work. Override only what you need.
+Defaults match Pinoox account APIs. Override only what you need.
 
-### How the default flow works
+### Default guard flow
 
-On the first navigation, Luma's `authGuard` runs and:
+On first navigation, `authGuard`:
 
-1. Auto-picks up a manager-issued JWT from `?__manager_token=…` if present
-   (off by default — set `themeConfig.auth.autoLoginFromUrl: true` to opt in).
-2. Calls `auth.me()` once to verify the token against the server. This
-   uses `@pinooxhq/auth`'s `remote` strategy, which defaults to
-   `/account/api/v1/auth/{login,logout,get}`.
-3. Redirects to `/account/login` if `requiresAuth` routes can't be reached.
+1. Optionally adopts `?__manager_token=…` when `themeConfig.auth.autoLoginFromUrl: true`
+2. Calls `auth.me()` once (`remote` strategy → `/account/api/v1/auth/{login,logout,get}` by default)
+3. Redirects to `/account/login` when `requiresAuth` cannot proceed
 
-If your app uses a different backend or auth strategy, override the
-defaults at the level that fits.
-
-### Override the me/login/logout endpoints
-
-Simplest path. Add `auth.endpoints` to your `themeConfig`:
+### Custom endpoints
 
 ```js
 // theme.config.js
-export default {
-  // …visual tokens…
-  auth: {
-    endpoints: {
-      me:     '/api/v1/auth/me',
-      login:  '/api/v1/auth/login',
-      logout: '/api/v1/auth/logout',
-    },
+auth: {
+  endpoints: {
+    me:     '/api/v1/auth/me',
+    login:  '/api/v1/auth/login',
+    logout: '/api/v1/auth/logout',
   },
-};
+},
 ```
 
-Luma passes these to `@pinooxhq/auth` before the first router guard runs.
-No `configureAuth()` call needed.
-
-### Replace the auth strategy entirely
-
-For non-Pinoox backends (your own auth service, Auth0, Firebase, etc.),
-call `configureAuth()` from your app's bootstrap before `createApp()`:
+### Replace the strategy
 
 ```js
-// src/main.js
 import { createApp, configureAuth } from '@pinooxhq/luma';
 import { RootShell } from '@pinooxhq/luma/layouts';
 
 configureAuth({
   endpoints: { me: '/api/auth/me', login: '/api/auth/login' },
-  // any @pinooxhq/auth options — see its docs
 });
 
 createApp({ AppRoot: RootShell, themeConfig, routes, pinia });
 ```
 
-`configureAuth()` replaces Luma's default auth singleton. It's safe to
-call once before `createApp()`.
-
-### Skip the cross-app `me()` round-trip
-
-When the framework's default `me()` endpoint is broken, or your app
-trusts a manager-issued JWT, set `auth.skipMe: true`:
+### Skip `me()`
 
 ```js
-// theme.config.js
 auth: { skipMe: true, autoLoginFromUrl: true },
 ```
 
-With `skipMe: true`, Luma trusts the token's presence and skips the
-`me()` HTTP call entirely. The dashboard renders immediately.
+Trusts token presence and skips the HTTP round-trip.
 
-### Take full control with `verifyAuth`
-
-For arbitrary session-validation logic, pass a `verifyAuth` hook to
-`createApp()`. When supplied, Luma skips its built-in flow and lets your
-hook decide:
+### Full control — `verifyAuth`
 
 ```js
-import { createApp } from '@pinooxhq/luma';
-import { RootShell } from '@pinooxhq/luma/layouts';
-
 createApp({
   AppRoot: RootShell,
   themeConfig,
   routes,
   pinia,
   verifyAuth: async ({ store, route, adoptedFromUrl }) => {
-    // Hit your own /me, decode a JWT, check a cookie — anything.
-    if (!store.token) return false;        // → redirect to login
+    if (!store.token) return false;
     const profile = await fetchMyProfile();
-    store.user = profile;                  // populate the store
-    return profile.active === true;        // allow navigation
+    store.user = profile;
+    return profile.active === true;
   },
 });
 ```
 
-| Hook return | Effect on `requiresAuth` route |
-|-------------|-------------------------------|
-| `true`      | Navigation allowed |
-| `false`     | Redirected to login |
-| throws      | Treated as `false` |
+| Return | Effect |
+|--------|--------|
+| `true` | Allow navigation |
+| `false` / throw | Redirect to login |
 
-### Access the auth instance
-
-For advanced use cases:
+### Helpers
 
 ```js
 import { auth, useAuthStore, http, configureAuth, getActiveAuth } from '@pinooxhq/luma';
-
-// auth, http, useAuthStore — direct access (proxy reads from active instance)
-// configureAuth(opts) — replace the active instance
-// getActiveAuth() — read the current instance directly
 ```
 
-`http` is an axios client with auth headers already wired in. Use it for
-API calls instead of creating your own axios instance.
+`http` is an axios client with auth headers wired — prefer it over a fresh axios instance.
 
 ---
 
 ## Usage examples
 
-Beyond the quick-start, here are common patterns you'll reach for.
-
-### Table page with PrimeVue DataTable
-
-PrimeVue 4 ships first-class data tables. Luma's theme tokens carry
-through automatically. Full API reference:
-[primevue.org/datatable](https://primevue.org/datatable/).
+### DataTable page
 
 ```vue
-<!-- src/pages/orders/page-orders.vue -->
 <script setup>
 import { ref } from 'vue';
 import DataTable from 'primevue/datatable';
@@ -595,87 +439,67 @@ import InputText from 'primevue/inputtext';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import { usePage } from '@pinooxhq/luma';
+import { LView, LHeader, LCard } from '@pinooxhq/luma/ui';
 
 const { pageTitle, pageLead } = usePage();
-
 const orders = ref([
-  { id: 1001, customer: 'Alex Rivera', total: 1250, status: 'paid',     createdAt: '2026-05-10' },
-  { id: 1002, customer: 'Sam Chen',    total:  890, status: 'pending',  createdAt: '2026-05-11' },
-  { id: 1003, customer: 'Jordan Lee',  total: 2310, status: 'shipped',  createdAt: '2026-05-12' },
+  { id: 1001, customer: 'Alex Rivera', total: 1250, status: 'paid' },
+  { id: 1002, customer: 'Sam Chen',    total:  890, status: 'pending' },
 ]);
-
 const filters = ref({ global: '' });
-
-const statusSeverity = {
-  paid:    'success',
-  pending: 'warn',
-  shipped: 'info',
-  canceled:'danger',
-};
+const statusSeverity = { paid: 'success', pending: 'warn', shipped: 'info' };
 </script>
 
 <template>
   <LView>
     <LHeader :title="pageTitle" :lead="pageLead">
-      <Button label="New order" icon="plus" severity="primary" />
+      <Button label="New order" severity="primary" />
     </LHeader>
-
     <LCard>
-      <div class="orders-toolbar">
-        <IconField>
-          <InputIcon class="pi pi-search" />
-          <InputText v-model="filters.global" placeholder="Search…" />
-        </IconField>
-      </div>
-
+      <IconField>
+        <InputIcon class="pi pi-search" />
+        <InputText v-model="filters.global" placeholder="Search…" />
+      </IconField>
       <DataTable
         :value="orders"
         v-model:filters="filters"
         :global-filter-fields="['customer', 'status']"
-        paginator :rows="10"
+        paginator
+        :rows="10"
         striped-rows
       >
         <Column field="id" header="ID" sortable />
         <Column field="customer" header="Customer" sortable />
-        <Column field="total" header="Total" sortable>
-          <template #body="{ data }">{{ data.total.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}</template>
-        </Column>
         <Column field="status" header="Status">
           <template #body="{ data }">
             <Tag :value="data.status" :severity="statusSeverity[data.status]" />
           </template>
         </Column>
-        <Column field="createdAt" header="Date" sortable />
       </DataTable>
     </LCard>
   </LView>
 </template>
 ```
 
-### Form page with PrimeVue forms
+Docs: [primevue.org/datatable](https://primevue.org/datatable/)
 
-For validation-ready forms, PrimeVue's input components pair with
-`@primeuix/forms` or any validation lib. Full list of components:
-[primevue.org/forms](https://primevue.org/forms/).
+### Form + `LField`
 
 ```vue
 <script setup>
 import { reactive, ref } from 'vue';
 import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
-import Message from 'primevue/message';
 import { http } from '@pinooxhq/luma';
+import { LView, LHeader, LCard, LField } from '@pinooxhq/luma/ui';
 
-const form = reactive({ name: '', sku: '', price: 0, category: null, description: '' });
+const form = reactive({ name: '', category: null });
 const errors = ref({});
 const submitting = ref(false);
-
 const categories = [
-  { label: 'پوشاک',  value: 'apparel' },
-  { label: 'کفش',    value: 'shoes'   },
-  { label: 'اکسسوری', value: 'accessories' },
+  { label: 'Apparel', value: 'apparel' },
+  { label: 'Shoes', value: 'shoes' },
 ];
 
 async function submit() {
@@ -693,68 +517,31 @@ async function submit() {
 
 <template>
   <LView>
-    <LHeader title="محصول جدید" lead="یک محصول به کاتالوگ اضافه کنید" />
-
+    <LHeader title="New product" lead="Add an item to the catalog" />
     <LCard>
-      <form @submit.prevent="submit" class="product-form">
-        <label>
-          <span>نام محصول</span>
+      <form class="product-form" @submit.prevent="submit">
+        <LField label="Name" :error="errors.name?.[0]">
           <InputText v-model="form.name" :invalid="!!errors.name" />
-          <Message v-if="errors.name" severity="error" size="small">
-            {{ errors.name[0] }}
-          </Message>
-        </label>
-
-        <label>
-          <span>کد محصول (SKU)</span>
-          <InputText v-model="form.sku" :invalid="!!errors.sku" />
-        </label>
-
-        <label>
-          <span>دسته‌بندی</span>
-          <Select v-model="form.category" :options="categories" option-label="label"
-                  option-value="value" placeholder="انتخاب…" />
-        </label>
-
-        <label>
-          <span>توضیحات</span>
-          <Textarea v-model="form.description" rows="4" />
-        </label>
-
-        <div class="product-form__actions">
-          <Button type="submit" label="ذخیره" :loading="submitting" />
-        </div>
+        </LField>
+        <LField label="Category">
+          <Select
+            v-model="form.category"
+            :options="categories"
+            option-label="label"
+            option-value="value"
+            placeholder="Select…"
+          />
+        </LField>
+        <Button type="submit" label="Save" :loading="submitting" />
       </form>
     </LCard>
   </LView>
 </template>
-
-<style lang="scss" scoped>
-.product-form {
-  display: grid;
-  gap: 1rem;
-  max-width: 640px;
-
-  label {
-    display: grid;
-    gap: 0.5rem;
-    font-weight: 500;
-  }
-
-  &__actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    margin-top: 0.5rem;
-  }
-}
-</style>
 ```
 
-### Toast / Dialog / Confirm
+### Toast / Dialog
 
-Global toasts come pre-wired in `RootShell`. Use PrimeVue's `useToast()`
-anywhere. Full API: [primevue.org/toast](https://primevue.org/toast/).
+Global Toast is mounted by `RootShell`. Use `useToast()` anywhere:
 
 ```vue
 <script setup>
@@ -764,37 +551,32 @@ import { useToast } from 'primevue/usetoast';
 import { ref } from 'vue';
 
 const toast = useToast();
-const dialogOpen = ref(false);
+const open = ref(false);
 
 function notify() {
   toast.add({
     severity: 'success',
-    summary: 'ذخیره شد',
-    detail: 'تغییرات با موفقیت ثبت شدند.',
+    summary: 'Saved',
+    detail: 'Changes were stored.',
     life: 3000,
   });
 }
 </script>
 
 <template>
-  <div>
-    <Button label="اعلان" @click="notify" />
-    <Button label="حذف" severity="danger" @click="dialogOpen = true" />
-
-    <Dialog v-model:visible="dialogOpen" header="تأیید حذف" modal>
-      <p>آیا از حذف این مورد مطمئن هستید؟</p>
-      <template #footer>
-        <Button label="انصراف" text @click="dialogOpen = false" />
-        <Button label="حذف" severity="danger" @click="dialogOpen = false" />
-      </template>
-    </Dialog>
-  </div>
+  <Button label="Notify" @click="notify" />
+  <Button label="Delete" severity="danger" @click="open = true" />
+  <Dialog v-model:visible="open" header="Confirm" modal>
+    <p>Delete this item?</p>
+    <template #footer>
+      <Button label="Cancel" text @click="open = false" />
+      <Button label="Delete" severity="danger" @click="open = false" />
+    </template>
+  </Dialog>
 </template>
 ```
 
-### Dark mode toggle
-
-`useTheme()` is reactive — drop a button anywhere.
+### Dark mode
 
 ```vue
 <script setup>
@@ -809,128 +591,86 @@ const { isDark, toggleTheme } = useTheme();
 </template>
 ```
 
-### Custom layout (skip `PageLayout`)
+---
 
-Some apps want to keep the chrome from `RootShell` but design their own
-page interior. Just wrap any component in a route:
+## Components
 
-```js
-import { RootShell } from '@pinooxhq/luma/layouts';
-import MarketingLayout from '@/layouts/marketing-layout.vue';
+**Rule of thumb:** use PrimeVue directly for forms, tables, overlays. Reach for an `L*` wrapper when you want Luma’s themed chrome on top.
 
-export const routes = [
-  {
-    path: '/',
-    component: RootShell,
-    children: [
-      { path: 'dashboard', component: MarketingLayout, meta: { requiresAuth: true }, children: […] },
-    ],
-  },
-];
-```
+### Luma UI (`@pinooxhq/luma/ui`)
 
-`RootShell` only provides the outer wrapper, global `<Toast>`, and the
-theme CSS variables. Everything inside is yours.
+| Component | Purpose |
+|-----------|---------|
+| `LView` / `LPage` | Page shells with consistent padding |
+| `LHeader` | Classic page header (`title`, `lead`, `badge`, actions slot) |
+| `LPageHeader` | Modern header (`eyebrow`, `title`, `lead`, `icon`) |
+| `LPageToolbar` | Sticky page actions |
+| `LPageContainer` | Honors `pageMaxWidth` + gutters |
+| `LPanel` | Content panel (incl. flush table chrome) |
+| `LCard` | Themed card (PrimeVue Card) |
+| `LStatCard` | KPI / metric card |
+| `LEmptyPanel` | Empty state + CTA |
+| `LBadge` | Status tag |
+| `LButton` | Variant / severity / size / shape system |
+| `LField` | Label, hint, error + input slot |
+| `LDatePicker` | Themed date picker |
+| `LTabs` | Tab strip helpers |
+| `LToolbar` | Filter / action row |
+| `LSpinner` | Loading spinner |
+| `LToast` | In-page toast host (global Toast still in `RootShell`) |
+| `LConfirmDialog` | Confirm surface with RTL-aware layout |
+| `LRichEditor` | TipTap rich text |
+| `LIcon` | Lucide wrapper (`<LIcon name="shopping-cart" />`) |
 
-### Available PrimeVue components
+### Design-system chrome (`@pinooxhq/luma/ds`)
 
-Luma wires **PrimeVue 4** with the Aura-derived Console preset. Import
-any core component in your pages without additional setup:
+| Component | Purpose |
+|-----------|---------|
+| `LSidebar` | Nav sidebar (`PageLayout`) |
+| `LTopbar` | Top bar |
+| `LMobileNav` | Mobile bottom nav |
+| `LThemeToggle` | Light / dark control |
+| `LEmptyState` | **Deprecated** alias of `LEmptyPanel` |
 
-| Component | Docs |
-|-----------|------|
-| `Button`, `IconButton` | [primevue.org/button](https://primevue.org/button/) |
-| `InputText`, `Textarea`, `Password`, `InputPassword`, `InputMask`, `InputOtp`, `InputTags` | [primevue.org/forms](https://primevue.org/forms/) |
-| `Select`, `MultiSelect`, `AutoComplete`, `Listbox`, `TreeSelect`, `CascadeSelect` | [primevue.org/select](https://primevue.org/select/) |
-| `Checkbox`, `RadioButton`, `ToggleSwitch`, `SelectButton`, `Slider`, `Rating`, `InputNumber` | [primevue.org/forms](https://primevue.org/forms/) |
-| `DatePicker` | [primevue.org/datepicker](https://primevue.org/datepicker/) |
-| `DataTable`, `DataView`, `Tree`, `TreeTable`, `Timeline`, `Paginator` | [primevue.org/datatable](https://primevue.org/datatable/) |
-| `Card`, `Panel`, `Accordion`, `Tabs`, `Stepper` | [primevue.org/panels](https://primevue.org/panels/) |
-| `Dialog`, `Drawer`, `Popover`, `Tooltip` | [primevue.org/overlay](https://primevue.org/overlay/) |
-| `Toast` (global, auto-mounted), `Message`, `Tag`, `Badge`, `Chip` | [primevue.org/toast](https://primevue.org/toast/) |
-| `Menu`, `Menubar`, `MegaMenu`, `PanelMenu`, `TieredMenu`, `CommandMenu` | [primevue.org/menu](https://primevue.org/menu/) |
-| `Avatar`, `AvatarGroup`, `Divider`, `Splitter`, `ScrollArea` | [primevue.org/misc](https://primevue.org/misc/) |
-| `FileUpload`, `ProgressBar`, `ProgressSpinner`, `Skeleton` | [primevue.org/fileupload](https://primevue.org/fileupload/) |
-| `Carousel`, `Gallery`, `Compare` | [primevue.org/media](https://primevue.org/media/) |
-| `ConfirmDialog`, `ConfirmPopup` | [primevue.org/confirmdialog](https://primevue.org/confirmdialog/) |
-| `Breadcrumb`, `Menubar`, `Dock` | [primevue.org/menubar](https://primevue.org/menubar/) |
-| `Knob`, `SelectButton`, `ToggleButton` | [primevue.org/button](https://primevue.org/button/) |
+### PrimeVue 4 (wired via Console preset)
 
-> **Rich text.** For an editor, Luma ships `LRichEditor` (TipTap) from
-> `@pinooxhq/luma/ui` instead of relying on PrimeVue's Quill-based Editor.
+Import any core component in pages — preset, ripple, RTL, and dark mode are already installed by `setupPrimeVue`:
 
-Luma's preset already registers an Aura-derived theme with your brand's
-primary color — no extra theme setup needed.
+| Area | Components |
+|------|------------|
+| Form | `InputText`, `Textarea`, `Password`, `InputMask`, `InputNumber`, `InputOtp`, `Select`, `MultiSelect`, `AutoComplete`, `Checkbox`, `RadioButton`, `ToggleSwitch`, `SelectButton`, `Slider`, `Rating`, `DatePicker`, … |
+| Data | `DataTable`, `DataView`, `Tree`, `TreeTable`, `Timeline`, `Paginator` |
+| Panels | `Card`, `Panel`, `Accordion`, `Tabs`, `Stepper`, `Toolbar` |
+| Overlay | `Dialog`, `Drawer`, `Popover`, `Tooltip`, `ConfirmDialog`, `ConfirmPopup` |
+| Feedback | `Toast`, `Message`, `Tag`, `Badge`, `Chip`, `ProgressBar`, `ProgressSpinner`, `Skeleton` |
+| Menu | `Menu`, `Menubar`, `MegaMenu`, `PanelMenu`, `TieredMenu`, `Breadcrumb` |
+| Media | `Image`, `Carousel`, `FileUpload` |
+| Misc | `Avatar`, `Divider`, `Splitter`, `ScrollPanel`, `Knob`, `Button`, `ToggleButton` |
 
-### Luma's own components
-
-Beyond PrimeVue, Luma ships a small set of opinionated shell components:
-
-| Component | Subpath | Purpose |
-|-----------|---------|---------|
-| `LView` | `@pinooxhq/luma/ui` | Page wrapper with consistent padding and max-width. |
-| `LHeader` | `@pinooxhq/luma/ui` | Page header with `title`, `lead`, `badge`, and a slot for actions. |
-| `LPageHeader` | `@pinooxhq/luma/ui` | Modern page header with eyebrow, title, lead, and icon. |
-| `LPageToolbar` | `@pinooxhq/luma/ui` | Sticky toolbar for page-level actions (right-aligned slot). |
-| `LPageContainer` | `@pinooxhq/luma/ui` | Constrains a page to the configured `pageMaxWidth` and handles gutters. |
-| `LCard` | `@pinooxhq/luma/ui` | Themed card with header/body/footer slots. |
-| `LEmptyPanel` | `@pinooxhq/luma/ui` | "No data" placeholder with icon, title, description, and CTA. |
-| `LBadge` | `@pinooxhq/luma/ui` | Inline status badge with `variant` + `dot` props. |
-| `LButton` | `@pinooxhq/luma/ui` | Themed button with `variant` / `severity` / `size` / `shape` props. |
-| `LField` | `@pinooxhq/luma/ui` | Form field wrapper — label, hint, error, slot for any input. |
-| `LSpinner` | `@pinooxhq/luma/ui` | Loading spinner with `size` and `center` props. |
-| `LToast` | `@pinooxhq/luma/ui` | Per-page toast mount (global `<Toast>` is auto-mounted by `RootShell`). |
-| `LRichEditor` | `@pinooxhq/luma/ui` | TipTap rich-text field. |
-| `LToolbar` | `@pinooxhq/luma/ui` | Horizontal toolbar for filter/action rows. |
-| `LIcon` | `@pinooxhq/luma/ui` | Lucide icon wrapper (e.g. `<LIcon name="shopping-cart" />`). |
-| `LSidebar` | `@pinooxhq/luma/ds` | Sidebar (used by `PageLayout`, available standalone). |
-| `LTopbar` | `@pinooxhq/luma/ds` | Topbar (used by `PageLayout`, available standalone). |
-| `LMobileNav` | `@pinooxhq/luma/ds` | Mobile bottom nav. |
-| `LThemeToggle` | `@pinooxhq/luma/ds` | Light/dark toggle. |
-| `LEmptyState` | `@pinooxhq/luma/ds` | **Deprecated alias** for `LEmptyPanel`. Prefer `LEmptyPanel`. |
-
-Import any of these alongside PrimeVue components in your pages:
-
-```js
-import { LView, LHeader, LButton, LField, LPageHeader } from '@pinooxhq/luma/ui';
-import { LCard, LEmptyPanel } from '@pinooxhq/luma/ui';
-import { LSidebar, LTopbar } from '@pinooxhq/luma/ds';
-```
-
-> **Full reference (every prop, slot, example):** see [`docs/README.md`](./docs/README.md).
+See [primevue.org](https://primevue.org/) for the full API. Theme CSS comes from `@primeuix/themes` via Luma’s preset — you do not need a separate PrimeVue CSS import for the Console look.
 
 ---
 
 ## Subpath exports
 
-Import from the package root for the full surface:
-
-```js
-import { createApp, usePage } from '@pinooxhq/luma';
-import { PageLayout } from '@pinooxhq/luma/layouts';
-```
-
-Or pick a smaller surface:
-
-| Path | What you get |
-|------|--------------|
-| `@pinooxhq/luma` | Full barrel (Node-safe, no `.vue` SFCs) |
-| `@pinooxhq/luma/ds` | `LSidebar`, `LTopbar`, `LMobileNav`, `LThemeToggle`, `LCard`, `LBadge`, `LEmptyState` (legacy alias for `LEmptyPanel`) |
-| `@pinooxhq/luma/ui` | `LButton`, `LBadge`, `LCard`, `LField`, `LHeader`, `LIcon`, `LPageContainer`, `LPageHeader`, `LPageToolbar`, `LSpinner`, `LToast`, `LRichEditor`, `LToolbar`, `LView`, `LEmptyPanel` |
+| Path | Contents |
+|------|----------|
+| `@pinooxhq/luma` | Node-safe barrel (`createApp`, composables, auth, theme helpers — no `.vue` SFCs) |
+| `@pinooxhq/luma/ui` | UI primitives listed above |
+| `@pinooxhq/luma/ds` | Shell chrome + legacy `LEmptyState` |
 | `@pinooxhq/luma/layouts` | `RootShell`, `PageLayout` |
-| `@pinooxhq/luma/composables` | `usePage` |
-| `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `redirectToLogin`, `buildAppPath`, `resolveHistoryBase` |
-| `@pinooxhq/luma/core` | `auth`, `http`, `useAuthStore`, `configureAuth`, `env`, `isDev`, `isProd`, icon helpers, `formatDate`, `resolveMediaUrl` |
+| `@pinooxhq/luma/composables` | `usePage`, … |
+| `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `redirectToLogin`, history helpers |
+| `@pinooxhq/luma/core` | `auth`, `http`, `useAuthStore`, `configureAuth`, `env`, dates, media helpers |
 | `@pinooxhq/luma/plugins` | `setupPrimeVue`, `ConsolePreset` |
 | `@pinooxhq/luma/styles` | Main SCSS bundle |
-| `@pinooxhq/luma/tokens` | SCSS tokens |
-| `@pinooxhq/luma/fonts` | Vazir font registration |
-| `@pinooxhq/luma/theme-config` | `flattenNavItems`, `findNavItemByRoute`, `findPageMeta`, `resolveThemeConfig`, `setActiveThemeConfig` |
-| `@pinooxhq/luma/createApp` | The `createApp` factory |
-| `@pinooxhq/luma/applyThemeConfig` | `applyThemeConfig` |
-| `@pinooxhq/luma/vite` | The Vite helper bundle |
-
-> **Full component catalog (props, slots, examples):** see [`docs/README.md`](./docs/README.md).
+| `@pinooxhq/luma/tokens` | SCSS design tokens |
+| `@pinooxhq/luma/fonts` | Vazir registration |
+| `@pinooxhq/luma/theme-config` | Nav / pageMeta / theme resolution helpers |
+| `@pinooxhq/luma/createApp` | Factory only |
+| `@pinooxhq/luma/applyThemeConfig` | Runtime CSS variable writer |
+| `@pinooxhq/luma/vite` | Vite plugin |
+| `@pinooxhq/luma/preset` | Console preset (default export) |
 
 ---
 
@@ -940,33 +680,27 @@ Or pick a smaller surface:
 npm update @pinooxhq/luma
 ```
 
-See [`CHANGELOG.md`](./CHANGELOG.md) for release notes. Luma follows
-semantic versioning:
+Semantic versioning (see [`CHANGELOG.md`](./CHANGELOG.md)):
 
-- **Patch** — internal refactors, no API change.
-- **Minor** — new components, tokens, or composables; backwards
-  compatible.
-- **Major** — breaking changes, documented in the changelog.
+- **Patch** — internal fixes, no public API break
+- **Minor** — new components / helpers, backwards compatible
+- **Major** — breaking changes, documented in the changelog
 
 Pin to `^0.4.0` (or stricter) for predictable upgrades.
 
 ### Migrating from 0.3.x → 0.4.x
 
-This release bumps several peer majors (PrimeVue stays on 4.x):
-
 | Package | 0.3.x | 0.4.x |
 |---------|-------|-------|
-| `primevue` | `^4` | `^4.5` (latest 4.x) |
+| `primevue` | `^4` | `^4.5` |
 | `@primeuix/themes` | `^1` | `^2` |
 | `pinia` | `^3` | `^4` |
-| `@vue/devtools-api` | — | `^8` (new peer) |
+| `@vue/devtools-api` | — | `^8` |
 
-1. Install the new peers (see [Install](#install)).
-2. Prefer `LEmptyPanel` over the deprecated `LEmptyState` alias.
-
-If you briefly installed `0.4.0` / `0.4.1` with `primevue@^5`, pin back to
-`primevue@^4` and `@primeuix/themes@^2`, and remove any `license` /
-`VITE_PRIMEUI_LICENSE` wiring — it is no longer used.
+1. Install the peer set from [Install](#install).
+2. Prefer `LEmptyPanel` over `LEmptyState`.
+3. Prefer the `luma()` Vite plugin when developing against a `file:` link.
+4. Set `themeConfig.direction` when you need explicit RTL.
 
 ---
 

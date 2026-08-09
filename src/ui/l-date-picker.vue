@@ -400,7 +400,7 @@ onBeforeUnmount(() => {
     }
 
     &__gregorian {
-        :deep(.p-datepicker) {
+        .p-datepicker {
             border: 0;
             padding: 0;
         }

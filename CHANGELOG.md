@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] — 2026-08-09
+
+### Fixed
+- **Vite lightningcss `:deep` warning** — unscoped `LDatePicker` styles used `:deep()`, which is Vue-scoped-only and was left in the CSS bundle. Use a normal descendant selector so minify no longer warns.
+
 ### Changed
 - **Stay on PrimeVue 4** — pin `primevue` to `^4.5` and `@primeuix/themes` to `^2` (no PrimeUI license key). Pinia 4 / Vue Router 5 and other peers stay current.
 - **Remove PrimeUI license wiring** — `createApp({ license })` / `setupPrimeVue({ license })` and env / `__PINOOX__.primevueLicense` fallbacks are gone.

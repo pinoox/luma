@@ -22,7 +22,7 @@ Luma is more than a component kit. It is the front-end foundation of a Pinoox ad
 12. [Upgrading](#upgrading)
 13. [License](#license)
 
-Full prop / slot reference for Luma UI: [`docs/README.md`](./docs/README.md) · release notes: [`CHANGELOG.md`](./CHANGELOG.md)
+Full prop / slot reference: [`docs/README.md`](./docs/README.md) · page kit: [`docs/page-kit.md`](./docs/page-kit.md) · release notes: [`CHANGELOG.md`](./CHANGELOG.md)
 
 ---
 

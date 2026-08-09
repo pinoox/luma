@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stay on PrimeVue 4** — pin `primevue` to `^4.5` and `@primeuix/themes` to `^2` (no PrimeUI license key). Pinia 4 / Vue Router 5 and other peers stay current.
 - **Remove PrimeUI license wiring** — `createApp({ license })` / `setupPrimeVue({ license })` and env / `__PINOOX__.primevueLicense` fallbacks are gone.
 - **README** — rewrite for clarity: requirements table, Vite `luma()` plugin, `createApp` options, RTL, accurate component / export maps.
+- **`docs/`** — refresh UI reference and page-kit docs (PrimeVue 4 peers, missing components, fixed boot examples).
 
 ## [0.4.1] — 2026-08-09
 

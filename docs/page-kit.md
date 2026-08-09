@@ -2,6 +2,10 @@
 
 Default admin page composition. Prefer these primitives over one-off page headers and custom panel CSS.
 
+Full prop reference: [`docs/README.md`](./README.md). App boot / layouts / auth: [root README](../README.md).
+
+## Canonical page
+
 ```vue
 <template>
   <LPage icon="users" header-tone="gradient">
@@ -11,7 +15,9 @@ Default admin page composition. Prefer these primitives over one-off page header
 
     <template #toolbar-info>12 items</template>
     <template #toolbar>
-      <LButton variant="outline" severity="neutral" size="sm" shape="rounded">Export</LButton>
+      <LButton variant="outline" severity="neutral" size="sm" shape="rounded">
+        Export
+      </LButton>
     </template>
 
     <LEmptyPanel v-if="loading" loading />
@@ -20,7 +26,11 @@ Default admin page composition. Prefer these primitives over one-off page header
       icon="inbox"
       title="Nothing here yet"
       message="Create the first item to get started."
-    />
+    >
+      <template #actions>
+        <LButton icon="plus">Add</LButton>
+      </template>
+    </LEmptyPanel>
     <LPanel v-else flush tone="glass">
       <DataTable :value="rows" class="luma-table" />
     </LPanel>
@@ -43,13 +53,17 @@ import DataTable from 'primevue/datatable';
 | `LPageContainer` | Content column (used inside `LPage`) |
 | `LPanel` | Content surface (`solid` \| `muted` \| `glass`; `flush` for tables) |
 | `LEmptyPanel` | Empty / loading block |
-| `LButton` / `LBadge` / `LStatCard` / `LCard` | Actions, status, KPIs |
+| `LStatCard` | KPI tiles above a panel |
+| `LTabs` | Workspace tabs (`variant="table"` pairs with `.luma-table`) |
+| `LButton` / `LBadge` / `LCard` | Actions, status, cards |
 
 ## CSS helpers
 
-- `.luma-table` — native table + PrimeVue DataTable chrome
-- `.luma-actions` / `.luma-actions--end` / `.luma-actions--between` — action rows
-- `.luma-panel` / `.luma-surface[--glass]` — surfaces without the SFC
+| Class | Role |
+|-------|------|
+| `.luma-table` | Native table + PrimeVue DataTable chrome |
+| `.luma-actions` / `--end` / `--between` | Action rows |
+| `.luma-panel` / `.luma-surface` / `--glass` | Surfaces without the SFC |
 
 ## Meta
 
@@ -61,4 +75,38 @@ pageMeta: {
 }
 ```
 
-`LPage` reads it automatically. Override with `:title` / `:lead` / `:eyebrow` when a page needs dynamic copy.
+`LPage` reads it automatically. Override with `:title` / `:lead` / `:eyebrow` / `:icon` when a page needs dynamic copy. Hide the header with `:header="false"`.
+
+## Patterns
+
+**KPI row + table**
+
+```vue
+<LPage>
+  <div class="luma-grid luma-grid--sm luma-grid--gap-3">
+    <LStatCard label="Open" :value="open" icon="inbox" tone="primary" />
+    <LStatCard label="Done" :value="done" icon="circle-check" tone="success" />
+  </div>
+  <LPanel flush>
+    <DataTable class="luma-table" :value="rows" />
+  </LPanel>
+</LPage>
+```
+
+**Tabs + flush panel**
+
+```vue
+<LPage>
+  <LTabs
+    flush
+    :items="[
+      { label: 'All', value: 'all' },
+      { label: 'Active', value: 'active', badge: activeCount },
+    ]"
+    v-model="tab"
+  />
+  <LPanel flush>
+    <DataTable class="luma-table" :value="filtered" />
+  </LPanel>
+</LPage>
+```

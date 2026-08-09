@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Stay on PrimeVue 4** — pin `primevue` to `^4.5` and `@primeuix/themes` to `^2` (no PrimeUI license key). Pinia 4 / Vue Router 5 and other peers stay current.
+- **Remove PrimeUI license wiring** — `createApp({ license })` / `setupPrimeVue({ license })` and env / `__PINOOX__.primevueLicense` fallbacks are gone.
+
+## [0.4.1] — 2026-08-09
+
+### Fixed
+- **Vite plugin on Windows** — `server.fs.allow` no longer builds `file://` URLs with `new URL(windowsPath)`, which treated `C:` as a scheme and threw `ERR_INVALID_URL_SCHEME`. Roots are normalized via `toFsPath` / `toAllowPath` (`path.resolve` + `pathToFileURL`), and package roots use `path.dirname` for cross-platform paths. Covered by `npm run test:vite-paths`.
+
+## [0.4.0]
+
 ### Added
 - **Direction detection** — `resolveDirection()` / `applyDocumentDirection()` sync `<html dir>` and PrimeVue `rtl` from `themeConfig.direction` → `<html dir>` → `__PINOOX__.direction` → `ltr`. Teleported Select/DatePicker/Menu overlays inherit RTL via Luma SCSS (no per-app CSS needed).
 - **`LConfirmDialog` RTL** — teleported confirm card sets `dir` from `resolveDirection()` so icon/title/message/actions flip correctly in RTL apps.

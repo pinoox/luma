@@ -101,17 +101,12 @@ const resolveAuthBootOptions = (themeConfig, authOptions) => {
  *   auth?: object,
  *   verifyAuth?: (ctx: { store, route, adoptedFromUrl }) => Promise<boolean>,
  *   IconComponent?: object,
- *   license?: string,
  * }} options
  *
  * Apps must supply `AppRoot` — usually the `RootShell` component
  * imported from `@pinooxhq/luma/layouts`. There's no default here
  * because that would force a `.vue` import into this module's graph,
  * which breaks Node-side tooling (e.g. `npm run test:smoke`).
- *
- * `license` is the PrimeUI key required by PrimeVue v5+ (community or
- * commercial). Falls back to `__PINOOX__.primevueLicense` or
- * `PRIMEUI_LICENSE` / `VITE_PRIMEUI_LICENSE` when omitted.
  */
 export async function createApp(options = {}) {
     const {
@@ -123,7 +118,6 @@ export async function createApp(options = {}) {
         auth: authOptions,
         verifyAuth,
         IconComponent,
-        license,
     } = options;
 
     if (!AppRoot) {
@@ -177,7 +171,6 @@ export async function createApp(options = {}) {
 
     setupPrimeVue(app, {
         ...(IconComponent ? { IconComponent } : {}),
-        ...(license ? { license } : {}),
         rtl: direction === 'rtl',
     });
 

@@ -37,13 +37,42 @@
 //     })
 
 import { createRequire } from 'node:module';
-import { fileURLToPath, URL } from 'node:url';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // Treat THIS package's location as the default `fs.allow` anchor.
 // Consumers usually link Luma via `file:`/`link:`, so its absolute path
 // can be found by looking at this file's own location.
 const here = fileURLToPath(new URL('.', import.meta.url));
 const require = createRequire(import.meta.url);
+
+/**
+ * Normalize Vite `root` (absolute/relative FS path or file: URL) to an
+ * absolute filesystem path. Avoids `new URL(windowsPath)` which treats
+ * `C:` as a URL scheme and throws ERR_INVALID_URL_SCHEME.
+ *
+ * @param {string | null | undefined} root
+ * @returns {string}
+ */
+export function toFsPath(root) {
+    if (root == null || root === '') return process.cwd();
+    if (typeof root !== 'string') return path.resolve(String(root));
+    if (root.startsWith('file:')) {
+        return fileURLToPath(root);
+    }
+    return path.resolve(root);
+}
+
+/**
+ * Absolute FS path suitable for Vite `server.fs.allow` on any OS.
+ * Round-trips through pathToFileURL so drive letters / UNC stay valid.
+ *
+ * @param {string} fsPath
+ * @returns {string}
+ */
+export function toAllowPath(fsPath) {
+    return fileURLToPath(pathToFileURL(toFsPath(fsPath)));
+}
 
 /**
  * Packages Luma needs shared with its consumer to avoid duplicated
@@ -79,9 +108,9 @@ const DEFAULT_EXCLUDE_FROM_OPTIMIZE = [
 function resolvePackage(name, consumerRoot) {
     try {
         const resolved = require.resolve(`${name}/package.json`, {
-            paths: [consumerRoot],
+            paths: [toFsPath(consumerRoot)],
         });
-        return resolved.replace(/\/package\.json$/, '');
+        return path.dirname(resolved);
     } catch (_) {
         return null;
     }
@@ -120,12 +149,12 @@ export default function luma(options = {}) {
         config(config, env) {
             // Vite passes the consumer's resolved root here. Fall back to
             // process.cwd() if it's not set (SSR-only contexts).
-            consumerRoot = config.root ?? process.cwd();
+            consumerRoot = toFsPath(config.root ?? process.cwd());
 
             const aliases = Object.fromEntries(
                 cfg.dedupe
                     .map((name) => [name, resolvePackage(name, consumerRoot)])
-                    .filter(([, path]) => path !== null),
+                    .filter(([, pkgPath]) => pkgPath !== null),
             );
             dedupeAliases = aliases;
 
@@ -146,14 +175,9 @@ export default function luma(options = {}) {
                             // Always allow Luma's own source directory.
                             here,
                             // Allow the consumer's root so symlinks resolve.
-                            fileURLToPath(
-                                new URL(
-                                    consumerRoot.startsWith('/')
-                                        ? `file://${consumerRoot}`
-                                        : consumerRoot,
-                                    'file:///',
-                                ),
-                            ),
+                            // pathToFileURL + fileURLToPath normalizes across
+                            // Windows drive letters, UNC, and POSIX paths.
+                            toAllowPath(consumerRoot),
                             ...cfg.fsAllow,
                         ],
                     },

@@ -37,6 +37,7 @@ can be replaced or extended without forking the package.
 7. [Usage examples](#usage-examples)
 8. [Subpath exports](#subpath-exports)
 9. [Upgrading](#upgrading)
+   - [Migrating from 0.3.x → 0.4.x](#migrating-from-03x--04x)
 10. [License](#license)
 
 ---
@@ -70,8 +71,8 @@ can be replaced or extended without forking the package.
   `LBadge`, `LEmptyPanel`, `LThemeToggle`, plus primitives
   `LIcon`, `LView`, `LHeader`, `LButton`, `LField`, `LPageHeader`,
   `LPageToolbar`, `LPageContainer`, `LSpinner`, `LToast`, and `LToolbar`.
-- **PrimeVue 4** — every component auto-registered with Luma's preset
-  (DataTable, Forms, Calendar, Dialog, Toast, Charts, FileUpload, …).
+- **PrimeVue 4** — every core component available with Luma's preset
+  (DataTable, Forms, DatePicker, Dialog, Toast, FileUpload, …).
   See the full table in [Usage examples](#available-primevue-components).
 - **Glassmorphism** and a fully responsive mobile experience out of
   the box.
@@ -119,16 +120,18 @@ Luma is published on npm as a standard package:
 npm install @pinooxhq/luma
 ```
 
-You'll also want PrimeVue 4 (Luma's UI layer), Pinia (state management),
+You'll also want PrimeVue 4 (Luma's UI layer), Pinia 4 (state management),
 Lucide (icons), and Sass (Luma's stylesheet is Sass):
 
 ```sh
-npm install primevue @primeuix/themes pinia vue-router axios lucide-vue-next sass --save-dev
+npm install primevue@^4 @primeuix/themes@^2 pinia@^4 @vue/devtools-api@^8 vue-router axios lucide-vue-next sass --save-dev
 ```
 
+`@vue/devtools-api` is required by Pinia 4. `sass` is only needed at
+build time, so it lives in `devDependencies` of your app.
+
 That's it — no manual plugin wiring, no symlinks, no path hacks. Standard
-npm install just works. `sass` is only needed at build time, so it lives
-in `devDependencies` of your app.
+npm install just works.
 
 ### Optional — Pinia auth helper
 
@@ -831,33 +834,33 @@ theme CSS variables. Everything inside is yours.
 
 ### Available PrimeVue components
 
-Luma installs and registers **every PrimeVue 4 component**. You can
-import any of them in your pages without additional setup:
+Luma wires **PrimeVue 4** with the Aura-derived Console preset. Import
+any core component in your pages without additional setup:
 
 | Component | Docs |
 |-----------|------|
 | `Button`, `IconButton` | [primevue.org/button](https://primevue.org/button/) |
-| `InputText`, `Textarea`, `Password`, `InputMask`, `InputOtp` | [primevue.org/forms](https://primevue.org/forms/) |
-| `Select`, `MultiSelect`, `AutoComplete`, `Listbox`, `TreeSelect`, `CascadedSelect` | [primevue.org/select](https://primevue.org/select/) |
+| `InputText`, `Textarea`, `Password`, `InputPassword`, `InputMask`, `InputOtp`, `InputTags` | [primevue.org/forms](https://primevue.org/forms/) |
+| `Select`, `MultiSelect`, `AutoComplete`, `Listbox`, `TreeSelect`, `CascadeSelect` | [primevue.org/select](https://primevue.org/select/) |
 | `Checkbox`, `RadioButton`, `ToggleSwitch`, `SelectButton`, `Slider`, `Rating`, `InputNumber` | [primevue.org/forms](https://primevue.org/forms/) |
-| `Calendar`, `DatePicker`, `InputDate` | [primevue.org/datepicker](https://primevue.org/datepicker/) |
+| `DatePicker` | [primevue.org/datepicker](https://primevue.org/datepicker/) |
 | `DataTable`, `DataView`, `Tree`, `TreeTable`, `Timeline`, `Paginator` | [primevue.org/datatable](https://primevue.org/datatable/) |
-| `Card`, `Panel`, `Accordion`, `TabView`, `Stepper` | [primevue.org/panels](https://primevue.org/panels/) |
-| `Dialog`, `Drawer`, `Popover`, `OverlayPanel`, `Tooltip` | [primevue.org/overlay](https://primevue.org/overlay/) |
+| `Card`, `Panel`, `Accordion`, `Tabs`, `Stepper` | [primevue.org/panels](https://primevue.org/panels/) |
+| `Dialog`, `Drawer`, `Popover`, `Tooltip` | [primevue.org/overlay](https://primevue.org/overlay/) |
 | `Toast` (global, auto-mounted), `Message`, `Tag`, `Badge`, `Chip` | [primevue.org/toast](https://primevue.org/toast/) |
-| `Menu`, `Menubar`, `MegaMenu`, `PanelMenu`, `TieredMenu` | [primevue.org/menu](https://primevue.org/menu/) |
-| `Avatar`, `AvatarGroup`, `Divider`, `Splitter`, `ScrollPanel` | [primevue.org/misc](https://primevue.org/misc/) |
+| `Menu`, `Menubar`, `MegaMenu`, `PanelMenu`, `TieredMenu`, `CommandMenu` | [primevue.org/menu](https://primevue.org/menu/) |
+| `Avatar`, `AvatarGroup`, `Divider`, `Splitter`, `ScrollArea` | [primevue.org/misc](https://primevue.org/misc/) |
 | `FileUpload`, `ProgressBar`, `ProgressSpinner`, `Skeleton` | [primevue.org/fileupload](https://primevue.org/fileupload/) |
-| `Chart` (wraps Chart.js) | [primevue.org/chart](https://primevue.org/chart/) |
-| `Carousel`, `Galleria`, `Image`, `ImageCompare` | [primevue.org/media](https://primevue.org/media/) |
+| `Carousel`, `Gallery`, `Compare` | [primevue.org/media](https://primevue.org/media/) |
 | `ConfirmDialog`, `ConfirmPopup` | [primevue.org/confirmdialog](https://primevue.org/confirmdialog/) |
-| `Breadcrumb`, `MenuBar`, `Dock` | [primevue.org/menubar](https://primevue.org/menubar/) |
-| `FullCalendar` (separate plugin) | [primevue.org/fullcalendar](https://primevue.org/fullcalendar/) |
-| `Editor` (Quill wrapper) | [primevue.org/editor](https://primevue.org/editor/) |
+| `Breadcrumb`, `Menubar`, `Dock` | [primevue.org/menubar](https://primevue.org/menubar/) |
 | `Knob`, `SelectButton`, `ToggleButton` | [primevue.org/button](https://primevue.org/button/) |
 
-Luma's preset already registers PrimeIcons and an Aura-derived theme with
-your brand's primary color — no extra theme setup needed.
+> **Rich text.** For an editor, Luma ships `LRichEditor` (TipTap) from
+> `@pinooxhq/luma/ui` instead of relying on PrimeVue's Quill-based Editor.
+
+Luma's preset already registers an Aura-derived theme with your brand's
+primary color — no extra theme setup needed.
 
 ### Luma's own components
 
@@ -877,13 +880,14 @@ Beyond PrimeVue, Luma ships a small set of opinionated shell components:
 | `LField` | `@pinooxhq/luma/ui` | Form field wrapper — label, hint, error, slot for any input. |
 | `LSpinner` | `@pinooxhq/luma/ui` | Loading spinner with `size` and `center` props. |
 | `LToast` | `@pinooxhq/luma/ui` | Per-page toast mount (global `<Toast>` is auto-mounted by `RootShell`). |
+| `LRichEditor` | `@pinooxhq/luma/ui` | TipTap rich-text field. |
 | `LToolbar` | `@pinooxhq/luma/ui` | Horizontal toolbar for filter/action rows. |
 | `LIcon` | `@pinooxhq/luma/ui` | Lucide icon wrapper (e.g. `<LIcon name="shopping-cart" />`). |
 | `LSidebar` | `@pinooxhq/luma/ds` | Sidebar (used by `PageLayout`, available standalone). |
 | `LTopbar` | `@pinooxhq/luma/ds` | Topbar (used by `PageLayout`, available standalone). |
 | `LMobileNav` | `@pinooxhq/luma/ds` | Mobile bottom nav. |
 | `LThemeToggle` | `@pinooxhq/luma/ds` | Light/dark toggle. |
-| `LEmptyState` | `@pinooxhq/luma/ds` | **Deprecated alias** for `LEmptyPanel`. Kept for one release; will be removed in 0.4.0. |
+| `LEmptyState` | `@pinooxhq/luma/ds` | **Deprecated alias** for `LEmptyPanel`. Prefer `LEmptyPanel`. |
 
 Import any of these alongside PrimeVue components in your pages:
 
@@ -912,7 +916,7 @@ Or pick a smaller surface:
 |------|--------------|
 | `@pinooxhq/luma` | Full barrel (Node-safe, no `.vue` SFCs) |
 | `@pinooxhq/luma/ds` | `LSidebar`, `LTopbar`, `LMobileNav`, `LThemeToggle`, `LCard`, `LBadge`, `LEmptyState` (legacy alias for `LEmptyPanel`) |
-| `@pinooxhq/luma/ui` | `LButton`, `LBadge`, `LCard`, `LField`, `LHeader`, `LIcon`, `LPageContainer`, `LPageHeader`, `LPageToolbar`, `LSpinner`, `LToast`, `LToolbar`, `LView`, `LEmptyPanel` |
+| `@pinooxhq/luma/ui` | `LButton`, `LBadge`, `LCard`, `LField`, `LHeader`, `LIcon`, `LPageContainer`, `LPageHeader`, `LPageToolbar`, `LSpinner`, `LToast`, `LRichEditor`, `LToolbar`, `LView`, `LEmptyPanel` |
 | `@pinooxhq/luma/layouts` | `RootShell`, `PageLayout` |
 | `@pinooxhq/luma/composables` | `usePage` |
 | `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `redirectToLogin`, `buildAppPath`, `resolveHistoryBase` |
@@ -944,7 +948,25 @@ semantic versioning:
   compatible.
 - **Major** — breaking changes, documented in the changelog.
 
-Pin to `^0.1.0` (or stricter) for predictable upgrades.
+Pin to `^0.4.0` (or stricter) for predictable upgrades.
+
+### Migrating from 0.3.x → 0.4.x
+
+This release bumps several peer majors (PrimeVue stays on 4.x):
+
+| Package | 0.3.x | 0.4.x |
+|---------|-------|-------|
+| `primevue` | `^4` | `^4.5` (latest 4.x) |
+| `@primeuix/themes` | `^1` | `^2` |
+| `pinia` | `^3` | `^4` |
+| `@vue/devtools-api` | — | `^8` (new peer) |
+
+1. Install the new peers (see [Install](#install)).
+2. Prefer `LEmptyPanel` over the deprecated `LEmptyState` alias.
+
+If you briefly installed `0.4.0` / `0.4.1` with `primevue@^5`, pin back to
+`primevue@^4` and `@primeuix/themes@^2`, and remove any `license` /
+`VITE_PRIMEUI_LICENSE` wiring — it is no longer used.
 
 ---
 

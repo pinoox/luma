@@ -26,17 +26,24 @@
 //      hot-reload without nuking `.vite/deps/`. Forces Luma through SSR
 //      `noExternal` so dev-server and build stay consistent.
 //
+//   4. Optional local checkout — set `LUMA_LOCAL=/path/to/luma-ui` (or pass
+//      `luma({ local: '/path/to/luma-ui' })`). Aliases every `@pinooxhq/luma`
+//      entry (JS + styles + fonts) to that tree so Sass/Vazir resolve the
+//      same as npm. Leave unset to use the published package.
+//
 // Every option below is optional; the plugin is fully usable with
 // `luma()`. Pass an object to override defaults.
 //
 //     luma({
-//       dedupe: ['primevue', 'pinia'],  // add to the default list
+//       local: '/abs/path/to/luma-ui', // or rely on LUMA_LOCAL
+//       dedupe: ['primevue', 'pinia'],
 //       excludeFromOptimize: ['some/peer'],
-//       fsAllow: ['/custom/luma/path'],  // extra dirs to allow in dev
+//       fsAllow: ['/extra/path'],
 //       watchPolling: { usePolling: true, interval: 300 },
 //     })
 
 import { createRequire } from 'node:module';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -117,11 +124,80 @@ function resolvePackage(name, consumerRoot) {
 }
 
 /**
+ * Resolve optional local Luma checkout.
+ * Accepts `options.local` / `options.root`, else `LUMA_LOCAL` env.
+ *
+ * @param {{ local?: string, root?: string }} options
+ * @returns {string | null}
+ */
+export function resolveLocalRoot(options = {}) {
+    const raw = String(options.local ?? options.root ?? process.env.LUMA_LOCAL ?? '').trim();
+    if (!raw) return null;
+    const resolved = toFsPath(raw);
+    if (!fs.existsSync(path.join(resolved, 'vite.js'))) {
+        console.warn(`[luma] LUMA_LOCAL set but vite.js missing: ${resolved}`);
+        return null;
+    }
+    if (!fs.existsSync(path.join(resolved, 'src', 'fonts', 'vazir'))) {
+        console.warn(`[luma] local checkout missing Vazir fonts: ${resolved}`);
+    }
+    return resolved;
+}
+
+/**
+ * Full alias map so local JS, Sass, and Vazir font URLs resolve like npm.
+ * Longer / more-specific entries must come first (array form).
+ *
+ * @param {string} lumaRoot
+ * @returns {Array<{ find: string | RegExp, replacement: string }>}
+ */
+export function localLumaAliases(lumaRoot) {
+    const root = toFsPath(lumaRoot);
+    const join = (...parts) => path.join(root, ...parts);
+
+    return [
+        { find: '@pinooxhq/luma/styles/_main', replacement: join('src/scss/main.scss') },
+        { find: '@pinooxhq/luma/styles.scss', replacement: join('exports/styles.scss') },
+        { find: '@pinooxhq/luma/styles', replacement: join('src/scss/_styles.scss') },
+        { find: '@pinooxhq/luma/tokens.scss', replacement: join('exports/tokens.scss') },
+        { find: '@pinooxhq/luma/tokens/_index', replacement: join('src/scss/tokens/_index.scss') },
+        { find: '@pinooxhq/luma/tokens', replacement: join('src/scss/tokens/_index.scss') },
+        { find: '@pinooxhq/luma/fonts', replacement: join('src/fonts/vazir.js') },
+        { find: '@pinooxhq/luma/vite', replacement: join('vite.js') },
+        { find: '@pinooxhq/luma/preset', replacement: join('exports/preset.js') },
+        { find: '@pinooxhq/luma/createApp', replacement: join('src/createApp.js') },
+        { find: '@pinooxhq/luma/applyThemeConfig', replacement: join('exports/applyThemeConfig.js') },
+        { find: '@pinooxhq/luma/theme-config', replacement: join('src/ds/theme-config.js') },
+        { find: '@pinooxhq/luma/core', replacement: join('src/core/index.js') },
+        { find: '@pinooxhq/luma/layouts', replacement: join('src/layouts/index.js') },
+        { find: '@pinooxhq/luma/ui', replacement: join('src/ui/index.js') },
+        { find: '@pinooxhq/luma/ds', replacement: join('src/ds/index.js') },
+        { find: '@pinooxhq/luma/composables', replacement: join('src/composables/index.js') },
+        { find: '@pinooxhq/luma/plugins', replacement: join('src/plugins/preset.js') },
+        { find: '@pinooxhq/luma/router', replacement: join('src/router/guards.js') },
+        { find: /^@pinooxhq\/luma\/fonts\/(.*)$/, replacement: join('src/fonts/$1') },
+        { find: /^@pinooxhq\/luma\/ui\/(.*)$/, replacement: join('src/ui/$1') },
+        { find: /^@pinooxhq\/luma\/ds\/(.*)$/, replacement: join('src/ds/$1') },
+        { find: /^@pinooxhq\/luma\/core\/(.*)$/, replacement: join('src/core/$1') },
+        { find: /^@pinooxhq\/luma\/layouts\/(.*)$/, replacement: join('src/layouts/$1') },
+        { find: /^@pinooxhq\/luma\/composables\/(.*)$/, replacement: join('src/composables/$1') },
+        { find: /^@pinooxhq\/luma\/plugins\/(.*)$/, replacement: join('src/plugins/$1') },
+        { find: /^@pinooxhq\/luma\/router\/(.*)$/, replacement: join('src/router/$1') },
+        { find: /^@pinooxhq\/luma\/styles\/(.*)$/, replacement: join('src/scss/$1') },
+        { find: /^@pinooxhq\/luma\/tokens\/(.*)$/, replacement: join('src/scss/tokens/$1') },
+        // Exact package root only — never prefix-match `/styles` etc.
+        { find: /^@pinooxhq\/luma$/, replacement: join('exports/index.js') },
+    ];
+}
+
+/**
  * The plugin factory. The returned object also exposes
  * `luma.dedupePackages` so consumers (or testing scripts) can introspect
  * what got resolved.
  *
  * @param {{
+ *   local?: string,
+ *   root?: string,
  *   dedupe?: string[],
  *   excludeFromOptimize?: string[],
  *   fsAllow?: string[],
@@ -129,6 +205,7 @@ function resolvePackage(name, consumerRoot) {
  * }} [options]
  */
 export default function luma(options = {}) {
+    const localRoot = resolveLocalRoot(options);
     const cfg = {
         dedupe: [...DEFAULT_DEDUPE, ...(options.dedupe ?? [])],
         excludeFromOptimize: [
@@ -158,10 +235,23 @@ export default function luma(options = {}) {
             );
             dedupeAliases = aliases;
 
+            const localAliases = localRoot ? localLumaAliases(localRoot) : [];
+            if (localRoot && env?.mode !== 'test') {
+                console.info(`[luma] local → ${localRoot}`);
+            }
+
             return {
                 resolve: {
                     dedupe: cfg.dedupe,
-                    alias: aliases,
+                    // Array form keeps specific `@pinooxhq/luma/*` entries
+                    // ahead of the exact `@pinooxhq/luma` match.
+                    alias: [
+                        ...localAliases,
+                        ...Object.entries(aliases).map(([find, replacement]) => ({
+                            find,
+                            replacement,
+                        })),
+                    ],
                 },
                 optimizeDeps: {
                     exclude: cfg.excludeFromOptimize,
@@ -174,6 +264,7 @@ export default function luma(options = {}) {
                         allow: [
                             // Always allow Luma's own source directory.
                             here,
+                            ...(localRoot ? [toAllowPath(localRoot)] : []),
                             // Allow the consumer's root so symlinks resolve.
                             // pathToFileURL + fileURLToPath normalizes across
                             // Windows drive letters, UNC, and POSIX paths.
@@ -191,6 +282,7 @@ export default function luma(options = {}) {
          */
         luma: {
             here,
+            localRoot,
             resolvePackage: (name) =>
                 consumerRoot ? resolvePackage(name, consumerRoot) : null,
         },

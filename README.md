@@ -99,8 +99,40 @@ What `luma()` does by default:
 1. **Dedupes** peers (`primevue`, `pinia`, `vue-router`, …) against the consumer `node_modules` — avoids duplicate PrimeVue inject keys (e.g. broken `useToast()`).
 2. **Allows** the Luma package root through `server.fs.allow` and enables watch polling for `file:` / symlink installs.
 3. Keeps Luma out of `optimizeDeps` pre-bundle so source edits HMR cleanly.
+4. **Optional local checkout** — set `LUMA_LOCAL=/path/to/luma-ui` or `luma({ local: '/path/to/luma-ui' })`. Aliases every `@pinooxhq/luma` entry (JS, Sass, Vazir fonts) to that tree. Leave unset to use npm.
 
-Optional overrides: `dedupe`, `excludeFromOptimize`, `fsAllow`, `watchPolling`. See comments in [`vite.js`](./vite.js).
+**Typography:** Luma’s default stack is Vazir (`$px-font-sans` + `@font-face` in styles, and `DEFAULT_THEME_CONFIG.font`). Override with `applyThemeConfig({ font: { sans, mono } })` when needed.
+
+Optional overrides: `local`, `dedupe`, `excludeFromOptimize`, `fsAllow`, `watchPolling`. See comments in [`vite.js`](./vite.js).
+
+### Local ↔ npm switch
+
+```bash
+# .env.local (app) — use checkout
+LUMA_LOCAL=/Applications/MAMP/htdocs/luma-ui
+
+# unset / comment out — use published @pinooxhq/luma from node_modules
+```
+
+Prefer loading the checkout’s `vite.js` when `LUMA_LOCAL` is set so plugin fixes apply before publish:
+
+```js
+import { defineConfig, loadEnv } from 'vite';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+
+export default defineConfig(async ({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const local = (env.LUMA_LOCAL || '').trim();
+  const { default: luma } = local
+    ? await import(pathToFileURL(path.join(path.resolve(local), 'vite.js')).href)
+    : await import('@pinooxhq/luma/vite');
+
+  return {
+    plugins: [luma(local ? { local } : {})],
+  };
+});
+```
 
 ---
 

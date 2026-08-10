@@ -139,6 +139,14 @@ export const DEFAULT_THEME_CONFIG = {
      * `__PINOOX__.direction`. Set `'rtl'` / `'ltr'` only to force.
      */
     direction: null,
+    /**
+     * Default type stack — Vazir ships with Luma (`@use '@pinooxhq/luma/styles'`).
+     * Apps can override via `applyThemeConfig({ font: { sans, mono } })`.
+     */
+    font: {
+        sans: "Vazir, Vazirmatn, Inter, system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif",
+        mono: "'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace",
+    },
 };
 
 /**

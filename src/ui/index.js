@@ -5,8 +5,9 @@
 //
 // Canonical page kit:
 //   LPage → (#actions / #toolbar) → LPanel / LEmptyPanel / LCard
-//   Tables: <LPanel flush><DataTable class="luma-table" /></LPanel>
-//   Tabs:   <LTabs variant="table" :items="[…]" />
+//   Tables: <LPanel flush bare><LDataTable :value="rows">…</LDataTable></LPanel>
+//   Filters: <LTableToolbar> + <LFilterMenu> + .luma-filter-chip
+//   Tabs:   <LTabs variant="pill" :items="[…]" />
 export { default as LIcon } from './l-icon.vue';
 export { default as LView } from './l-view.vue';
 export { default as LPage } from './l-page.vue';
@@ -30,4 +31,11 @@ export { default as LDatePicker } from './l-date-picker.vue';
 export { default as LRichEditor } from './l-rich-editor.vue';
 export { default as LTabs } from './l-tabs.vue';
 export { default as LConfirmDialog } from './l-confirm-dialog.vue';
+
+// Table kit — soft DataTable, filters, bulk, status
+export { default as LDataTable } from './l-data-table.vue';
+export { default as LTableToolbar } from './l-table-toolbar.vue';
+export { default as LFilterMenu } from './l-filter-menu.vue';
+export { default as LBulkBar } from './l-bulk-bar.vue';
+export { default as LStatusChip } from './l-status-chip.vue';
 

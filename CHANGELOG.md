@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Table kit** — `LDataTable` (soft/classic), `LTableToolbar`, `LFilterMenu`, `LBulkBar`, `LStatusChip` for reusable admin list pages without app-level copy-paste CSS.
+- **SCSS** — `table-soft`, `table-toolbar`, `bulk-bar`, `status-chip`, `glass` (pill tabs shell, glass cards/panels). Soft table is the default chrome for `LDataTable`.
+- **`LPanel` `bare`** — transparent flush host for soft DataTables.
+
+### Changed
+- **Pill tabs** — Orbit-soft pill look is the default `.luma-tabs--pill` styling.
+
 ## [0.4.3] — 2026-08-09
 
 ### Fixed

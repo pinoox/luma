@@ -28,8 +28,8 @@ import { computed } from 'vue';
 /**
  * LPanel — default content surface for lists, forms, and tables.
  *
- *     <LPanel title="Items" tone="glass">
- *       <DataTable class="luma-table" … />
+ *     <LPanel flush bare title="Items">
+ *       <LDataTable :value="rows">…</LDataTable>
  *     </LPanel>
  */
 const props = defineProps({
@@ -42,10 +42,13 @@ const props = defineProps({
     },
     /** Remove body padding (useful for full-bleed tables). */
     flush: { type: Boolean, default: false },
+    /** Drop panel chrome — transparent host for soft tables. */
+    bare: { type: Boolean, default: false },
 });
 
 const panelClass = computed(() => [
     props.tone !== 'solid' ? `luma-panel--${props.tone}` : null,
+    props.bare ? 'luma-panel--bare' : null,
 ]);
 </script>
 
@@ -69,6 +72,16 @@ const panelClass = computed(() => [
         box-shadow: var(--px-glass-shadow, var(--px-shadow-sm));
         backdrop-filter: var(--px-blur-md);
         -webkit-backdrop-filter: var(--px-blur-md);
+    }
+
+    &--bare {
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+
+        > .luma-panel__body {
+            padding: 0 !important;
+        }
     }
 
     &__head {

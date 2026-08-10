@@ -1,0 +1,256 @@
+// class="luma-table luma-table--soft" on PrimeVue DataTable.
+
+$luma-soft-table: '.luma-table.luma-table--soft.p-datatable, .p-datatable.luma-table.luma-table--soft';
+
+#{$luma-soft-table} {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    .p-datatable-table-container,
+    .p-datatable-wrapper {
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0.1rem 0.35rem 0.4rem;
+    }
+
+    .p-datatable-table {
+        width: 100%;
+        border-collapse: separate !important;
+        border-spacing: 0 0.5rem !important;
+    }
+
+    .p-datatable-thead > tr > th {
+        background: transparent !important;
+        border: 0 !important;
+        border-bottom: 0 !important;
+        border-inline-end: 0 !important;
+        box-shadow: none !important;
+        color: var(--px-text-muted) !important;
+        font-size: 0.72rem !important;
+        font-weight: 650 !important;
+        letter-spacing: 0.02em;
+        padding: 0.2rem 0.85rem 0.35rem !important;
+        white-space: nowrap;
+
+        &:last-child {
+            border-inline-end: 0 !important;
+        }
+
+        .p-datatable-sort-icon {
+            color: var(--px-text-muted);
+            opacity: 0.5;
+        }
+
+        &[aria-sort='ascending'] .p-datatable-sort-icon,
+        &[aria-sort='descending'] .p-datatable-sort-icon {
+            color: var(--px-primary);
+            opacity: 1;
+        }
+    }
+
+    .p-datatable-tbody > tr {
+        background: color-mix(in srgb, var(--px-surface-strong) 92%, transparent) !important;
+        box-shadow: 0 1px 2px color-mix(in srgb, #0f172a 4%, transparent);
+        transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+
+        > td {
+            border: 0 !important;
+            border-bottom: 0 !important;
+            border-inline-end: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            color: var(--px-text);
+            padding: 0.82rem 0.85rem !important;
+            vertical-align: middle;
+
+            &:first-child {
+                border-start-start-radius: 14px;
+                border-end-start-radius: 14px;
+            }
+
+            &:last-child {
+                border-inline-end: 0 !important;
+                border-start-end-radius: 14px;
+                border-end-end-radius: 14px;
+            }
+        }
+
+        &:hover {
+            background: color-mix(in srgb, var(--px-primary) 7%, var(--px-surface-strong)) !important;
+            box-shadow: 0 8px 20px color-mix(in srgb, var(--px-primary) 10%, transparent);
+            transform: translateY(-1px);
+
+            > td {
+                background: transparent !important;
+                border: 0 !important;
+            }
+        }
+
+        &.p-datatable-row-selected > td,
+        &[data-p-selected='true'] > td {
+            background: color-mix(in srgb, var(--px-primary) 9%, var(--px-surface-strong)) !important;
+        }
+
+        &:nth-child(even) > td,
+        &:nth-child(odd) > td {
+            background: transparent !important;
+            border: 0 !important;
+            border-bottom: 0 !important;
+            border-inline-end: 0 !important;
+        }
+    }
+
+    .p-checkbox .p-checkbox-box {
+        border-radius: 0.35rem !important;
+        border-color: color-mix(in srgb, var(--px-border) 85%, transparent) !important;
+        background: color-mix(in srgb, var(--px-surface-strong) 80%, transparent) !important;
+        width: 1.05rem !important;
+        height: 1.05rem !important;
+    }
+
+    .p-checkbox.p-highlight .p-checkbox-box,
+    .p-checkbox-checked .p-checkbox-box {
+        border-color: var(--px-primary) !important;
+        background: var(--px-primary) !important;
+    }
+
+    .p-datatable-emptymessage > td {
+        border: 0 !important;
+        background: transparent !important;
+        padding: 2rem 1rem !important;
+        text-align: center;
+        color: var(--px-text-muted);
+    }
+
+    .p-datatable-paginator-bottom,
+    .p-datatable-paginator-top {
+        border: 0 !important;
+        border-width: 0 !important;
+        background: transparent !important;
+    }
+
+    .p-paginator {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem 0.55rem;
+        background: transparent !important;
+        border: 0 !important;
+        border-top: 0 !important;
+        box-shadow: none !important;
+        margin-top: 0.25rem;
+        padding: 0.45rem 0.65rem 0.85rem !important;
+        color: var(--px-text-muted);
+
+        .p-paginator-content {
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .p-paginator-page,
+        .p-paginator-first,
+        .p-paginator-prev,
+        .p-paginator-next,
+        .p-paginator-last {
+            border-radius: 999px !important;
+            border: 0 !important;
+            background: transparent !important;
+            color: var(--px-text-muted) !important;
+            min-width: 2rem;
+            height: 2rem;
+            box-shadow: none !important;
+            transition: background 0.15s ease, color 0.15s ease;
+
+            &:not(.p-disabled):hover {
+                background: color-mix(in srgb, var(--px-primary) 10%, transparent) !important;
+                color: var(--px-primary) !important;
+            }
+        }
+
+        .p-paginator-page.p-paginator-page-selected,
+        .p-paginator-page[aria-current='page'] {
+            background: color-mix(in srgb, var(--px-primary) 14%, transparent) !important;
+            color: var(--px-primary) !important;
+            font-weight: 700;
+        }
+
+        .p-paginator-current {
+            border: 0 !important;
+            background: transparent !important;
+            color: var(--px-text-muted) !important;
+            font-size: 0.78rem;
+            padding-inline: 0.35rem;
+        }
+
+        .p-paginator-rpp-dropdown,
+        .p-select {
+            border: 0 !important;
+            border-radius: 999px !important;
+            background: color-mix(in srgb, var(--px-surface-muted) 70%, transparent) !important;
+            box-shadow: none !important;
+            min-width: 3.75rem;
+            height: 2rem;
+
+            .p-select-label {
+                padding-block: 0.25rem !important;
+                padding-inline: 0.7rem 0.2rem !important;
+                font-size: 0.8rem;
+                font-weight: 650;
+                color: var(--px-text-soft);
+            }
+
+            .p-select-dropdown {
+                width: 1.6rem;
+                color: var(--px-text-muted);
+            }
+
+            &:not(.p-disabled):hover,
+            &.p-focus {
+                background: color-mix(in srgb, var(--px-primary) 10%, var(--px-surface-muted)) !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+}
+
+html[data-theme='dark'] #{$luma-soft-table} .p-datatable-tbody > tr {
+    background: color-mix(in srgb, var(--px-surface-strong) 88%, transparent) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+}
+
+// Select overlay used by soft paginator (teleported)
+.p-select-overlay.p-component {
+    border-radius: 12px !important;
+    border: 1px solid color-mix(in srgb, var(--px-border) 70%, transparent) !important;
+    box-shadow: 0 12px 28px color-mix(in srgb, #0f172a 12%, transparent) !important;
+    overflow: hidden;
+
+    .p-select-option {
+        border-radius: 8px;
+        margin: 0.15rem;
+        font-size: 0.84rem;
+
+        &.p-select-option-selected {
+            background: color-mix(in srgb, var(--px-primary) 12%, transparent) !important;
+            color: var(--px-primary) !important;
+            font-weight: 700;
+        }
+    }
+}
+
+// Transparent flush panel around soft tables
+.luma-panel.luma-panel--bare,
+.luma-panel--bare {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    > .luma-panel__body,
+    .luma-panel__body {
+        padding: 0 !important;
+    }
+}

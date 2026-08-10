@@ -1,0 +1,241 @@
+// Glass / card surface helpers for admin shells.
+
+html[data-theme='light'],
+html:root:not([data-theme='dark']) {
+    --luma-card-bg: #ffffff;
+    --luma-card-border: rgba(15, 23, 42, 0.08);
+    --luma-card-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 8px 24px rgba(15, 23, 42, 0.07);
+    --luma-card-shadow-hover:
+        0 4px 10px rgba(15, 23, 42, 0.06),
+        0 16px 36px rgba(15, 23, 42, 0.1);
+}
+
+html[data-theme='dark'] {
+    --luma-card-bg: color-mix(in srgb, var(--px-surface-strong) 88%, transparent);
+    --luma-card-border: rgba(148, 163, 184, 0.16);
+    --luma-card-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.35),
+        0 10px 28px rgba(0, 0, 0, 0.38);
+    --luma-card-shadow-hover:
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        0 18px 40px rgba(0, 0, 0, 0.48);
+}
+
+// Back-compat aliases used by early shop panel skins
+html {
+    --shop-card-bg: var(--luma-card-bg);
+    --shop-card-border: var(--luma-card-border);
+    --shop-card-shadow: var(--luma-card-shadow);
+    --shop-card-shadow-hover: var(--luma-card-shadow-hover);
+    --orbit-card-bg: var(--luma-card-bg);
+    --orbit-card-border: var(--luma-card-border);
+    --orbit-card-shadow: var(--luma-card-shadow);
+    --orbit-card-shadow-hover: var(--luma-card-shadow-hover);
+}
+
+.luma-glass-panel,
+.shop-glass-panel {
+    background: var(--px-glass-bg-strong, var(--px-surface-strong));
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border: 1px solid var(--px-glass-border, var(--px-border));
+    box-shadow: var(--px-shadow-lg, var(--px-glass-shadow));
+}
+
+html[data-theme='light'] .luma-glass-panel,
+html:root:not([data-theme='dark']) .luma-glass-panel,
+html[data-theme='light'] .shop-glass-panel,
+html:root:not([data-theme='dark']) .shop-glass-panel {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.06),
+        0 22px 48px rgba(15, 23, 42, 0.1);
+}
+
+html[data-theme='dark'] .luma-glass-panel,
+html[data-theme='dark'] .shop-glass-panel {
+    background: color-mix(in srgb, var(--px-surface-strong) 92%, transparent);
+    border-color: rgba(148, 163, 184, 0.16);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.45),
+        0 24px 56px rgba(0, 0, 0, 0.35);
+}
+
+.luma-glass-card,
+.shop-glass-card {
+    border-radius: 18px;
+    border: 1px solid var(--luma-card-border, color-mix(in srgb, var(--px-border) 75%, transparent));
+    background:
+        linear-gradient(
+            165deg,
+            color-mix(in srgb, var(--px-surface-strong) 92%, transparent) 0%,
+            color-mix(in srgb, var(--px-surface-muted) 35%, var(--px-surface-strong)) 100%
+        );
+    backdrop-filter: blur(14px) saturate(1.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    box-shadow: var(--luma-card-shadow, var(--px-glass-shadow));
+    padding: 1.05rem 1.1rem 1.15rem;
+    min-width: 0;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        box-shadow: var(--luma-card-shadow-hover, var(--luma-card-shadow));
+    }
+
+    &__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.95rem;
+    }
+
+    &__title {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 750;
+        color: var(--px-text);
+        letter-spacing: -0.01em;
+    }
+
+    &__sub {
+        margin: 0.22rem 0 0;
+        font-size: 0.78rem;
+        color: var(--px-text-muted);
+    }
+}
+
+html[data-theme='dark'] .luma-glass-card,
+html[data-theme='dark'] .shop-glass-card {
+    background: linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--px-surface-strong) 88%, transparent) 0%,
+        color-mix(in srgb, var(--px-surface-muted) 40%, var(--px-bg)) 100%
+    );
+}
+
+// Soft pill tabs chrome (overrides denser LTabs defaults)
+.luma-tabs.luma-tabs--pill {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    overflow: visible;
+
+    &.luma-tabs--flush {
+        border-bottom: none;
+    }
+
+    .luma-tabs__list {
+        width: auto;
+        justify-content: flex-start;
+        gap: 0.35rem;
+        background: transparent;
+        padding: 0;
+    }
+
+    .luma-tabs__tab {
+        flex: 0 0 auto;
+        padding: 0.45rem 0.95rem;
+        border: none !important;
+        border-bottom: none !important;
+        border-radius: 999px;
+        color: var(--px-text-muted);
+        background: transparent;
+        box-shadow: none !important;
+        font-weight: 650;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover {
+            color: var(--px-text);
+            background: color-mix(in srgb, var(--px-surface-muted) 70%, transparent);
+        }
+
+        &.is-active {
+            color: var(--px-primary);
+            background: color-mix(in srgb, var(--px-primary) 14%, var(--px-surface-strong));
+            font-weight: 700;
+            border-bottom-color: transparent !important;
+            box-shadow: none !important;
+
+            .luma-tabs__badge {
+                background: color-mix(in srgb, var(--px-primary) 18%, transparent);
+                color: var(--px-primary);
+            }
+        }
+    }
+}
+
+.luma-tabs-shell,
+.tb-tabs-nav {
+    display: inline-flex;
+    max-width: 100%;
+    width: fit-content;
+    padding: 0.4rem 0.55rem;
+    margin-block-end: 0.45rem;
+    margin-inline: 0.15rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--px-border) 85%, transparent);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--px-surface-strong) 92%, transparent),
+            color-mix(in srgb, var(--px-surface-muted) 55%, var(--px-surface-strong))
+        );
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent);
+}
+
+@media (max-width: 768px) {
+    .luma-tabs-shell,
+    .tb-tabs-nav {
+        display: flex;
+        width: calc(100% - 0.3rem);
+        max-width: calc(100% - 0.3rem);
+        margin-inline: 0.15rem;
+        padding: 0.3rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+
+        .luma-tabs {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .luma-tabs__list {
+            flex-wrap: nowrap;
+            width: max-content;
+            min-width: 100%;
+            justify-content: flex-start;
+            gap: 0.25rem;
+            padding-bottom: 0.05rem;
+        }
+
+        .luma-tabs__tab {
+            flex: 1 1 auto;
+            min-width: max-content;
+            padding: 0.38rem 0.72rem;
+            font-size: 0.78rem;
+            scroll-snap-align: start;
+        }
+
+        .luma-tabs__icon {
+            flex-shrink: 0;
+        }
+    }
+}
+
+@media (max-width: 420px) {
+    .luma-tabs-shell .luma-tabs__label,
+    .tb-tabs-nav .luma-tabs__label {
+        display: none;
+    }
+
+    .luma-tabs-shell .luma-tabs__tab,
+    .tb-tabs-nav .luma-tabs__tab {
+        padding: 0.42rem 0.62rem;
+    }
+}

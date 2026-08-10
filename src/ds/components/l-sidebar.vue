@@ -5,7 +5,14 @@
                 <div class="px-sidebar__brand-default">
                     <div class="px-sidebar__brand-mark">
                         <slot name="brand-logo">
-                            <img v-if="brandLogo" :src="brandLogo" :alt="brandTitle" />
+                            <img
+                                v-if="brandLogo"
+                                class="px-sidebar__brand-img"
+                                :src="brandLogo"
+                                :alt="brandTitle"
+                                width="48"
+                                height="48"
+                            />
                             <span v-else>{{ brandInitials }}</span>
                         </slot>
                     </div>
@@ -192,6 +199,10 @@ const resolveLink = (item) => {
     &__brand-mark {
         width: 48px;
         height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+        max-width: 48px;
+        max-height: 48px;
         border-radius: var(--px-radius-md);
         background: transparent;
         color: var(--px-primary);
@@ -202,12 +213,17 @@ const resolveLink = (item) => {
         font-size: var(--px-text-lg);
         flex-shrink: 0;
         overflow: hidden;
+        box-sizing: border-box;
+        line-height: 0;
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
+        img,
+        .px-sidebar__brand-img {
+            width: 48px !important;
+            height: 48px !important;
+            max-width: 48px !important;
+            max-height: 48px !important;
+            object-fit: contain !important;
+            display: block !important;
         }
     }
 

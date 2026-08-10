@@ -5,18 +5,29 @@
  * Prefer the plugin API (`jYYYY` / `jMMMM` / `jYear` / `loadPersian`)
  * instead of hand-rolled conversions.
  *
- * `moment-jalaali` is CJS (`module.exports = …`). Resolve both the
- * optimized ESM interop shape (`{ default }`) and raw namespace forms.
+ * `moment-jalaali` is CJS. Prefer Vite `optimizeDeps.include` (see `vite.js`)
+ * so the prebundle exposes a real `default` export. Keep a small interop
+ * fallback for namespace / default shapes.
  */
 import * as momentJalaaliNs from 'moment-jalaali';
 
-const moment =
-    typeof momentJalaaliNs === 'function'
-        ? momentJalaaliNs
-        : typeof momentJalaaliNs.default === 'function'
-            ? momentJalaaliNs.default
-            : momentJalaaliNs;
+function resolveMoment(mod) {
+    if (typeof mod === 'function') return mod;
+    if (mod && typeof mod.default === 'function') return mod.default;
+    if (mod && typeof mod.default?.default === 'function') return mod.default.default;
+    // Some Vite CJS interops put the fn on the module object itself.
+    for (const value of Object.values(mod ?? {})) {
+        if (typeof value === 'function' && typeof value?.loadPersian === 'function') {
+            return value;
+        }
+        if (typeof value === 'function' && typeof value?.locale === 'function') {
+            return value;
+        }
+    }
+    throw new Error('[luma] could not resolve moment-jalaali export');
+}
 
+const moment = resolveMoment(momentJalaaliNs);
 // Official Persian locale (modern dialect: مرداد، جمعه، …)
 moment.loadPersian({
     dialect: 'persian-modern',

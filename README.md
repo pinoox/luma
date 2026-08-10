@@ -109,7 +109,7 @@ Optional overrides: `local`, `dedupe`, `excludeFromOptimize`, `fsAllow`, `watchP
 
 ```bash
 # .env.local (app) — use checkout
-LUMA_LOCAL=/Applications/MAMP/htdocs/luma-ui
+LUMA_LOCAL={PATH_TO_LOCAL_LUMA}/luma-ui
 
 # unset / comment out — use published @pinooxhq/luma from node_modules
 ```

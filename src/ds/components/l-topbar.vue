@@ -57,18 +57,22 @@
                 class="px-topbar__user"
                 @click="$emit('user-click', $event, user)"
             >
-                <Avatar
-                    v-if="user.image"
-                    :image="user.image"
-                    shape="circle"
-                    class="px-topbar__avatar"
-                />
-                <Avatar
-                    v-else
-                    :label="userInitials"
-                    shape="circle"
-                    class="px-topbar__avatar"
-                />
+                <span class="px-topbar__avatar-wrap">
+                    <Avatar
+                        v-if="user.image"
+                        :image="user.image"
+                        shape="circle"
+                        class="px-topbar__avatar"
+                        :pt="avatarPt"
+                    />
+                    <Avatar
+                        v-else
+                        :label="userInitials"
+                        shape="circle"
+                        class="px-topbar__avatar"
+                        :pt="avatarPt"
+                    />
+                </span>
                 <div class="px-topbar__user-meta">
                     <strong>{{ user.name }}</strong>
                     <span>{{ user.role || '' }}</span>
@@ -124,6 +128,33 @@ const userInitials = computed(() => {
     const single = parts[0] || 'U';
     return single.slice(0, 2);
 });
+
+/** Inline sizes win even when design-token CSS vars for Avatar are missing. */
+const avatarPt = {
+    root: {
+        style: {
+            width: '2.25rem',
+            height: '2.25rem',
+            minWidth: '2.25rem',
+            minHeight: '2.25rem',
+            maxWidth: '2.25rem',
+            maxHeight: '2.25rem',
+            overflow: 'hidden',
+            flexShrink: '0',
+        },
+    },
+    image: {
+        style: {
+            width: '100%',
+            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            display: 'block',
+            background: 'var(--px-primary-soft, #dbe7fe)',
+        },
+    },
+};
 </script>
 
 <style lang="scss">
@@ -302,6 +333,8 @@ const userInitials = computed(() => {
         padding: 4px var(--px-space-2) 4px 4px;
         border-radius: var(--px-radius-pill);
         cursor: pointer;
+        max-width: min(100%, 16rem);
+        overflow: hidden;
         transition: background var(--px-duration-fast) var(--px-easing-standard);
 
         &:hover {
@@ -309,16 +342,47 @@ const userInitials = computed(() => {
         }
     }
 
-    &__avatar {
+    &__avatar-wrap {
+        display: inline-flex;
         width: 2.25rem;
         height: 2.25rem;
+        min-width: 2.25rem;
+        min-height: 2.25rem;
+        max-width: 2.25rem;
+        max-height: 2.25rem;
         flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 50%;
+        line-height: 0;
+    }
+
+    &__avatar {
+        /* Explicit size — PrimeVue Avatar uses dt('avatar.width'); if those
+           tokens are missing, the img falls back to intrinsic size (huge). */
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        max-width: 2.25rem !important;
+        max-height: 2.25rem !important;
+        flex-shrink: 0;
+        overflow: hidden !important;
+        border-radius: 50%;
+        box-sizing: border-box;
+
+        &.p-avatar,
+        &.p-avatar-image {
+            width: 2.25rem !important;
+            height: 2.25rem !important;
+        }
 
         .p-avatar-image,
         img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain !important;
+            display: block !important;
+            background: var(--px-primary-soft, #dbe7fe);
         }
     }
 

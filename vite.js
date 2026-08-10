@@ -107,6 +107,17 @@ const DEFAULT_EXCLUDE_FROM_OPTIMIZE = [
 ];
 
 /**
+ * CJS deps that must be pre-bundled. Without this, Vite may serve
+ * `moment-jalaali/index.js` raw and browsers throw:
+ * "does not provide an export named 'default'".
+ */
+const DEFAULT_INCLUDE_IN_OPTIMIZE = [
+    'moment-jalaali',
+    'moment',
+    'jalaali-js',
+];
+
+/**
  * Resolve a package's location from the consumer's `node_modules`. Returns
  * `null` if the package isn't installed in the consumer's tree (Luma
  * preserves that gracefully — Vite will then fall back to its own
@@ -212,6 +223,10 @@ export default function luma(options = {}) {
             ...DEFAULT_EXCLUDE_FROM_OPTIMIZE,
             ...(options.excludeFromOptimize ?? []),
         ],
+        includeInOptimize: [
+            ...DEFAULT_INCLUDE_IN_OPTIMIZE,
+            ...(options.includeInOptimize ?? []),
+        ],
         fsAllow: options.fsAllow ?? [],
         watchPolling: options.watchPolling ?? { usePolling: true, interval: 300 },
     };
@@ -254,6 +269,7 @@ export default function luma(options = {}) {
                     ],
                 },
                 optimizeDeps: {
+                    include: cfg.includeInOptimize,
                     exclude: cfg.excludeFromOptimize,
                 },
                 ssr: {

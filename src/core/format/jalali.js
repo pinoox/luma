@@ -4,8 +4,18 @@
  *
  * Prefer the plugin API (`jYYYY` / `jMMMM` / `jYear` / `loadPersian`)
  * instead of hand-rolled conversions.
+ *
+ * `moment-jalaali` is CJS (`module.exports = …`). Resolve both the
+ * optimized ESM interop shape (`{ default }`) and raw namespace forms.
  */
-import moment from 'moment-jalaali';
+import * as momentJalaaliNs from 'moment-jalaali';
+
+const moment =
+    typeof momentJalaaliNs === 'function'
+        ? momentJalaaliNs
+        : typeof momentJalaaliNs.default === 'function'
+            ? momentJalaaliNs.default
+            : momentJalaaliNs;
 
 // Official Persian locale (modern dialect: مرداد، جمعه، …)
 moment.loadPersian({

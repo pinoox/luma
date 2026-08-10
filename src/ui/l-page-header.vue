@@ -1,5 +1,9 @@
 <template>
   <header class="ppage-header" :class="`ppage-header--${tone}`">
+    <div v-if="$slots.leading" class="ppage-header__leading">
+      <slot name="leading" />
+    </div>
+
     <div v-if="icon" class="ppage-header__icon" :style="iconStyle">
       <LIcon :name="icon" size="lg" />
     </div>
@@ -57,6 +61,14 @@ const iconStyle = computed(() =>
     padding: var(--px-space-2) var(--ppage-header-padding-x) var(--px-space-4);
     margin: 0;
     font-family: var(--px-font-sans);
+
+    &__leading {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+        z-index: 1;
+        margin-inline-end: calc(var(--px-space-2) * -1);
+    }
 
     &--glass,
     &--gradient {

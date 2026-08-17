@@ -31,6 +31,7 @@ export { default as LDatePicker } from './l-date-picker.vue';
 export { default as LRichEditor } from './l-rich-editor.vue';
 export { default as LTabs } from './l-tabs.vue';
 export { default as LConfirmDialog } from './l-confirm-dialog.vue';
+export { default as LDropzone } from './l-dropzone.vue';
 
 // Table kit — soft DataTable, filters, bulk, status
 export { default as LDataTable } from './l-data-table.vue';

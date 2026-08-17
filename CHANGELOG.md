@@ -7,13 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.4] — 2026-08-17
+
 ### Added
+- **`LDropzone`** — click/drag file surface with accept, size, and max-file validation.
+- **`useFilePicker`** / **`useSortable`** (+ `moveItem`) — composables for file picking and list reordering.
 - **Local Luma switch** — `luma({ local })` / `LUMA_LOCAL` aliases every `@pinooxhq/luma` entry (JS, Sass, Vazir fonts) so apps flip between checkout and npm without bespoke Vite maps.
 - **Default font** — `DEFAULT_THEME_CONFIG.font` ships Vazir (same stack as `$px-font-sans`).
 - **`styles/_main` shim** — `src/scss/_main.scss` forwards `main.scss` for the package export.
 - **Table kit** — `LDataTable` (soft/classic), `LTableToolbar`, `LFilterMenu`, `LBulkBar`, `LStatusChip` for reusable admin list pages without app-level copy-paste CSS.
 - **SCSS** — `table-soft`, `table-toolbar`, `bulk-bar`, `status-chip`, `glass` (pill tabs shell, glass cards/panels). Soft table is the default chrome for `LDataTable`.
 - **`LPanel` `bare`** — transparent flush host for soft DataTables.
+
+### Fixed
+- **Avatars** — constrain topbar/sidebar avatar images so oversized sources no longer blow the chrome.
+- **`moment-jalaali`** — prebundle in Vite so Jalali date tooling resolves cleanly in app builds.
 
 ### Changed
 - **Pill tabs** — Orbit-soft pill look is the default `.luma-tabs--pill` styling.

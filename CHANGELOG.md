@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.5] — 2026-08-18
+
 ### Added
 - **`LSidebar` nested menus** — nav items may include `children` for an in-section submenu. `flattenNavItems` / `findNavItemByRoute` walk nested items.
 - **`@pinooxhq/slug`** — `slugify`, `toFinglish`, `sanitizeSlug`, `extendLoanwords` from `@pinooxhq/luma`; `useSlugField` from `@pinooxhq/luma/composables`; `LSlugField` title+slug pair. Docs: [`docs/slug.md`](./docs/slug.md) / [`docs/slug.fa.md`](./docs/slug.fa.md).

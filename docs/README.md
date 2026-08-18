@@ -412,13 +412,11 @@ Static label or [FloatLabel](https://primevue.org/floatlabel/).
 
 Default slot scoped `{ id }`.
 
-See also: [Slug — Finglish URLs](./slug.md) ([فارسی](./slug.fa.md)).
-
 ---
 
 ### Slug — `slugify` / `LSlugField`
 
-Persian titles become Finglish URL slugs. Full guide: [`slug.md`](./slug.md) / [`slug.fa.md`](./slug.fa.md).
+Persian titles become Finglish URL slugs.
 
 ```js
 import { slugify, sanitizeSlug } from '@pinooxhq/luma'

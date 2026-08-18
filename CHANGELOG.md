@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.6] — 2026-08-18
+
+### Removed
+- Standalone slug docs (`docs/slug.md`, `docs/slug.fa.md`); slug usage stays in the main README and docs reference.
+
 ## [0.4.5] — 2026-08-18
 
 ### Added
 - **`LSidebar` nested menus** — nav items may include `children` for an in-section submenu. `flattenNavItems` / `findNavItemByRoute` walk nested items.
-- **`@pinooxhq/slug`** — `slugify`, `toFinglish`, `sanitizeSlug`, `extendLoanwords` from `@pinooxhq/luma`; `useSlugField` from `@pinooxhq/luma/composables`; `LSlugField` title+slug pair. Docs: [`docs/slug.md`](./docs/slug.md) / [`docs/slug.fa.md`](./docs/slug.fa.md).
+- **`@pinooxhq/slug`** — `slugify`, `toFinglish`, `sanitizeSlug`, `extendLoanwords` from `@pinooxhq/luma`; `useSlugField` from `@pinooxhq/luma/composables`; `LSlugField` title+slug pair.
 - **`LEmptyPanel`** — `size` (`sm` / `md` / `lg`) and one-line CTA via `actionLabel` / `actionIcon` / `@action`.
 - **`LDataTable` empty props** — `emptyIcon`, `emptyTitle`, `emptyMessage`, `emptyActionLabel`, `@emptyAction` render a compact `LEmptyPanel` when `#empty` is not provided.
 

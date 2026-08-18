@@ -67,8 +67,6 @@ npm install @pinooxhq/auth
 
 Without `@pinooxhq/auth`, `createApp` still boots and public pages work; `requiresAuth` routes redirect.
 
-Persian URL slugs (`slugify`, `useSlugField`, `LSlugField`): see [`docs/slug.md`](./docs/slug.md) ([فارسی](./docs/slug.fa.md)).
-
 Import styles once in your app entry SCSS:
 
 ```scss

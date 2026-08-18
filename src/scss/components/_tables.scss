@@ -141,10 +141,14 @@
     }
 
     .p-datatable-emptymessage > td {
-        padding: 2rem 1rem !important;
+        padding: 1.25rem 1rem !important;
         text-align: center;
         color: var(--px-text-muted);
         border: 0 !important;
+    }
+
+    .p-datatable-emptymessage .empty-panel {
+        min-height: 12.5rem;
     }
 }
 

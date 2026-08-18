@@ -22,3 +22,10 @@ export {
 export { resolveMediaUrl } from './media/url.js';
 export { env, isDev, isProd } from './env.js';
 export { resolveDirection, applyDocumentDirection } from './direction.js';
+export {
+    toFinglish,
+    toPinglish,
+    slugify,
+    sanitizeSlug,
+    extendLoanwords,
+} from './slug.js';

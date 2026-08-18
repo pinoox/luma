@@ -110,7 +110,16 @@ const navSections = computed(() =>
     (config.nav?.sections ?? [])
         .map((section) => ({
             ...section,
-            items: (section.items ?? []).filter((item) => canPermission(item.permission)),
+            items: (section.items ?? [])
+                .map((item) => ({
+                    ...item,
+                    children: (item.children ?? []).filter((child) => canPermission(child.permission)),
+                }))
+                .filter((item) => {
+                    if (!canPermission(item.permission)) return false;
+                    if (item.children && !item.children.length && !item.route && !item.to) return false;
+                    return true;
+                }),
         }))
         .filter((section) => (section.items ?? []).length > 0),
 );

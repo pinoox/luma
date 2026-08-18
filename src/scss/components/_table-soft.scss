@@ -119,9 +119,13 @@ $luma-soft-table: '.luma-table.luma-table--soft.p-datatable, .p-datatable.luma-t
     .p-datatable-emptymessage > td {
         border: 0 !important;
         background: transparent !important;
-        padding: 2rem 1rem !important;
+        padding: 1.25rem 1rem !important;
         text-align: center;
         color: var(--px-text-muted);
+    }
+
+    .p-datatable-emptymessage .empty-panel {
+        min-height: 12.5rem;
     }
 
     .p-datatable-paginator-bottom,

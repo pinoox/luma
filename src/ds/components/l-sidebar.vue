@@ -60,34 +60,87 @@
                 </div>
 
                 <div
-                    v-show="!isCollapsible(section) || !collapsedSections[section.key]"
-                    class="px-sidebar__section-items"
+                    class="px-sidebar__fold"
+                    :class="{ 'is-open': !isCollapsible(section) || !collapsedSections[section.key] }"
                 >
-                    <component
-                        :is="resolveLink(item)"
-                        v-for="item in section.items"
-                        :key="item.key"
-                        :to="linkTo(item)"
-                        :href="item.disabled ? undefined : item.href"
-                        :aria-disabled="item.disabled ? 'true' : undefined"
-                        :tabindex="item.disabled ? -1 : undefined"
-                        :class="[
-                            'px-sidebar__link',
-                            {
-                                'px-sidebar__link--active': !item.disabled && isActive(item),
-                                'px-sidebar__link--disabled': item.disabled,
-                            },
-                        ]"
-                        @click="item.disabled ? $event.preventDefault() : undefined"
-                    >
-                        <span class="px-sidebar__link-icon">
-                            <LIcon :name="item.icon" size="lg" />
-                        </span>
-                        <span v-if="!collapsed" class="px-sidebar__link-text">{{ item.label }}</span>
-                        <span v-if="!collapsed && item.badge" class="px-sidebar__link-badge">
-                            {{ item.badge }}
-                        </span>
-                    </component>
+                    <div class="px-sidebar__fold-inner">
+                        <div class="px-sidebar__section-items">
+                            <template v-for="item in section.items" :key="item.key">
+                                <div v-if="hasChildren(item)" class="px-sidebar__submenu">
+                                    <button
+                                        type="button"
+                                        class="px-sidebar__link px-sidebar__link--menu"
+                                        :class="{ 'px-sidebar__link--active': isGroupActive(item) }"
+                                        :aria-expanded="isGroupOpen(item)"
+                                        @click="toggleGroup(item.key)"
+                                    >
+                                        <span class="px-sidebar__link-icon">
+                                            <LIcon :name="item.icon" size="lg" />
+                                        </span>
+                                        <span v-if="!collapsed" class="px-sidebar__link-text">{{ item.label }}</span>
+                                        <LIcon
+                                            v-if="!collapsed"
+                                            name="chevron-down"
+                                            size="xs"
+                                            class="px-sidebar__chevron"
+                                            :class="{ 'px-sidebar__chevron--collapsed': !isGroupOpen(item) }"
+                                        />
+                                    </button>
+                                    <div
+                                        v-if="!collapsed"
+                                        class="px-sidebar__fold"
+                                        :class="{ 'is-open': isGroupOpen(item) }"
+                                    >
+                                        <div class="px-sidebar__fold-inner">
+                                            <div class="px-sidebar__submenu-items">
+                                                <component
+                                                    :is="resolveLink(child)"
+                                                    v-for="child in item.children"
+                                                    :key="child.key"
+                                                    :to="linkTo(child)"
+                                                    :href="child.disabled ? undefined : child.href"
+                                                    class="px-sidebar__link px-sidebar__link--sub"
+                                                    :class="{
+                                                        'px-sidebar__link--active': isActive(child),
+                                                        'px-sidebar__link--disabled': child.disabled,
+                                                    }"
+                                                >
+                                                    <span class="px-sidebar__link-icon">
+                                                        <LIcon :name="child.icon" size="lg" />
+                                                    </span>
+                                                    <span class="px-sidebar__link-text">{{ child.label }}</span>
+                                                </component>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <component
+                                    :is="resolveLink(item)"
+                                    v-else
+                                    :to="linkTo(item)"
+                                    :href="item.disabled ? undefined : item.href"
+                                    :aria-disabled="item.disabled ? 'true' : undefined"
+                                    :tabindex="item.disabled ? -1 : undefined"
+                                    :class="[
+                                        'px-sidebar__link',
+                                        {
+                                            'px-sidebar__link--active': !item.disabled && isActive(item),
+                                            'px-sidebar__link--disabled': item.disabled,
+                                        },
+                                    ]"
+                                    @click="item.disabled ? $event.preventDefault() : undefined"
+                                >
+                                    <span class="px-sidebar__link-icon">
+                                        <LIcon :name="item.icon" size="lg" />
+                                    </span>
+                                    <span v-if="!collapsed" class="px-sidebar__link-text">{{ item.label }}</span>
+                                    <span v-if="!collapsed && item.badge" class="px-sidebar__link-badge">
+                                        {{ item.badge }}
+                                    </span>
+                                </component>
+                            </template>
+                        </div>
+                    </div>
                 </div>
             </section>
         </nav>
@@ -99,7 +152,7 @@
 </template>
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
 import { LIcon } from '../../ui/index.js';
 
@@ -113,6 +166,7 @@ const props = defineProps({
 
 const route = useRoute();
 const collapsedSections = reactive({});
+const openGroups = reactive({});
 
 props.sections.forEach((section) => {
     if (section.collapsible === true && section.defaultCollapsed && section.key) {
@@ -155,6 +209,31 @@ const resolveLink = (item) => {
     if (routeName(item) || item.match) return RouterLink;
     return 'a';
 };
+
+const hasChildren = (item) => Array.isArray(item?.children) && item.children.length > 0;
+
+const isGroupActive = (item) => (item.children || []).some((child) => isActive(child));
+
+const isGroupOpen = (item) => !!(item?.key && openGroups[item.key]);
+
+const toggleGroup = (key) => {
+    if (!key) return;
+    openGroups[key] = !openGroups[key];
+};
+
+watch(
+    () => route.name,
+    () => {
+        for (const section of props.sections || []) {
+            for (const item of section.items || []) {
+                if (item.key && hasChildren(item) && isGroupActive(item)) {
+                    openGroups[item.key] = true;
+                }
+            }
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <style lang="scss">
@@ -255,18 +334,14 @@ const resolveLink = (item) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: var(--px-space-4);
+        gap: 0.85rem;
         min-height: 0;
     }
 
     &__section {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-
-        &--collapsed &__section-items {
-            display: none;
-        }
+        gap: 0.55rem;
     }
 
     &__section-heading {
@@ -329,11 +404,11 @@ const resolveLink = (item) => {
         display: flex;
         align-items: center;
         gap: var(--px-space-3);
-        padding: 0.7rem 0.9rem;
+        padding: 0.58rem 0.8rem;
         border-radius: var(--px-radius-md);
         color: var(--px-text-soft);
         font-family: var(--px-font-sans);
-        font-size: var(--px-text-md);
+        font-size: 0.9rem;
         font-weight: var(--px-weight-semibold);
         line-height: var(--px-leading-snug);
         text-decoration: none;
@@ -351,6 +426,25 @@ const resolveLink = (item) => {
             background: var(--px-primary-soft);
             color: var(--px-primary);
             font-weight: var(--px-weight-bold);
+        }
+
+        &--menu {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            text-align: inherit;
+
+            .px-sidebar__chevron {
+                margin-inline-start: auto;
+                flex-shrink: 0;
+                opacity: 0.7;
+            }
+        }
+
+        &--sub {
+            font-weight: 550;
+            font-size: 0.86rem;
+            padding-block: 0.48rem;
         }
 
         &--disabled {
@@ -371,8 +465,8 @@ const resolveLink = (item) => {
         }
 
         &-icon {
-            width: 26px;
-            height: 26px;
+            width: 22px;
+            height: 22px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -400,6 +494,41 @@ const resolveLink = (item) => {
     &__footer {
         padding-top: var(--px-space-3);
         border-top: 1px solid var(--px-border-soft);
+    }
+
+    &__fold {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows var(--px-duration-base) var(--px-easing-emphasized);
+
+        &.is-open {
+            grid-template-rows: 1fr;
+        }
+    }
+
+    &__fold-inner {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    &__submenu {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__submenu-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.08rem;
+        padding-inline-start: 0.7rem;
+        padding-block: 0.12rem 0.2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .px-sidebar__fold,
+    .px-sidebar__chevron {
+        transition: none;
     }
 }
 </style>

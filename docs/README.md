@@ -38,7 +38,7 @@ npm install -D sass
 import {
   LButton, LBadge, LCard, LConfirmDialog, LDatePicker, LEmptyPanel,
   LField, LIcon, LPage, LPageContainer, LPageHeader, LPageToolbar,
-  LPanel, LRichEditor, LSpinner, LStatCard, LTabs, LToast, LToolbar, LView,
+  LPanel, LRichEditor, LSlugField, LSpinner, LStatCard, LTabs, LToast, LToolbar, LView,
 } from '@pinooxhq/luma/ui';
 
 import { usePage, http, auth } from '@pinooxhq/luma';
@@ -412,6 +412,29 @@ Static label or [FloatLabel](https://primevue.org/floatlabel/).
 
 Default slot scoped `{ id }`.
 
+See also: [Slug — Finglish URLs](./slug.md) ([فارسی](./slug.fa.md)).
+
+---
+
+### Slug — `slugify` / `LSlugField`
+
+Persian titles become Finglish URL slugs. Full guide: [`slug.md`](./slug.md) / [`slug.fa.md`](./slug.fa.md).
+
+```js
+import { slugify, sanitizeSlug } from '@pinooxhq/luma'
+import { useSlugField } from '@pinooxhq/luma/composables'
+import { LSlugField } from '@pinooxhq/luma/ui'
+```
+
+```vue
+<LSlugField
+  v-model:title="form.title"
+  v-model:slug="form.slug"
+  title-label="Title"
+  slug-label="Slug"
+/>
+```
+
 ---
 
 ### Date picker — `LDatePicker`
@@ -534,15 +557,27 @@ Optional `lucideIcon` on the require payload overrides the severity icon.
   icon="inbox"
   title="No items yet"
   message="Create the first item to get started."
-  :loading="fetching"
->
-  <template #actions>
-    <LButton variant="outline" icon="plus">Add</LButton>
-  </template>
-</LEmptyPanel>
+  action-label="Add item"
+  @action="openCreate"
+/>
 ```
 
-Props: `icon`, `title`, `message`, `iconColor`, `tone` (`dashed` \| `solid` \| `plain`), `loading`. Slot `#actions`.
+Or with a custom `#actions` slot and `:loading` for fetch placeholders.
+
+Props: `icon`, `title`, `message`, `tone` (`dashed` \| `solid` \| `plain`), `size` (`sm` \| `md` \| `lg`), `loading`, `actionLabel`, `actionIcon`, `actionVariant`. Slot `#actions`. Event `@action`.
+
+Tables can skip the slot entirely:
+
+```vue
+<LDataTable
+  :value="rows"
+  empty-icon="package"
+  empty-title="No products"
+  empty-message="Create the first product."
+  empty-action-label="Add product"
+  @empty-action="openCreate"
+/>
+```
 
 `LEmptyState` from `@pinooxhq/luma/ds` is a deprecated alias — prefer `LEmptyPanel`.
 
@@ -729,6 +764,7 @@ const { pageTitle, pageLead, pageBadge } = usePage();
 | Content / table surface | `<LPanel flush>` + `.luma-table` |
 | Status pill | `<LBadge>` |
 | Form label | `<LField>` |
+| Title + URL slug | `<LSlugField>` / `slugify()` |
 | Jalali / themed date | `<LDatePicker>` — or PrimeVue `DatePicker` |
 | Tab strip | `<LTabs>` — or PrimeVue `<Tabs>` |
 | Toast | Global Toast + `useToast()`; optional `<LToast>` |
@@ -779,5 +815,6 @@ Checklist:
 | `lucide-vue-next` | `^1` |
 | `sass` | `^1` (devDependency for styles) |
 | `@pinooxhq/auth` | `^0.1` (optional) |
+| `@pinooxhq/slug` | `^0.1` (bundled — Finglish slugs) |
 
 Theme CSS for PrimeVue comes through Luma’s Console preset (`@primeuix/themes` + `setupPrimeVue`). You do not need a separate PrimeVue CSS import for the default Luma look — import `@pinooxhq/luma/styles` for Luma tokens and chrome.

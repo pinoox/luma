@@ -34,6 +34,15 @@ export default function setupPrimeVue(app, options = {}) {
                   list: { dir: 'rtl' },
                   option: { style: { textAlign: 'right' } },
               },
+              autoComplete: {
+                  overlay: { dir: 'rtl' },
+                  list: { dir: 'rtl' },
+                  option: { style: { textAlign: 'right' } },
+                  emptyMessage: { style: { textAlign: 'right' } },
+              },
+              treeSelect: {
+                  overlay: { dir: 'rtl' },
+              },
           }
         : undefined;
 

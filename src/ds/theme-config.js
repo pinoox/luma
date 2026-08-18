@@ -11,7 +11,13 @@
  * @returns {Array<object>}
  */
 export const flattenNavItems = (sections) =>
-    (sections ?? []).flatMap((section) => section.items ?? []);
+    (sections ?? []).flatMap((section) =>
+        (section.items ?? []).flatMap((item) => (
+            Array.isArray(item.children) && item.children.length
+                ? item.children
+                : [item]
+        )),
+    );
 
 /**
  * Find the nav item whose `route` matches the given route name.

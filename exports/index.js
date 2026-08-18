@@ -94,3 +94,10 @@ export { default as createApp } from '../src/createApp.js';
 // read the same Vite variables in a Node-safe way without crashing.
 export { env, isDev, isProd } from '../src/core/env.js';
 export { resolveDirection, applyDocumentDirection } from '../src/core/direction.js';
+export {
+    toFinglish,
+    toPinglish,
+    slugify,
+    sanitizeSlug,
+    extendLoanwords,
+} from '../src/core/slug.js';

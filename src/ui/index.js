@@ -23,6 +23,7 @@ export { default as LCard } from './l-card.vue';          // wraps PrimeVue Card
 export { default as LStatCard } from './l-stat-card.vue';  // theme-aware KPI card
 export { default as LBadge } from './l-badge.vue';        // wraps PrimeVue Tag
 export { default as LField } from './l-field.vue';        // wraps FloatLabel
+export { default as LSlugField } from './l-slug-field.vue';
 export { default as LToolbar } from './l-toolbar.vue';    // wraps PrimeVue Toolbar
 export { default as LToast } from './l-toast.vue';        // wraps PrimeVue Toast
 export { default as LSpinner } from './l-spinner.vue';    // wraps PrimeVue ProgressSpinner

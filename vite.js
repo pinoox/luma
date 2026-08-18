@@ -95,6 +95,7 @@ const DEFAULT_DEDUPE = [
     '@primeuix/themes',
     'lucide-vue-next',
     '@pinooxhq/auth',
+    '@pinooxhq/slug',
 ];
 
 /**
@@ -285,6 +286,7 @@ export default function luma(options = {}) {
                             // pathToFileURL + fileURLToPath normalizes across
                             // Windows drive letters, UNC, and POSIX paths.
                             toAllowPath(consumerRoot),
+                            ...Object.values(aliases).map((pkgPath) => toAllowPath(pkgPath)),
                             ...cfg.fsAllow,
                         ],
                     },

@@ -1,0 +1,12 @@
+.luma-slug-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--px-space-3);
+    min-width: 0;
+
+    &__input {
+        direction: ltr;
+        text-align: start;
+        font-variant-ligatures: none;
+    }
+}

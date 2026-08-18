@@ -40,6 +40,7 @@ Full prop / slot reference: [`docs/README.md`](./docs/README.md) · page kit: [`
 | `lucide-vue-next` | `^1` | Icons for `<LIcon>` |
 | `sass` | `^1` | Compile `@pinooxhq/luma/styles` (devDependency) |
 | `@pinooxhq/auth` | `^0.1` | Optional — bundled auth helpers |
+| `@pinooxhq/slug` | `^0.1` | Persian → Finglish slugs (`slugify`, `LSlugField`) |
 
 Node **≥ 18**. Luma targets **PrimeVue 4.x** (latest 4.5 line) with `@primeuix/themes` **2.x**.
 
@@ -65,6 +66,8 @@ npm install @pinooxhq/auth
 ```
 
 Without `@pinooxhq/auth`, `createApp` still boots and public pages work; `requiresAuth` routes redirect.
+
+Persian URL slugs (`slugify`, `useSlugField`, `LSlugField`): see [`docs/slug.md`](./docs/slug.md) ([فارسی](./docs/slug.fa.md)).
 
 Import styles once in your app entry SCSS:
 
@@ -202,6 +205,15 @@ export const themeConfig = {
         items: [
           { key: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard', route: 'shop.dashboard' },
           { key: 'orders',    label: 'Orders',    icon: 'shopping-cart',    route: 'shop.orders' },
+          {
+            key: 'catalog',
+            label: 'Catalog',
+            icon: 'layers',
+            children: [
+              { key: 'categories', label: 'Categories', icon: 'folder-tree', route: 'shop.products.categories' },
+              { key: 'brands',     label: 'Brands',     icon: 'award',       route: 'shop.products.brands' },
+            ],
+          },
         ],
       },
     ],
@@ -352,7 +364,7 @@ const { toggleTheme, isDark } = useTheme();
 ```ts
 {
   brand:    { title, subtitle?, logo?, primary?, /* visual brand keys */ },
-  nav:      { sections: Array<{ key, label, items, collapsible?, defaultCollapsed? }> },
+  nav:      { sections: Array<{ key, label, items: Array<{ key, label, icon, route?, children? }>, collapsible?, defaultCollapsed? }> },
   pageMeta: Record<string, { title, lead?, badge? }>,
   user?:    { roleLabel? },
   font?:    { sans?, mono? },
@@ -362,7 +374,7 @@ const { toggleTheme, isDark } = useTheme();
 }
 ```
 
-Omitted fields fall back to Luma defaults. Nav section `label` is a static heading; set `collapsible: true` for accordion sections.
+Omitted fields fall back to Luma defaults. Nav section `label` is a static heading; set `collapsible: true` for accordion sections. Nav items may include `children` for a nested submenu.
 
 ### Layouts
 

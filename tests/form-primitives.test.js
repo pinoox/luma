@@ -39,3 +39,11 @@ test('useFilePicker filters type, size, and single mode', async () => {
     assert.deepEqual(picker.errors.value.map((error) => error.code), ['type', 'size']);
     scope.stop();
 });
+
+test('slugify turns Persian titles into Finglish slugs', async () => {
+    const { slugify, sanitizeSlug, toFinglish } = await import('../src/core/slug.js');
+    assert.equal(toFinglish('سلام دنیا'), 'salam donya');
+    assert.equal(slugify('سلام دنیا'), 'salam-donya');
+    assert.equal(slugify('لپتاپ'), 'laptop');
+    assert.equal(sanitizeSlug('lap--top'), 'lap-top');
+});

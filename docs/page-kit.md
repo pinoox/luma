@@ -26,11 +26,9 @@ Full prop reference: [`docs/README.md`](./README.md). App boot / layouts / auth:
       icon="inbox"
       title="Nothing here yet"
       message="Create the first item to get started."
-    >
-      <template #actions>
-        <LButton icon="plus">Add</LButton>
-      </template>
-    </LEmptyPanel>
+      action-label="Add"
+      @action="openCreate"
+    />
     <LPanel v-else flush bare>
       <LDataTable :value="rows" paginator :rows="20" data-key="id">
         <Column field="name" header="Name" />
@@ -71,7 +69,16 @@ import Column from 'primevue/column';
 </LBulkBar>
 
 <LPanel flush bare>
-  <LDataTable v-model:selection="selected" :value="rows" paginator data-key="id">
+  <LDataTable
+    v-model:selection="selected"
+    :value="rows"
+    paginator
+    data-key="id"
+    empty-icon="inbox"
+    empty-title="No rows"
+    empty-action-label="Add"
+    @empty-action="openCreate"
+  >
     <Column selection-mode="multiple" style="width: 3rem" />
     <Column field="name" header="Name" />
     <Column header="Status">

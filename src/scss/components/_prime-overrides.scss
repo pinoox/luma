@@ -203,21 +203,25 @@
 
 [dir='rtl'] .p-select-overlay,
 [dir='rtl'] .p-multiselect-overlay,
+[dir='rtl'] .p-autocomplete-overlay,
 [dir='rtl'] .p-datepicker-panel,
 [dir='rtl'] .p-popover,
 [dir='rtl'] .p-menu,
 [dir='rtl'] .l-select-overlay,
 [dir='rtl'] .l-multiselect-overlay,
+[dir='rtl'] .l-autocomplete-overlay,
 [dir='rtl'] .l-datepicker-panel,
 [dir='rtl'] .l-popover,
 [dir='rtl'] .l-menu,
 .p-select-overlay[dir='rtl'],
 .p-multiselect-overlay[dir='rtl'],
+.p-autocomplete-overlay[dir='rtl'],
 .p-datepicker-panel[dir='rtl'],
 .p-popover[dir='rtl'],
 .p-menu[dir='rtl'],
 .l-select-overlay[dir='rtl'],
 .l-multiselect-overlay[dir='rtl'],
+.l-autocomplete-overlay[dir='rtl'],
 .l-datepicker-panel[dir='rtl'],
 .l-popover[dir='rtl'],
 .l-menu[dir='rtl'] {
@@ -278,12 +282,16 @@
 
 [dir='rtl'] .p-select-empty-message,
 [dir='rtl'] .p-multiselect-empty-message,
+[dir='rtl'] .p-autocomplete-empty-message,
 [dir='rtl'] .l-select-empty-message,
 [dir='rtl'] .l-multiselect-empty-message,
+[dir='rtl'] .l-autocomplete-empty-message,
 .p-select-overlay[dir='rtl'] .p-select-empty-message,
 .p-multiselect-overlay[dir='rtl'] .p-multiselect-empty-message,
+.p-autocomplete-overlay[dir='rtl'] .p-autocomplete-empty-message,
 .l-select-overlay[dir='rtl'] .l-select-empty-message,
-.l-multiselect-overlay[dir='rtl'] .l-multiselect-empty-message {
+.l-multiselect-overlay[dir='rtl'] .l-multiselect-empty-message,
+.l-autocomplete-overlay[dir='rtl'] .l-autocomplete-empty-message {
   display: block;
   width: 100%;
 }

@@ -2,7 +2,7 @@
 
 Default admin page composition. Prefer these primitives over one-off page headers and custom panel CSS.
 
-Full prop reference: [`docs/README.md`](./README.md). App boot / layouts / auth: [root README](../README.md).
+Full prop reference: [`ui-reference.md`](./ui-reference.md). Docs index: [`README.md`](./README.md). App boot / layouts / auth: [root README](../README.md).
 
 ## Canonical page
 

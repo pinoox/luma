@@ -22,7 +22,7 @@ Luma is more than a component kit. It is the front-end foundation of a Pinoox ad
 12. [Upgrading](#upgrading)
 13. [License](#license)
 
-Full prop / slot reference: [`docs/README.md`](./docs/README.md) · page kit: [`docs/page-kit.md`](./docs/page-kit.md) · release notes: [`CHANGELOG.md`](./CHANGELOG.md)
+Full prop / slot reference: [`docs/ui-reference.md`](./docs/ui-reference.md) · docs index: [`docs/README.md`](./docs/README.md) · page kit: [`docs/page-kit.md`](./docs/page-kit.md) · entity forms: [`docs/guides/entity-form.md`](./docs/guides/entity-form.md) · release notes: [`CHANGELOG.md`](./CHANGELOG.md)
 
 ---
 
@@ -526,6 +526,8 @@ const statusSeverity = { paid: 'success', pending: 'warn', shipped: 'info' };
 Docs: [primevue.org/datatable](https://primevue.org/datatable/)
 
 ### Form + `LField`
+
+For entity CRUD with Yup defaults / `toForm` / `toPayload`, see **[Entity Form](./docs/guides/entity-form.md)** (index: [`docs/README.md`](./docs/README.md)).
 
 ```vue
 <script setup>

@@ -25,8 +25,7 @@
 <script setup>
 import { computed, inject } from 'vue';
 import FloatLabel from 'primevue/floatlabel';
-
-const FORM_VALIDATION_KEY = Symbol.for('luma.formValidation');
+import { FORM_VALIDATION_KEY } from '../composables/form/form-validation.js';
 
 /**
  * LField — themed form field wrapper.
@@ -36,6 +35,13 @@ const FORM_VALIDATION_KEY = Symbol.for('luma.formValidation');
  *   - floating=false → static label above input
  *
  * Bind `name` to a useFormValidation field to show client/server errors.
+ *
+ * @example
+ * const validation = useFormValidation({ rules: { title: 'required' }, labels: { title: 'Title' } });
+ * validation.bind(form);
+ * <LField name="title" label="Title" required>
+ *   <InputText v-model="form.title" />
+ * </LField>
  */
 const props = defineProps({
     label: { type: String, default: '' },

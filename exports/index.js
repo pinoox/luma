@@ -18,6 +18,7 @@ export {
 
 export {
     useAuthStore,
+    useAuthRedirect,
     auth,
     http,
     configureAuth,

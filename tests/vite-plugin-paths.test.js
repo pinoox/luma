@@ -5,12 +5,20 @@
  */
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, it } from 'node:test';
 
-import luma, { resolvePackage, toAllowPath, toFsPath } from '../vite.js';
+import luma, {
+    resolvePackage,
+    dedupePackageAliases,
+    wildcardExportAlias,
+    expandWildcardStringAliases,
+    toAllowPath,
+    toFsPath,
+} from '../vite.js';
 
 const isWindows = process.platform === 'win32';
 const require = createRequire(import.meta.url);
@@ -26,6 +34,14 @@ function legacyAllowPath(consumerRoot) {
             'file:///',
         ),
     );
+}
+
+function exactAlias(aliases, id) {
+    return aliases.find((entry) => {
+        if (entry.find === id) return true;
+        if (!(entry.find instanceof RegExp)) return false;
+        return entry.find.test(id) && !entry.find.test(`${id}/x`);
+    });
 }
 
 function invokeConfig(root, options = {}) {
@@ -184,6 +200,222 @@ describe('luma() plugin config hook', () => {
         assert.ok(conf.resolve.dedupe.includes('primevue'));
         assert.ok(conf.optimizeDeps.exclude.includes('@pinooxhq/luma'));
     });
+
+    it('aliases @primeuix/themes/aura through wildcard exports when themes is installed', () => {
+        const themesDir = resolvePackage('@primeuix/themes', lumaDir);
+        if (themesDir == null) return;
+        const aliases = dedupePackageAliases('@primeuix/themes', themesDir);
+        const wildcard = aliases.find(
+            (entry) => entry.find instanceof RegExp && entry.find.test('@primeuix/themes/aura'),
+        );
+        assert.ok(wildcard);
+        assert.equal(
+            '@primeuix/themes/aura'.replace(wildcard.find, wildcard.replacement),
+            path.join(themesDir, 'dist/aura/index.mjs'),
+        );
+        const main = aliases.find(
+            (entry) => entry.find instanceof RegExp && entry.find.test('@primeuix/themes'),
+        );
+        assert.ok(main);
+        assert.equal(main.find.test('@primeuix/themes/aura'), false);
+    });
+
+    it('aliases @pinooxhq/auth/vue through package exports when auth is installed', () => {
+        const authDir = resolvePackage('@pinooxhq/auth', lumaDir);
+        if (authDir == null) return;
+        const conf = invokeConfig(lumaDir);
+        const vue = exactAlias(conf.resolve.alias, '@pinooxhq/auth/vue');
+        const dirAlias = conf.resolve.alias.find((entry) => entry.find === '@pinooxhq/auth');
+        assert.ok(vue || dirAlias);
+        if (vue) {
+            assert.equal(vue.replacement, path.join(authDir, 'dist/vue/index.js'));
+            const main = exactAlias(conf.resolve.alias, '@pinooxhq/auth');
+            assert.ok(main);
+            assert.equal(main.find.test('@pinooxhq/auth/vue'), false);
+        }
+    });
+});
+
+describe('dedupePackageAliases', () => {
+    it('maps package.json subpath exports that are not files at the export key', () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-auth-exports-'));
+        try {
+            fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({
+                name: '@pinooxhq/auth',
+                exports: {
+                    '.': { import: './dist/index.js' },
+                    './vue': { import: './dist/vue/index.js' },
+                },
+            }));
+            const aliases = dedupePackageAliases('@pinooxhq/auth', dir);
+            const vue = exactAlias(aliases, '@pinooxhq/auth/vue');
+            assert.ok(vue);
+            assert.equal(vue.replacement, path.join(dir, 'dist/vue/index.js'));
+            const main = exactAlias(aliases, '@pinooxhq/auth');
+            assert.ok(main);
+            assert.equal(main.find.test('@pinooxhq/auth/vue'), false);
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    it('keeps a directory alias when subpaths exist on disk', () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-dir-alias-'));
+        try {
+            fs.mkdirSync(path.join(dir, 'vue'));
+            fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({
+                name: 'example',
+                exports: {
+                    '.': './index.js',
+                    './vue': './vue/index.js',
+                },
+            }));
+            const aliases = dedupePackageAliases('example', dir);
+            assert.equal(aliases.length, 1);
+            assert.equal(aliases[0].find, 'example');
+            assert.equal(aliases[0].replacement, dir);
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    it('keeps a directory alias for on-disk ./* wildcards (primevue-style)', () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-ondisk-wild-'));
+        try {
+            fs.mkdirSync(path.join(dir, 'menu', 'style'), { recursive: true });
+            fs.writeFileSync(path.join(dir, 'menu', 'index.mjs'), 'export default {}\n');
+            fs.writeFileSync(path.join(dir, 'menu', 'style', 'index.mjs'), 'export default {}\n');
+            fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({
+                name: 'primevue',
+                exports: {
+                    '.': { import: './index.mjs' },
+                    './*': { import: './*/index.mjs' },
+                },
+            }));
+            const aliases = dedupePackageAliases('primevue', dir);
+            assert.equal(aliases.length, 1);
+            assert.equal(aliases[0].find, 'primevue');
+            assert.equal(aliases[0].replacement, dir);
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    it('maps wildcard ./* exports so @primeuix/themes/aura hits dist/aura', () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-themes-exports-'));
+        try {
+            fs.mkdirSync(path.join(dir, 'tokens'));
+            fs.mkdirSync(path.join(dir, 'dist', 'aura'), { recursive: true });
+            fs.writeFileSync(path.join(dir, 'dist', 'aura', 'index.mjs'), 'export default {}\n');
+            fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({
+                name: '@primeuix/themes',
+                exports: {
+                    '.': { import: './dist/index.mjs' },
+                    './tokens': { import: './tokens/index.mjs' },
+                    './*': { import: './dist/*/index.mjs' },
+                },
+            }));
+            const aliases = dedupePackageAliases('@primeuix/themes', dir);
+            const tokens = exactAlias(aliases, '@primeuix/themes/tokens');
+            assert.ok(tokens);
+            assert.equal(tokens.replacement, path.join(dir, 'tokens/index.mjs'));
+
+            const aura = exactAlias(aliases, '@primeuix/themes/aura');
+            assert.ok(aura);
+            assert.equal(aura.replacement, path.join(dir, 'dist/aura/index.mjs'));
+
+            const wildcard = aliases.find(
+                (entry) => entry.find instanceof RegExp && entry.find.test('@primeuix/themes/aura'),
+            );
+            assert.ok(wildcard);
+            assert.equal(
+                '@primeuix/themes/aura'.replace(wildcard.find, wildcard.replacement),
+                path.join(dir, 'dist/aura/index.mjs'),
+            );
+            assert.equal(wildcard.find.test('@primeuix/themes'), false);
+
+            const main = aliases.find(
+                (entry) => entry.find instanceof RegExp && entry.find.test('@primeuix/themes'),
+            );
+            assert.ok(main);
+            assert.equal(main.find.test('@primeuix/themes/aura'), false);
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    });
+});
+
+describe('wildcardExportAlias', () => {
+    it('builds a capture-group replacement for ./* → dist/*', () => {
+        const alias = wildcardExportAlias(
+            '@primeuix/themes',
+            '/pkg',
+            './*',
+            './dist/*/index.mjs',
+        );
+        assert.ok(alias);
+        assert.equal(alias.find.test('@primeuix/themes/aura'), true);
+        assert.equal(
+            '@primeuix/themes/aura'.replace(alias.find, alias.replacement),
+            path.join('/pkg', 'dist/aura/index.mjs'),
+        );
+    });
+});
+
+describe('expandWildcardStringAliases', () => {
+    it('lists dist/<name> folders as string aliases', () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-wildcard-strings-'));
+        try {
+            fs.mkdirSync(path.join(dir, 'dist', 'aura'), { recursive: true });
+            fs.writeFileSync(path.join(dir, 'dist', 'aura', 'index.mjs'), 'export default {}\n');
+            const aliases = expandWildcardStringAliases(
+                '@primeuix/themes',
+                dir,
+                './*',
+                './dist/*/index.mjs',
+            );
+            assert.equal(aliases.length, 1);
+            assert.ok(aliases[0].find instanceof RegExp);
+            assert.equal(aliases[0].find.test('@primeuix/themes/aura'), true);
+            assert.equal(aliases[0].find.test('@primeuix/themes/aura/x'), false);
+            assert.equal(aliases[0].replacement, path.join(dir, 'dist/aura/index.mjs'));
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    });
+});
+
+describe('resolveId dedupe', () => {
+    it('resolves @primeuix/themes/aura from the consumer node_modules', () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-resolveid-'));
+        try {
+            fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'app' }));
+            fs.writeFileSync(path.join(dir, 'vite.js'), 'export default function luma() { return {}; }\n');
+            const pkg = path.join(dir, 'node_modules', '@primeuix', 'themes');
+            fs.mkdirSync(path.join(pkg, 'dist', 'aura'), { recursive: true });
+            fs.writeFileSync(path.join(pkg, 'dist', 'aura', 'index.mjs'), 'export default {}\n');
+            fs.writeFileSync(path.join(pkg, 'package.json'), JSON.stringify({
+                name: '@primeuix/themes',
+                exports: {
+                    '.': { import: './dist/index.mjs' },
+                    './*': { import: './dist/*/index.mjs' },
+                },
+            }));
+
+            const plugin = luma({ local: dir });
+            plugin.config({ root: dir }, { mode: 'test', command: 'serve' });
+            const importer = path.join(dir, 'src', 'plugins', 'preset.js');
+            fs.mkdirSync(path.dirname(importer), { recursive: true });
+            const resolved = plugin.resolveId('@primeuix/themes/aura', importer);
+            assert.equal(resolved, path.join(pkg, 'dist/aura/index.mjs'));
+            assert.equal(
+                plugin.resolveId('@primeuix/themes/aura', path.join(os.tmpdir(), 'other-app', 'main.js')),
+                null,
+            );
+        } finally {
+            fs.rmSync(dir, { recursive: true, force: true });
+        }
+    });
 });
 
 describe('resolvePackage', () => {
@@ -202,6 +434,16 @@ describe('resolvePackage', () => {
 
     it('returns null for a missing package without throwing', () => {
         assert.equal(resolvePackage('definitely-not-a-real-pkg-xyz', lumaDir), null);
+    });
+
+    it('resolves packages whose exports omit ./package.json', () => {
+        const pkg = resolvePackage('@pinooxhq/auth', lumaDir);
+        if (pkg == null) return;
+        assert.ok(path.isAbsolute(pkg));
+        assert.equal(
+            JSON.parse(fs.readFileSync(path.join(pkg, 'package.json'), 'utf8')).name,
+            '@pinooxhq/auth',
+        );
     });
 
     it('accepts Windows drive consumerRoot without throwing', () => {

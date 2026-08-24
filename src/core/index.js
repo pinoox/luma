@@ -1,5 +1,5 @@
 // Core utilities — barrel exports
-export { auth, http, useAuthStore } from './auth/index.js';
+export { auth, http, useAuthStore, useAuthRedirect } from './auth/index.js';
 export {
     lucidePixelSize,
     lucideStrokeWidth,

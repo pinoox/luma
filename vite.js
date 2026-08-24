@@ -81,6 +81,13 @@ export function toAllowPath(fsPath) {
     return fileURLToPath(pathToFileURL(toFsPath(fsPath)));
 }
 
+function isInsideDir(file, dir) {
+    if (!file || !dir) return false;
+    const resolvedFile = path.resolve(file);
+    const resolvedDir = path.resolve(dir);
+    return resolvedFile === resolvedDir || resolvedFile.startsWith(`${resolvedDir}${path.sep}`);
+}
+
 /**
  * Packages Luma needs shared with its consumer to avoid duplicated
  * module instances and broken dependency injection.
@@ -123,16 +130,286 @@ const DEFAULT_INCLUDE_IN_OPTIMIZE = [
  * `null` if the package isn't installed in the consumer's tree (Luma
  * preserves that gracefully — Vite will then fall back to its own
  * resolution chain).
+ *
+ * Prefer a real `node_modules/<name>/package.json` path. `require.resolve`
+ * of `./package.json` fails when the package `exports` map omits that
+ * subpath (`@pinooxhq/auth`).
  */
 function resolvePackage(name, consumerRoot) {
+    const root = toFsPath(consumerRoot);
+    const direct = path.join(root, 'node_modules', name, 'package.json');
+    if (fs.existsSync(direct)) {
+        return path.dirname(direct);
+    }
+
     try {
         const resolved = require.resolve(`${name}/package.json`, {
-            paths: [toFsPath(consumerRoot)],
+            paths: [root],
         });
         return path.dirname(resolved);
     } catch (_) {
-        return null;
+        try {
+            const entry = require.resolve(name, { paths: [root] });
+            return findPackageRoot(entry, name);
+        } catch {
+            return null;
+        }
     }
+}
+
+function findPackageRoot(fromFile, name) {
+    let dir = path.dirname(fromFile);
+    while (true) {
+        const pkgFile = path.join(dir, 'package.json');
+        if (fs.existsSync(pkgFile)) {
+            try {
+                const pkg = JSON.parse(fs.readFileSync(pkgFile, 'utf8'));
+                if (pkg.name === name) return dir;
+            } catch {
+                // keep walking
+            }
+        }
+        const parent = path.dirname(dir);
+        if (parent === dir) return null;
+        dir = parent;
+    }
+}
+
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * ESM `import` target from a package.json `exports` entry.
+ */
+function resolveExportTarget(value) {
+    if (typeof value === 'string') return value;
+    if (!value || typeof value !== 'object') return null;
+
+    const pick = (node) => {
+        if (typeof node === 'string') return node;
+        if (!node || typeof node !== 'object') return null;
+        if (typeof node.default === 'string') return node.default;
+        if (typeof node.import === 'string') return node.import;
+        return null;
+    };
+
+    if (value.import) {
+        const fromImport = pick(value.import);
+        if (fromImport) return fromImport;
+    }
+    if (typeof value.default === 'string') return value.default;
+    if (value.default && typeof value.default === 'object') {
+        const fromDefault = pick(value.default);
+        if (fromDefault) return fromDefault;
+    }
+    return null;
+}
+
+function exportKeyExistsOnDisk(pkgDir, exportKey) {
+    const relative = exportKey.replace(/^\.\//, '');
+    const naive = path.join(pkgDir, relative);
+    return (
+        fs.existsSync(naive)
+        || fs.existsSync(`${naive}.js`)
+        || fs.existsSync(`${naive}.mjs`)
+        || fs.existsSync(`${naive}.cjs`)
+    );
+}
+
+function exactIdAlias(id, replacement) {
+    return {
+        find: new RegExp(`^${escapeRegExp(id)}$`),
+        replacement,
+    };
+}
+
+/**
+ * True when a wildcard export is already on disk at the import path
+ * (PrimeVue menu/style). A file alias for the parent would prefix-match
+ * nested subpaths and yield index.mjs/style. Use a directory alias instead.
+ */
+export function isOnDiskWildcard(exportKey, target) {
+    if (!exportKey.endsWith('/*') || typeof target !== 'string') return false;
+    const rel = target.replace(/^\.\//, '');
+    const prefix = exportKey.slice(2, -2);
+    const starPath = prefix ? `${prefix}/*` : '*';
+    return rel === starPath
+        || rel === `${starPath}/index.mjs`
+        || rel === `${starPath}/index.js`
+        || rel === `${starPath}/index.cjs`;
+}
+
+/**
+ * Turn a remapped exports wildcard ("./*" -> "./dist/<name>/index.mjs")
+ * into a Vite regex alias. Capture group 1 is the subpath ("aura").
+ *
+ * @param {string} name
+ * @param {string} pkgDir
+ * @param {string} exportKey
+ * @param {string} target
+ * @returns {{ find: RegExp, replacement: string } | null}
+ */
+export function wildcardExportAlias(name, pkgDir, exportKey, target) {
+    if (!exportKey.endsWith('/*') || !target.includes('*')) return null;
+    if (isOnDiskWildcard(exportKey, target)) return null;
+
+    const prefixKey = exportKey.slice(0, -2);
+    const importBase = prefixKey === '.' ? name : `${name}${prefixKey.slice(1)}`;
+    const replacement = path.join(
+        pkgDir,
+        ...target.replace(/^\.\//, '').split('/').map((part) => (part === '*' ? '$1' : part)),
+    );
+
+    return {
+        find: new RegExp(`^${escapeRegExp(importBase)}/(.+)$`),
+        replacement,
+    };
+}
+
+/**
+ * Expand a remapped "./*" onto concrete exact aliases by listing the
+ * folder that the star stands for (`dist/aura` → `@primeuix/themes/aura`).
+ * Finds are exact regex so they cannot prefix-match nested subpaths.
+ *
+ * @param {string} name
+ * @param {string} pkgDir
+ * @param {string} exportKey
+ * @param {string} target
+ * @returns {Array<{ find: RegExp, replacement: string }>}
+ */
+export function expandWildcardStringAliases(name, pkgDir, exportKey, target) {
+    if (!exportKey.endsWith('/*') || !target.includes('*')) return [];
+    if (isOnDiskWildcard(exportKey, target)) return [];
+
+    const prefixKey = exportKey.slice(0, -2);
+    const importBase = prefixKey === '.' ? name : `${name}${prefixKey.slice(1)}`;
+    const parts = target.replace(/^\.\//, '').split('/');
+    const starAt = parts.indexOf('*');
+    if (starAt < 0) return [];
+
+    const parent = path.join(pkgDir, ...parts.slice(0, starAt));
+    if (!fs.existsSync(parent) || !fs.statSync(parent).isDirectory()) return [];
+
+    const aliases = [];
+    for (const entry of fs.readdirSync(parent, { withFileTypes: true })) {
+        if (entry.name.startsWith('.')) continue;
+        const filePath = path.join(
+            pkgDir,
+            ...parts.map((part) => (part === '*' ? entry.name : part)),
+        );
+        if (!fs.existsSync(filePath)) continue;
+        aliases.push(exactIdAlias(`${importBase}/${entry.name}`, filePath));
+    }
+    return aliases;
+}
+
+/**
+ * Resolve a bare specifier from a consumer's node_modules using Node exports.
+ *
+ * @param {string} id
+ * @param {Array<string | null | undefined>} roots
+ * @returns {string | null}
+ */
+export function resolveDedupeSpecifier(id, roots) {
+    const name = id.startsWith('@')
+        ? id.split('/').slice(0, 2).join('/')
+        : id.split('/')[0];
+
+    const seen = new Set();
+    for (const root of roots) {
+        if (root == null || root === '') continue;
+        const abs = toFsPath(root);
+        if (seen.has(abs)) continue;
+        seen.add(abs);
+
+        const pkgDir = resolvePackage(name, abs);
+        if (!pkgDir) continue;
+
+        const aliases = dedupePackageAliases(name, pkgDir);
+        const exact = aliases.find((entry) => entry.find === id);
+        if (exact) return exact.replacement;
+
+        const regex = aliases.find(
+            (entry) => entry.find instanceof RegExp && entry.find.test(id),
+        );
+        if (regex) return id.replace(regex.find, regex.replacement);
+    }
+    return null;
+}
+
+/**
+ * Vite aliases for a deduped package that keep Node `exports` subpaths
+ * working. A string alias `{ find: '@pinooxhq/auth', replacement: pkgDir }`
+ * is a prefix match, so `@pinooxhq/auth/vue` becomes `{pkgDir}/vue` and
+ * skips `exports` (`./vue` → `./dist/vue/index.js`). The same bug hits
+ * `@primeuix/themes/aura` when the wildcard maps into `dist/<name>/index.mjs`.
+ *
+ * Packages whose subpath keys already exist on disk and have no wildcard
+ * remaps keep the directory alias (vue, pinia). Remapped / wildcard
+ * exports get file aliases plus an exact package-name match so the
+ * prefix does not swallow `/vue` or `/aura`.
+ *
+ * @param {string} name
+ * @param {string} pkgDir
+ * @returns {Array<{ find: string | RegExp, replacement: string }>}
+ */
+export function dedupePackageAliases(name, pkgDir) {
+    let pkg = {};
+    try {
+        pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8'));
+    } catch {
+        return [{ find: name, replacement: pkgDir }];
+    }
+
+    const exportsField = pkg.exports;
+    if (!exportsField || typeof exportsField !== 'object' || Array.isArray(exportsField)) {
+        return [{ find: name, replacement: pkgDir }];
+    }
+
+    const explicit = [];
+    const wildcards = [];
+    const wildcardStrings = [];
+    for (const [key, val] of Object.entries(exportsField)) {
+        if (key === '.' || key === './package.json' || !key.startsWith('./')) {
+            continue;
+        }
+        const target = resolveExportTarget(val);
+        if (!target) continue;
+
+        if (key.includes('*')) {
+            const alias = wildcardExportAlias(name, pkgDir, key, target);
+            if (alias) wildcards.push(alias);
+            wildcardStrings.push(...expandWildcardStringAliases(name, pkgDir, key, target));
+            continue;
+        }
+
+        explicit.push({
+            id: `${name}${key.slice(1)}`,
+            replacement: path.join(pkgDir, target.replace(/^\.\//, '')),
+            existsOnDisk: exportKeyExistsOnDisk(pkgDir, key),
+        });
+    }
+
+    const remapped = explicit.filter((entry) => !entry.existsOnDisk);
+    if (wildcards.length === 0 && wildcardStrings.length === 0 && remapped.length === 0) {
+        return [{ find: name, replacement: pkgDir }];
+    }
+
+    const main = resolveExportTarget(exportsField['.']);
+    const explicitAliases = (wildcards.length > 0 || wildcardStrings.length > 0 ? explicit : remapped).map(
+        ({ id, replacement }) => exactIdAlias(id, replacement),
+    );
+
+    return [
+        ...explicitAliases,
+        ...wildcardStrings,
+        ...wildcards,
+        {
+            find: new RegExp(`^${escapeRegExp(name)}$`),
+            replacement: main ? path.join(pkgDir, main.replace(/^\.\//, '')) : pkgDir,
+        },
+    ];
 }
 
 /**
@@ -168,25 +445,25 @@ export function localLumaAliases(lumaRoot) {
     const join = (...parts) => path.join(root, ...parts);
 
     return [
-        { find: '@pinooxhq/luma/styles/_main', replacement: join('src/scss/main.scss') },
-        { find: '@pinooxhq/luma/styles.scss', replacement: join('exports/styles.scss') },
-        { find: '@pinooxhq/luma/styles', replacement: join('src/scss/_styles.scss') },
-        { find: '@pinooxhq/luma/tokens.scss', replacement: join('exports/tokens.scss') },
-        { find: '@pinooxhq/luma/tokens/_index', replacement: join('src/scss/tokens/_index.scss') },
-        { find: '@pinooxhq/luma/tokens', replacement: join('src/scss/tokens/_index.scss') },
-        { find: '@pinooxhq/luma/fonts', replacement: join('src/fonts/vazir.js') },
-        { find: '@pinooxhq/luma/vite', replacement: join('vite.js') },
-        { find: '@pinooxhq/luma/preset', replacement: join('exports/preset.js') },
-        { find: '@pinooxhq/luma/createApp', replacement: join('src/createApp.js') },
-        { find: '@pinooxhq/luma/applyThemeConfig', replacement: join('exports/applyThemeConfig.js') },
-        { find: '@pinooxhq/luma/theme-config', replacement: join('src/ds/theme-config.js') },
-        { find: '@pinooxhq/luma/core', replacement: join('src/core/index.js') },
-        { find: '@pinooxhq/luma/layouts', replacement: join('src/layouts/index.js') },
-        { find: '@pinooxhq/luma/ui', replacement: join('src/ui/index.js') },
-        { find: '@pinooxhq/luma/ds', replacement: join('src/ds/index.js') },
-        { find: '@pinooxhq/luma/composables', replacement: join('src/composables/index.js') },
-        { find: '@pinooxhq/luma/plugins', replacement: join('src/plugins/preset.js') },
-        { find: '@pinooxhq/luma/router', replacement: join('src/router/guards.js') },
+        exactIdAlias('@pinooxhq/luma/styles/_main', join('src/scss/main.scss')),
+        exactIdAlias('@pinooxhq/luma/styles.scss', join('exports/styles.scss')),
+        exactIdAlias('@pinooxhq/luma/styles', join('src/scss/_styles.scss')),
+        exactIdAlias('@pinooxhq/luma/tokens.scss', join('exports/tokens.scss')),
+        exactIdAlias('@pinooxhq/luma/tokens/_index', join('src/scss/tokens/_index.scss')),
+        exactIdAlias('@pinooxhq/luma/tokens', join('src/scss/tokens/_index.scss')),
+        exactIdAlias('@pinooxhq/luma/fonts', join('src/fonts/vazir.js')),
+        exactIdAlias('@pinooxhq/luma/vite', join('vite.js')),
+        exactIdAlias('@pinooxhq/luma/preset', join('exports/preset.js')),
+        exactIdAlias('@pinooxhq/luma/createApp', join('src/createApp.js')),
+        exactIdAlias('@pinooxhq/luma/applyThemeConfig', join('exports/applyThemeConfig.js')),
+        exactIdAlias('@pinooxhq/luma/theme-config', join('src/ds/theme-config.js')),
+        exactIdAlias('@pinooxhq/luma/core', join('src/core/index.js')),
+        exactIdAlias('@pinooxhq/luma/layouts', join('src/layouts/index.js')),
+        exactIdAlias('@pinooxhq/luma/ui', join('src/ui/index.js')),
+        exactIdAlias('@pinooxhq/luma/ds', join('src/ds/index.js')),
+        exactIdAlias('@pinooxhq/luma/composables', join('src/composables/index.js')),
+        exactIdAlias('@pinooxhq/luma/plugins', join('src/plugins/preset.js')),
+        exactIdAlias('@pinooxhq/luma/router', join('src/router/guards.js')),
         { find: /^@pinooxhq\/luma\/fonts\/(.*)$/, replacement: join('src/fonts/$1') },
         { find: /^@pinooxhq\/luma\/ui\/(.*)$/, replacement: join('src/ui/$1') },
         { find: /^@pinooxhq\/luma\/ds\/(.*)$/, replacement: join('src/ds/$1') },
@@ -197,7 +474,6 @@ export function localLumaAliases(lumaRoot) {
         { find: /^@pinooxhq\/luma\/router\/(.*)$/, replacement: join('src/router/$1') },
         { find: /^@pinooxhq\/luma\/styles\/(.*)$/, replacement: join('src/scss/$1') },
         { find: /^@pinooxhq\/luma\/tokens\/(.*)$/, replacement: join('src/scss/tokens/$1') },
-        // Exact package root only — never prefix-match `/styles` etc.
         { find: /^@pinooxhq\/luma$/, replacement: join('exports/index.js') },
     ];
 }
@@ -244,12 +520,15 @@ export default function luma(options = {}) {
             // process.cwd() if it's not set (SSR-only contexts).
             consumerRoot = toFsPath(config.root ?? process.cwd());
 
-            const aliases = Object.fromEntries(
-                cfg.dedupe
-                    .map((name) => [name, resolvePackage(name, consumerRoot)])
-                    .filter(([, pkgPath]) => pkgPath !== null),
-            );
-            dedupeAliases = aliases;
+            const pkgDirs = {};
+            const aliases = [];
+            for (const name of cfg.dedupe) {
+                const pkgPath = resolvePackage(name, consumerRoot);
+                if (!pkgPath) continue;
+                pkgDirs[name] = pkgPath;
+                aliases.push(...dedupePackageAliases(name, pkgPath));
+            }
+            dedupeAliases = pkgDirs;
 
             const localAliases = localRoot ? localLumaAliases(localRoot) : [];
             if (localRoot && env?.mode !== 'test') {
@@ -263,10 +542,7 @@ export default function luma(options = {}) {
                     // ahead of the exact `@pinooxhq/luma` match.
                     alias: [
                         ...localAliases,
-                        ...Object.entries(aliases).map(([find, replacement]) => ({
-                            find,
-                            replacement,
-                        })),
+                        ...aliases,
                     ],
                 },
                 optimizeDeps: {
@@ -286,13 +562,36 @@ export default function luma(options = {}) {
                             // pathToFileURL + fileURLToPath normalizes across
                             // Windows drive letters, UNC, and POSIX paths.
                             toAllowPath(consumerRoot),
-                            ...Object.values(aliases).map((pkgPath) => toAllowPath(pkgPath)),
+                            ...Object.values(pkgDirs).map((pkgPath) => toAllowPath(pkgPath)),
                             ...cfg.fsAllow,
                         ],
                     },
                     watch: cfg.watchPolling,
                 },
             };
+        },
+
+        configResolved(resolved) {
+            consumerRoot = toFsPath(resolved.root);
+        },
+
+        resolveId(id, importer) {
+            if (!id || id.startsWith('\0') || id.startsWith('.') || path.isAbsolute(id)) {
+                return null;
+            }
+            const bare = id.replace(/\?.*$/, '');
+            const hit = cfg.dedupe.some((name) => bare === name || bare.startsWith(`${name}/`));
+            if (!hit) return null;
+
+            // Luma's own files (published package, file: link, or LUMA_LOCAL)
+            // sit outside the app graph. Resolve peers from Vite's root so
+            // luma() stays zero-config for any consumer.
+            const lumaTrees = [here, localRoot].filter(Boolean);
+            if (!importer || !lumaTrees.some((dir) => isInsideDir(importer, dir))) {
+                return null;
+            }
+
+            return resolveDedupeSpecifier(bare, [consumerRoot, process.cwd()]);
         },
 
         /**

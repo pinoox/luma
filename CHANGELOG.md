@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.8] — 2026-08-24
+
+### Fixed
+- Vite plugin no longer aliases `@pinooxhq/auth` to the package folder. That prefix match broke `@pinooxhq/auth/vue` (`exports` maps it to `dist/vue/index.js`). Remapped subpaths now get explicit file aliases.
+- Vite plugin maps remapped `exports` wildcards (`@primeuix/themes/aura`) with exact aliases. On-disk wildcards (PrimeVue `./*/index.mjs`) keep a directory alias so `primevue/menu/style` does not resolve as `index.mjs/style`.
+- `resolvePackage()` finds packages whose `exports` omit `./package.json` (including `@pinooxhq/auth`) by reading `node_modules/<name>` directly.
+- Auth Pinia store and `useAuthRedirect` use Luma's `createAuth` instance (axios `http`). `@pinooxhq/auth/vue` bundles a second singleton, so `me()` on that copy never saw the session and guest routes stayed on login.
+- Luma ignores `auth.client.baseUrl` when creating auth. Axios already uses `url.API`, so applying both produced `/api/v1/api/v1/auth/me`.
+
 ## [0.4.6] — 2026-08-18
 
 ### Removed

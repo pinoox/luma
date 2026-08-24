@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { useRoute } from 'vue-router';
 import { createAuth, createHttp } from '@pinooxhq/auth';
-import { createPiniaAuthStore } from '@pinooxhq/auth/vue';
 import { env, isDev } from '../env.js';
 
 /**
@@ -11,10 +12,13 @@ import { env, isDev } from '../env.js';
  * endpoints, or use a different auth strategy, can call `configureAuth()`
  * before `createApp()` to register their overrides.
  *
- * Why expose this? Because `@pinooxhq/auth` closes over its options in
- * `createAuth()` and exposes the singleton via `getAuth()`. Apps can call
- * `configureAuth({ endpoints: { me: '/api/me' } })` to redirect the broken
- * default `/account/api/v1/auth/get` (or replace it entirely).
+ * `@pinooxhq/auth/vue` ships a second bundled createAuth singleton.
+ * The Pinia store and `useAuthRedirect` must use this instance (and its
+ * axios `http`), not that copy, or `me()` runs on a detached fetch client.
+ *
+ * `baseUrl: ''` skips `auth.client.baseUrl` from `__PINOOX__`. Axios already
+ * prefixes with `url.API` (`/api/v1/`). Joining both produced
+ * `/api/v1/api/v1/auth/me`.
  *
  * Note: the very first `createAuth()` call below sets pinoox-auth's global
  * defaultInstance. Subsequent `configureAuth()` calls reset that singleton
@@ -22,6 +26,7 @@ import { env, isDev } from '../env.js';
  */
 const defaultAuth = createAuth({
     debug: isDev(),
+    baseUrl: '',
 });
 
 let activeAuth = defaultAuth;
@@ -57,6 +62,7 @@ function buildHttp(authInstance) {
 export const configureAuth = (options = {}) => {
     activeAuth = createAuth({
         debug: isDev(),
+        baseUrl: '',
         ...options,
     });
     activeHttp = buildHttp(activeAuth);
@@ -95,7 +101,108 @@ export const http = new Proxy({}, {
     },
 });
 
-export const useAuthStore = createPiniaAuthStore(defineStore, 'auth');
+function syncStoreFromAuth(user, token) {
+    const instance = getActiveAuth();
+    user.value = instance.user;
+    token.value = instance.getToken();
+}
+
+/**
+ * Pinia store bound to Luma's active auth (axios `http` included).
+ * Same field names as `@pinooxhq/auth/vue`'s `createPiniaAuthStore`.
+ */
+export const useAuthStore = defineStore('auth', () => {
+    const user = ref(null);
+    const token = ref(null);
+
+    const isAuthenticated = computed(() => {
+        const instance = getActiveAuth();
+        return instance.isAuthenticated || !!token.value;
+    });
+
+    const login = (loginKey, userData = null) => {
+        const instance = getActiveAuth();
+        instance.setToken(loginKey);
+        token.value = loginKey;
+        instance.isAuthenticated = true;
+        if (userData) {
+            instance.user = userData;
+            user.value = userData;
+        }
+    };
+
+    const me = async () => {
+        const profile = await getActiveAuth().me();
+        syncStoreFromAuth(user, token);
+        return profile;
+    };
+
+    const canUserAccess = async (refresh = false) => {
+        const instance = getActiveAuth();
+        token.value = instance.getToken();
+        if (!refresh && instance.isAuthenticated) {
+            return true;
+        }
+        const profile = await me();
+        return !!profile || instance.isAuthenticated;
+    };
+
+    const logout = async () => {
+        await getActiveAuth().logout();
+        syncStoreFromAuth(user, token);
+    };
+
+    const syncTokenFromStorage = () => {
+        const instance = getActiveAuth();
+        const latest = instance.getToken();
+        if (latest) {
+            instance.setToken(latest);
+        }
+        token.value = latest;
+        user.value = instance.user;
+        return !!latest;
+    };
+
+    const loginWithCredentials = async (credentials) => {
+        const result = await getActiveAuth().login(credentials);
+        syncStoreFromAuth(user, token);
+        return result;
+    };
+
+    syncTokenFromStorage();
+
+    return {
+        auth: isAuthenticated,
+        user,
+        token,
+        isAuth: isAuthenticated,
+        getUser: user,
+        login,
+        logout,
+        canUserAccess,
+        syncTokenFromStorage,
+        me,
+        loginWithCredentials,
+    };
+});
+
+/**
+ * Post-login `?redirect=` helpers bound to Luma's active auth instance.
+ */
+export function useAuthRedirect(fallback = '/') {
+    const route = useRoute();
+    const instance = () => getActiveAuth();
+    const returnPath = computed(() => instance().getReturnPath(route.query, fallback));
+    const returnUrl = computed(() => instance().getReturnUrl(route.query, fallback));
+    const redirectQuery = computed(() => instance().getRedirectQuery(route.query, fallback));
+    return {
+        returnPath,
+        returnUrl,
+        redirectQuery,
+        resolveRedirect: () => returnUrl.value,
+        redirectBack: () => instance().redirectBack(route.query, fallback),
+    };
+}
 
 // Backwards-compat: `auth` exported as a const proxy. Always reads the
 // current `activeAuth` instance — module-level reassignment is supported by

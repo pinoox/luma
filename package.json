@@ -7,8 +7,11 @@
     "module": "./exports/index.js",
     "scripts": {
         "pack:check": "npm pack --dry-run",
-        "test": "npm run test:vite-paths && npm run test:form-primitives && npm run test:entity-form",
+        "test": "npm run test:vite-paths && npm run test:vite-perf && npm run test:vite-config && npm run test:vite-theme-auto && npm run test:form-primitives && npm run test:entity-form",
         "test:vite-paths": "node --test tests/vite-plugin-paths.test.js",
+        "test:vite-perf": "node --test tests/vite-perf.test.js",
+        "test:vite-config": "node --test tests/vite-config.test.js",
+        "test:vite-theme-auto": "node --test tests/vite-theme-auto.test.js",
         "test:form-primitives": "node --test tests/form-primitives.test.js",
         "test:entity-form": "node --test tests/entity-form.test.js",
         "test:smoke": "npm pack && rm -rf smoke-test && mkdir smoke-test && cd smoke-test && npm init -y >/dev/null 2>&1 && npm install ../$(ls ../pinooxhq-luma-*.tgz | head -1) primevue@^4 vue@^3.5 pinia@^4 @vue/devtools-api@^8 vue-router@^5 axios@^1 lucide-vue-next@^1 @primeuix/themes@^2 @pinooxhq/auth@^0.1 sass@^1 vite@^8 && node --input-type=module -e \"import { createApp, usePage, useTheme, applyThemeConfig, applyDarkThemeConfig, configureAuth, getActiveAuth, isAuthConfigured, authGuard, setupPrimeVue, ConsolePreset, createAppRouter, redirectToLogin, useAuthStore, auth, http, applyDevBootstrap, resolveDevBootstrap, getBoot, getUrl, hasBoot, flattenNavItems, findNavItemByRoute, findPageMeta, resolveUserDisplayName, buildUserInfo, resolveThemeConfig, setActiveThemeConfig, getActiveThemeConfig, DEFAULT_THEME_CONFIG, initThemeEarly, getActiveTheme, slugify, sanitizeSlug, toFinglish } from '@pinooxhq/luma'; console.log('luma smoke ok');\""
@@ -96,6 +99,12 @@
         "./vite": {
             "import": "./vite.js"
         },
+        "./vite/perf": {
+            "import": "./vite-perf.js"
+        },
+        "./vite/config": {
+            "import": "./vite-config.js"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -103,6 +112,9 @@
         "src",
         "docs",
         "vite.js",
+        "vite-perf.js",
+        "vite-config.js",
+        "vite-theme-auto.js",
         "README.md",
         "CHANGELOG.md"
     ],

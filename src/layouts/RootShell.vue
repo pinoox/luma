@@ -3,10 +3,11 @@
   <!-- Position & dir resolve from theme / document (RTL apps → top-left). -->
   <LToast />
   <LConfirmDialog />
+  <LLoading />
 </template>
 
 <script setup>
-import { LToast, LConfirmDialog } from '../ui/index.js';
+import { LToast, LConfirmDialog, LLoading } from '../ui/index.js';
 import { useTheme } from '../ds/composables/use-theme.js';
 
 const theme = useTheme();

@@ -36,6 +36,31 @@ export {
     isAuthConfigured,
 } from '../src/core/auth/index.js';
 
+export {
+    configureHttpLoading,
+    useHttpLoading,
+    attachHttpLoading,
+    beginLocalLoading,
+    endLocalLoading,
+} from '../src/core/http/loading.js';
+
+export {
+    TABLE_SKEL_FLAG,
+    TABLE_SKEL_KEY,
+    TABLE_SKEL_COUNT,
+    createSkeletonRows,
+    isSkelRow,
+    isSkelRowSelectable,
+} from '../src/core/table/skeleton.js';
+
+export {
+    LUMA_ROWS_PER_PAGE_OPTIONS,
+    LUMA_PAGINATOR_TEMPLATE,
+    LUMA_PAGINATOR_TEMPLATE_MINIMAL,
+    LUMA_CURRENT_PAGE_REPORT_TEMPLATE,
+    primePageReportFromI18n,
+} from '../src/core/table/paginator.js';
+
 export { default as setupPrimeVue } from '../src/plugins/primevue.js';
 
 export {
@@ -66,6 +91,10 @@ export {
 } from '../src/ds/theme-config.js';
 
 export { usePage } from '../src/composables/use-page.js';
+export { useLocalLoading } from '../src/composables/use-local-loading.js';
+export { useTableRows } from '../src/composables/use-table-rows.js';
+export { useMediaQuery, useIsMobile } from '../src/composables/use-media-query.js';
+export { useSwipeReveal } from '../src/composables/use-swipe-reveal.js';
 
 export {
     registerSpotlightProvider,

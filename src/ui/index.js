@@ -27,6 +27,7 @@ export { default as LSlugField } from './l-slug-field.vue';
 export { default as LToolbar } from './l-toolbar.vue';    // wraps PrimeVue Toolbar
 export { default as LToast } from './l-toast.vue';        // wraps PrimeVue Toast
 export { default as LSpinner } from './l-spinner.vue';    // wraps PrimeVue ProgressSpinner
+export { default as LLoading } from './l-loading.vue';    // global HTTP overlay
 export { default as LButton } from './l-button.vue';      // wraps PrimeVue Button
 export { default as LDatePicker } from './l-date-picker.vue';
 export { default as LRichEditor } from './l-rich-editor.vue';
@@ -35,7 +36,12 @@ export { default as LConfirmDialog } from './l-confirm-dialog.vue';
 export { default as LDropzone } from './l-dropzone.vue';
 
 // Table kit — soft DataTable, filters, bulk, status
+export { default as LSwipeReveal } from './l-swipe-reveal.vue';
+export { default as LMobileTable } from './l-mobile-table.vue';
 export { default as LDataTable } from './l-data-table.vue';
+export { default as LTableSkel } from './l-table-skel.vue';
+export { default as LColumnBody } from './l-column-body.vue';
+export { default as LPaginator } from './l-paginator.vue';
 export { default as LTableToolbar } from './l-table-toolbar.vue';
 export { default as LFilterMenu } from './l-filter-menu.vue';
 export { default as LBulkBar } from './l-bulk-bar.vue';

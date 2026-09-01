@@ -1,6 +1,22 @@
 // Core utilities — barrel exports
 export { auth, http, useAuthStore, useAuthRedirect } from './auth/index.js';
 export {
+    configureHttpLoading,
+    useHttpLoading,
+    attachHttpLoading,
+    beginLocalLoading,
+    endLocalLoading,
+} from './http/loading.js';
+export { unwrapApiBody, attachApiEnvelope } from './http/envelope.js';
+export {
+    TABLE_SKEL_FLAG,
+    TABLE_SKEL_KEY,
+    TABLE_SKEL_COUNT,
+    createSkeletonRows,
+    isSkelRow,
+    isSkelRowSelectable,
+} from './table/skeleton.js';
+export {
     lucidePixelSize,
     lucideStrokeWidth,
     resolveLucideComponent,

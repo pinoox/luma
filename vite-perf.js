@@ -70,6 +70,7 @@ export const LUMA_OPTIMIZE_DEPS = [
     '@tiptap/extension-text-style',
     '@tiptap/extension-underline',
     '@tiptap/extension-youtube',
+    '@vueuse/gesture',
     'lucide-vue-next',
     '@lucide/vue',
     'chart.js',

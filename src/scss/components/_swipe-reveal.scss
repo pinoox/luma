@@ -1,0 +1,169 @@
+.luma-swipe-reveal {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 0;
+    background: transparent;
+    isolation: isolate;
+}
+
+.luma-swipe-reveal__actions {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    padding: 0.45rem 0.5rem;
+    z-index: 0;
+    pointer-events: none;
+    background: transparent;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.luma-swipe-reveal--open .luma-swipe-reveal__actions,
+.luma-swipe-reveal--dragging .luma-swipe-reveal__actions {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+}
+
+.luma-swipe-reveal__action {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 2.35rem;
+    height: 2.35rem;
+    min-width: 2.35rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--px-surface-muted) 78%, transparent);
+    color: var(--px-text-soft);
+    font: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+
+    &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--px-surface-muted) 100%, transparent);
+        color: var(--px-text);
+        transform: scale(1.04);
+    }
+
+    &:active:not(:disabled) {
+        transform: scale(0.96);
+    }
+
+    &:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+    }
+}
+
+.luma-swipe-reveal__action--danger {
+    color: color-mix(in srgb, #e11d48 82%, var(--px-text-soft));
+
+    &:hover:not(:disabled) {
+        background: color-mix(in srgb, #ef4444 12%, var(--px-surface-muted));
+        color: #e11d48;
+    }
+}
+
+.luma-swipe-reveal__action-label {
+    display: none;
+}
+
+.luma-swipe-reveal__surface {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 100%;
+    border-radius: 14px;
+    background: var(--px-surface-strong);
+    box-shadow: 0 1px 2px color-mix(in srgb, #0f172a 5%, transparent);
+    transition:
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.22s ease;
+    touch-action: manipulation;
+    will-change: transform;
+}
+
+html[data-theme='dark'] .luma-swipe-reveal__surface {
+    background: var(--px-surface-strong);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+.luma-swipe-reveal--open .luma-swipe-reveal__surface,
+.luma-swipe-reveal--dragging .luma-swipe-reveal__surface {
+    box-shadow: 0 4px 14px color-mix(in srgb, #0f172a 8%, transparent);
+}
+
+.luma-swipe-reveal--open .luma-swipe-reveal__surface,
+.luma-swipe-reveal--reduced .luma-swipe-reveal__surface {
+    transition:
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.22s ease;
+}
+
+.luma-swipe-reveal--reduced .luma-swipe-reveal__surface {
+    touch-action: auto;
+}
+
+.luma-swipe-reveal__content {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    padding: 0.72rem 0.85rem;
+    background: inherit;
+}
+
+.luma-swipe-reveal__toggle {
+    appearance: none;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    margin-inline-start: 0.35rem;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--px-surface-muted) 72%, transparent);
+    color: var(--px-text-muted);
+    cursor: pointer;
+}
+
+.luma-swipe-reveal--disabled .luma-swipe-reveal__surface {
+    touch-action: auto;
+}
+
+@media (max-width: 768px) {
+    .luma-swipe-reveal__action {
+        width: 2.2rem;
+        height: 2.2rem;
+        min-width: 2.2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .luma-swipe-reveal__surface {
+        transition: none;
+    }
+
+    .luma-swipe-reveal__action {
+        transition: none;
+
+        &:hover:not(:disabled),
+        &:active:not(:disabled) {
+            transform: none;
+        }
+    }
+}

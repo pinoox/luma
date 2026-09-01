@@ -397,6 +397,7 @@ const { toggleTheme, isDark } = useTheme();
   layout?:  { sidebarWidth?, sidebarCollapsedWidth?, topbarHeight?, pageMaxWidth?, radius? },
   direction?: 'rtl' | 'ltr',
   auth?:    { endpoints?, skipMe?, autoLoginFromUrl? },
+  loading?: { enabled?, delay?, exclude?, label? },
 }
 ```
 
@@ -412,7 +413,62 @@ import { LSidebar, LTopbar, LMobileNav } from '@pinooxhq/luma/ds';
 import { LView, LHeader, LIcon } from '@pinooxhq/luma/ui';
 ```
 
-Compose DS / UI pieces into a custom layout when `PageLayout` is too opinionated — `RootShell` only provides the outer wrapper, global Toast, and theme CSS variables.
+Compose DS / UI pieces into a custom layout when `PageLayout` is too opinionated — `RootShell` only provides the outer wrapper, global Toast, confirm dialog, HTTP loading overlay, and theme CSS variables.
+
+### Global HTTP loading
+
+`RootShell` mounts `<LLoading />`. Any request through Luma `http` is counted; the overlay appears after `delay` ms so fast calls do not flash.
+
+```js
+// theme.config.js
+export default {
+  loading: {
+    enabled: true,
+    delay: 220,
+    exclude: ['/pricing/fx/quotes'],
+    label: 'Loading',
+  },
+};
+```
+
+```js
+http.get('/pricing/fx/quotes', { skipLoading: true });
+```
+
+`configureHttpLoading()` updates the same options at runtime. `{ skipLoading: true }` always wins for that request.
+
+While a **local loading surface** is active (table skeleton, custom spinner), the overlay stays hidden even if HTTP is in flight. `LDataTable :loading` and `useTableRows()` register automatically. Anywhere else:
+
+```js
+import { useLocalLoading } from '@pinooxhq/luma';
+
+useLocalLoading(loading); // ref or computed
+```
+
+### Table skeleton
+
+Keep the table visible while the first fetch runs. Pass `:loading` to `LDataTable` and wrap cells with `LColumnBody`:
+
+```vue
+<LDataTable :value="rows" :loading="loading" paginator data-key="id">
+  <Column field="name" header="Name">
+    <template #body="{ data }">
+      <LColumnBody :data="data" part="entity">
+        {{ data.name }}
+      </LColumnBody>
+    </template>
+  </Column>
+  <Column header="">
+    <template #body="{ data }">
+      <LColumnBody :data="data" part="actions" :skel-props="{ count: 2 }">
+        …
+      </LColumnBody>
+    </template>
+  </Column>
+</LDataTable>
+```
+
+For a custom PrimeVue `DataTable`, use `useTableRows(items, loading)` and `LTableSkel` / `isSkelRow()`.
 
 ---
 

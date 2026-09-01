@@ -4,6 +4,8 @@ import { defineStore } from 'pinia';
 import { useRoute } from 'vue-router';
 import { createAuth, createHttp } from '@pinooxhq/auth';
 import { env, isDev } from '../env.js';
+import { attachHttpLoading } from '../http/loading.js';
+import { attachApiEnvelope } from '../http/envelope.js';
 
 /**
  * Default auth instance. Luma auto-creates one at module load using the
@@ -43,11 +45,11 @@ let isConfigured = false;
  * the active config.
  */
 function buildHttp(authInstance) {
-    return createHttp({
+    return attachApiEnvelope(attachHttpLoading(createHttp({
         auth: authInstance,
         axios,
         baseURL: env('VITE_API_PATH', '') || undefined,
-    });
+    })));
 }
 
 /**

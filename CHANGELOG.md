@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.12] — 2026-09-01
+
+### Added
+- **Global HTTP loading** — `LLoading` overlay in `RootShell` tracks Luma `http` (axios) requests automatically. Configure via `themeConfig.loading` (`enabled`, `delay`, `exclude`, `label`). Skip one call with `{ skipLoading: true }`. `configureHttpLoading()` / `useHttpLoading()` for runtime control. Tables and other local skeletons register with `useLocalLoading()` / `LDataTable :loading` so the overlay does not stack on top of in-place loading.
+- **Table skeleton kit** — `LDataTable :loading` injects placeholder rows, `LColumnBody` / `LTableSkel` draw cell shapes, `useTableRows()` does the same for a custom DataTable. Generic parts: `check`, `id`, `entity`, `count`, `status-pill`, `tone-badge`, `meta`, `line`, `chips`, `actions`, `tree`.
+- **Mobile table kit** — `LDataTable mobile` switches to `LMobileTable` below `mobileBreakpoint` (default 768px). `LSwipeReveal` + `swipeActions` prop/slot for per-row gestures (RTL-aware). Slots: `#mobile-item`, `#mobile-leading`, `#swipe-actions`. Composables: `useMediaQuery`, `useIsMobile`, `useSwipeReveal`.
+
+### Changed
+- `LDataTable` prop `mobile-friendly` / `mobileFriendly` renamed to **`mobile`** (shorter opt-in flag).
+- **`http` client** unwraps Pinoox API envelopes (`{ success, data, message }`) in a response interceptor — callers use `response.data` as the payload.
+
 ## [0.4.11] — 2026-09-01
 
 ### Added

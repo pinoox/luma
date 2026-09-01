@@ -1,3 +1,5 @@
+import { configureHttpLoading } from '../core/http/loading.js';
+
 /**
  * Luma — Theme Config Helpers
  *
@@ -140,6 +142,17 @@ export const DEFAULT_THEME_CONFIG = {
         navGroup: 'صفحات',
     },
     /**
+     * Global HTTP overlay (`LLoading` in RootShell).
+     * Axios `http` requests are tracked automatically.
+     * Per-request opt-out: `http.get(url, { skipLoading: true })`.
+     */
+    loading: {
+        enabled: true,
+        delay: 220,
+        exclude: [],
+        label: '',
+    },
+    /**
      * Text direction for the shell + PrimeVue.
      * Prefer leaving this unset so Luma can detect from `<html dir>` /
      * `__PINOOX__.direction`. Set `'rtl'` / `'ltr'` only to force.
@@ -178,6 +191,11 @@ export const resolveThemeConfig = (config = {}) => ({
         ...DEFAULT_THEME_CONFIG.spotlight,
         ...(config.spotlight ?? {}),
     },
+    loading: {
+        ...DEFAULT_THEME_CONFIG.loading,
+        ...(config.loading ?? {}),
+        exclude: config.loading?.exclude ?? DEFAULT_THEME_CONFIG.loading.exclude,
+    },
     // Pass through layout/font tokens used by applyThemeConfig.
     font: config.font ?? DEFAULT_THEME_CONFIG.font ?? null,
     layout: config.layout ?? DEFAULT_THEME_CONFIG.layout ?? null,
@@ -192,6 +210,7 @@ let activeThemeConfig = resolveThemeConfig();
 
 export const setActiveThemeConfig = (config) => {
     activeThemeConfig = resolveThemeConfig(config);
+    configureHttpLoading(activeThemeConfig.loading);
     return activeThemeConfig;
 };
 

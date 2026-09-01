@@ -1,5 +1,9 @@
 // Luma — composables barrel.
 export { usePage } from './use-page.js';
+export { useLocalLoading } from './use-local-loading.js';
+export { useTableRows } from './use-table-rows.js';
+export { useMediaQuery, useIsMobile } from './use-media-query.js';
+export { useSwipeReveal } from './use-swipe-reveal.js';
 export { useFilePicker } from './use-file-picker.js';
 export { moveItem, useSortable } from './use-sortable.js';
 export { useSlugField } from './use-slug-field.js';

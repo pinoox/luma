@@ -23,9 +23,12 @@
 @use './components/utilities';
 @use './components/surfaces';
 @use './components/tables';
+@use './components/table-skel';
 @use './components/table-soft';
 @use './components/table-toolbar';
 @use './components/bulk-bar';
 @use './components/status-chip';
 @use './components/glass';
 @use './components/slug-field';
+@use './components/swipe-reveal';
+@use './components/table-mobile';

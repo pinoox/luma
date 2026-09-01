@@ -38,7 +38,8 @@ npm install -D sass
 import {
   LButton, LBadge, LCard, LConfirmDialog, LDatePicker, LEmptyPanel,
   LField, LIcon, LPage, LPageContainer, LPageHeader, LPageToolbar,
-  LPanel, LRichEditor, LSlugField, LSpinner, LStatCard, LTabs, LToast, LToolbar, LView,
+  LPanel, LRichEditor, LSlugField, LSpinner, LLoading, LStatCard, LTabs, LToast, LToolbar, LView,
+  LDataTable, LColumnBody, LTableSkel,
 } from '@pinooxhq/luma/ui';
 
 import { usePage, http, auth } from '@pinooxhq/luma';
@@ -337,6 +338,22 @@ Themed [ProgressSpinner](https://primevue.org/progressspinner/).
 
 ---
 
+### Loading overlay — `LLoading`
+
+Full-viewport overlay used by `RootShell`. It watches Luma `http` automatically (see README: Global HTTP loading). Pass `:active` to drive it yourself.
+
+```vue
+<LLoading />
+<LLoading :active="saving" label="Saving" />
+```
+
+| Prop | Type | Default |
+|------|------|---------|
+| `active` | `boolean` | global HTTP pending |
+| `label` | `string` | `themeConfig.loading.label` or `Loading` |
+
+---
+
 ### Cards — `LCard`
 
 Themed [Card](https://primevue.org/card/).
@@ -577,13 +594,55 @@ Tables can skip the slot entirely:
 ```vue
 <LDataTable
   :value="rows"
+  :loading="loading"
   empty-icon="package"
   empty-title="No products"
   empty-message="Create the first product."
   empty-action-label="Add product"
   @empty-action="openCreate"
-/>
+>
+  <Column field="name" header="Name">
+    <template #body="{ data }">
+      <LColumnBody :data="data" part="entity">
+        {{ data.name }}
+      </LColumnBody>
+    </template>
+  </Column>
+</LDataTable>
 ```
+
+`:loading` replaces `value` with skeleton rows, hides the paginator, and suppresses the global HTTP overlay. Wrap each custom cell with `LColumnBody` (`part`: `check`, `id`, `entity`, `count`, `status-pill`, `tone-badge`, `meta`, `line`, `chips`, `actions`, `tree`). Shop-specific shapes stay in the app.
+
+For a custom PrimeVue `DataTable`, import `useTableRows` / `isSkelRow` / `LTableSkel` from Luma. Other local spinners can call `useLocalLoading(loading)` so they also hide the cube overlay.
+
+**Mobile lists** (opt-in per table):
+
+```vue
+<LDataTable
+  mobile
+  :swipe-actions="(row) => [
+    { key: 'edit', icon: 'pencil', label: 'Edit', onClick: () => openEdit(row.id) },
+    { key: 'delete', icon: 'trash-2', variant: 'danger', label: 'Delete', onClick: () => remove(row.id) },
+  ]"
+  :value="rows"
+  :loading="loading"
+>
+  <template #mobile-item="{ data }">
+  </template>
+  <template #mobile-leading="{ data }">
+    <!-- optional checkbox / avatar rail -->
+  </template>
+  <Column … />
+</LDataTable>
+```
+
+| Prop | Role |
+|------|------|
+| `mobile` | Below `mobileBreakpoint` (default 768px), render `LMobileTable` + `LSwipeReveal` instead of the column grid |
+| `swipe-actions` | Array or `(row) => actions` — `{ key, icon, label?, variant?: 'default'|'danger', disabled?, onClick }` |
+| `mobile-breakpoint` | Max width (px) for mobile layout |
+
+Below the breakpoint, `LDataTable` renders `LMobileTable` with `LSwipeReveal` rows instead of the column grid. Swipe direction follows `resolveDirection()` (RTL-aware). Override per row with `#swipe-actions`. `useIsMobile()` / `useMediaQuery()` share the same breakpoint helpers as modal drawer mode.
 
 `LEmptyState` from `@pinooxhq/luma/ds` is a deprecated alias — prefer `LEmptyPanel`.
 
@@ -765,6 +824,7 @@ const { pageTitle, pageLead, pageBadge } = usePage();
 | Hero CTA | `<LButton>` (default gradient + primary) |
 | Secondary / destructive / icon-only | `variant` + `severity` + `icon-only` on `LButton` |
 | Page / section loading | `<LSpinner center />` or `:loading` on `LCard` / `LEmptyPanel` |
+| Global HTTP loading | `<LLoading />` in `RootShell` — configure `themeConfig.loading` |
 | KPI tile | `<LStatCard>` |
 | Card surface | `<LCard>` — or PrimeVue `<Card>` for full slot API |
 | Content / table surface | `<LPanel flush>` + `.luma-table` |

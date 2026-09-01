@@ -20,25 +20,33 @@ Full prop reference: [`ui-reference.md`](./ui-reference.md). Docs index: [`READM
       </LButton>
     </template>
 
-    <LEmptyPanel v-if="loading" loading />
-    <LEmptyPanel
-      v-else-if="!rows.length"
-      icon="inbox"
-      title="Nothing here yet"
-      message="Create the first item to get started."
-      action-label="Add"
-      @action="openCreate"
-    />
-    <LPanel v-else flush bare>
-      <LDataTable :value="rows" paginator :rows="20" data-key="id">
-        <Column field="name" header="Name" />
+    <LPanel flush bare>
+      <LDataTable
+        :value="rows"
+        :loading="loading"
+        paginator
+        :rows="20"
+        data-key="id"
+        empty-icon="inbox"
+        empty-title="Nothing here yet"
+        empty-message="Create the first item to get started."
+        empty-action-label="Add"
+        @empty-action="openCreate"
+      >
+        <Column field="name" header="Name">
+          <template #body="{ data }">
+            <LColumnBody :data="data" part="entity">
+              {{ data.name }}
+            </LColumnBody>
+          </template>
+        </Column>
       </LDataTable>
     </LPanel>
   </LPage>
 </template>
 
 <script setup>
-import { LPage, LPanel, LEmptyPanel, LButton, LDataTable } from '@pinooxhq/luma/ui';
+import { LPage, LPanel, LButton, LDataTable, LColumnBody } from '@pinooxhq/luma/ui';
 import Column from 'primevue/column';
 </script>
 ```
@@ -47,7 +55,9 @@ import Column from 'primevue/column';
 
 | Component | Role |
 |-----------|------|
-| `LDataTable` | PrimeVue DataTable + soft/classic chrome (`variant`, default rows `20/50/100/500`) |
+| `LDataTable` | PrimeVue DataTable + soft/classic chrome (`variant`, default rows `20/50/100/500`). `:loading` shows skeleton rows and hides the global HTTP overlay |
+| `LColumnBody` | Cell wrapper: `LTableSkel` while the row is a placeholder, slot otherwise |
+| `LTableSkel` | Cell-level skeleton shapes (`part`: `entity`, `actions`, `chips`, …) |
 | `LTableToolbar` | Glass strip: filter chips + count + search |
 | `LFilterMenu` | Popup checklist for chips (`persist` for multi-select) |
 | `LBulkBar` | Selection action bar (`count` / clear / `#default` actions) |

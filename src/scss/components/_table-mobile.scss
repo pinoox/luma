@@ -1,0 +1,208 @@
+.luma-mobile-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.1rem 0.35rem 0.4rem;
+}
+
+.luma-mobile-table__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.luma-mobile-table__item {
+    margin: 0;
+}
+
+.luma-mobile-table__row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.luma-mobile-table__leading {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.luma-mobile-table__swipe {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.luma-mobile-table__skel {
+    padding: 0.15rem 0;
+    width: 100%;
+
+    .luma-table-skel-entity {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+.luma-mobile-table--loading .luma-mobile-table__leading .luma-table-skel--check {
+    opacity: 0.55;
+}
+
+.luma-mobile-table__empty {
+    padding: 1.25rem 1rem;
+    text-align: center;
+}
+
+.luma-mobile-table--loading .luma-swipe-reveal__surface {
+    pointer-events: none;
+}
+
+// LPaginator + DataTable paginator chrome
+@mixin luma-paginator-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--px-border) 52%, transparent) !important;
+    border-radius: 6px !important;
+    background: var(--px-surface-strong) !important;
+    color: var(--px-text-soft) !important;
+    box-shadow: none !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    transition:
+        background-color 0.14s ease,
+        border-color 0.14s ease,
+        color 0.14s ease;
+
+    &:not(.p-disabled):hover {
+        background: color-mix(in srgb, var(--px-surface-muted) 82%, var(--px-surface-strong)) !important;
+        border-color: color-mix(in srgb, var(--px-border) 72%, transparent) !important;
+        color: var(--px-text) !important;
+    }
+
+    &.p-disabled {
+        opacity: 0.32;
+    }
+}
+
+.luma-paginator,
+.luma-table .p-paginator {
+    margin-top: 0.35rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid color-mix(in srgb, var(--px-border) 45%, transparent);
+    border-radius: 10px;
+    background: var(--px-surface-strong);
+    color: var(--px-text-muted);
+}
+
+.luma-paginator .p-paginator,
+.luma-table .p-paginator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.45rem;
+    margin: 0;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: inherit;
+}
+
+.luma-paginator .p-paginator-content,
+.luma-table .p-paginator .p-paginator-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.28rem 0.35rem;
+    width: 100%;
+    direction: rtl;
+}
+
+.luma-paginator .p-paginator-first,
+.luma-paginator .p-paginator-prev,
+.luma-paginator .p-paginator-next,
+.luma-paginator .p-paginator-last,
+.luma-paginator .p-paginator-page,
+.luma-table .p-paginator .p-paginator-first,
+.luma-table .p-paginator .p-paginator-prev,
+.luma-table .p-paginator .p-paginator-next,
+.luma-table .p-paginator .p-paginator-last,
+.luma-table .p-paginator .p-paginator-page {
+    @include luma-paginator-chip;
+}
+
+.luma-paginator .p-paginator-page.p-paginator-page-selected,
+.luma-paginator .p-paginator-page[aria-current='page'],
+.luma-table .p-paginator .p-paginator-page.p-paginator-page-selected,
+.luma-table .p-paginator .p-paginator-page[aria-current='page'] {
+    background: color-mix(in srgb, var(--px-surface-muted) 88%, var(--px-surface-strong)) !important;
+    border-color: color-mix(in srgb, var(--px-border) 65%, transparent) !important;
+    color: var(--px-text) !important;
+    font-weight: 650;
+}
+
+.luma-paginator .p-paginator-current,
+.luma-table .p-paginator .p-paginator-current {
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--px-text-soft) !important;
+    font-size: 0.76rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 0 0.35rem !important;
+    min-width: auto;
+    white-space: nowrap;
+}
+
+.luma-paginator .p-paginator-rpp-dropdown,
+.luma-paginator .p-select,
+.luma-table .p-paginator .p-paginator-rpp-dropdown,
+.luma-table .p-paginator .p-select {
+    @include luma-paginator-chip;
+    min-width: 3.25rem;
+    height: 2rem;
+
+    .p-select-label {
+        padding-block: 0.15rem !important;
+        padding-inline: 0.5rem 0.1rem !important;
+        font-size: 0.76rem;
+        font-weight: 650;
+        color: var(--px-text-soft);
+    }
+
+    .p-select-dropdown {
+        width: 1.4rem;
+        color: var(--px-text-muted);
+    }
+}
+
+.luma-paginator--minimal .p-paginator-content {
+    justify-content: center;
+}
+
+.luma-mobile-table__paginator.luma-paginator {
+    padding: 0.45rem 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .luma-paginator .p-paginator-first,
+    .luma-paginator .p-paginator-last,
+    .luma-table .p-paginator .p-paginator-first,
+    .luma-table .p-paginator .p-paginator-last {
+        display: none;
+    }
+
+    .luma-paginator .p-paginator-current,
+    .luma-table .p-paginator .p-paginator-current {
+        font-size: 0.72rem;
+    }
+}

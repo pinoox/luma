@@ -1,0 +1,157 @@
+@mixin luma-table-skel-shimmer {
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--px-border) 58%, transparent) 0%,
+        color-mix(in srgb, var(--px-border) 26%, transparent) 50%,
+        color-mix(in srgb, var(--px-border) 58%, transparent) 100%
+    );
+    background-size: 200% 100%;
+    animation: luma-table-skel-shimmer 1.35s ease-in-out infinite;
+}
+
+.luma-table-skel {
+    display: block;
+    border-radius: 0.45rem;
+    @include luma-table-skel-shimmer;
+
+    &--check {
+        width: 1.05rem;
+        height: 1.05rem;
+        border-radius: 0.35rem;
+    }
+
+    &--id {
+        width: 1.15rem;
+        height: 0.82rem;
+    }
+
+    &--thumb {
+        width: 2.75rem;
+        height: 2.75rem;
+        flex: 0 0 auto;
+        border-radius: 0.7rem;
+    }
+
+    &--thumb-product {
+        width: 3.1rem;
+        height: 3.1rem;
+    }
+
+    &--line {
+        height: 0.72rem;
+        border-radius: 0.4rem;
+
+        &-title {
+            width: 7rem;
+            max-width: 100%;
+        }
+
+        &-sub {
+            width: 5rem;
+            height: 0.58rem;
+        }
+
+        &-meta {
+            width: 6.75rem;
+        }
+
+        &-meta-short {
+            width: 5.5rem;
+        }
+    }
+
+    &--count {
+        width: 2.35rem;
+        height: 1.55rem;
+        border-radius: 999px;
+    }
+
+    &--status-pill {
+        width: 4.85rem;
+        height: 1.55rem;
+        border-radius: 999px;
+    }
+
+    &--tone-badge {
+        width: 3.85rem;
+        height: 1.35rem;
+        border-radius: 999px;
+    }
+
+    &--chip {
+        width: 3.25rem;
+        height: 1.35rem;
+        border-radius: 999px;
+    }
+
+    &--action {
+        width: 1.85rem;
+        height: 1.85rem;
+        border-radius: 0.55rem;
+    }
+}
+
+.luma-table-skel-entity {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 18rem;
+}
+
+.luma-table-skel-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    min-width: 0;
+}
+
+.luma-table-skel-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.luma-table-skel-actions {
+    display: inline-flex;
+    gap: 0.3rem;
+}
+
+.luma-table-skel-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.luma-table-skel-tree {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 2.85rem;
+    padding: 0.82rem 0.85rem;
+    padding-inline-start: var(--luma-skel-indent, 0.85rem);
+    margin-bottom: 0.5rem;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--px-surface-strong) 92%, transparent);
+    box-shadow: 0 1px 2px color-mix(in srgb, #0f172a 4%, transparent);
+}
+
+.luma-table--loading.p-datatable,
+.p-datatable.luma-table--loading {
+    .p-datatable-tbody > tr > td {
+        pointer-events: none;
+    }
+
+    .p-checkbox {
+        opacity: 0.35;
+    }
+}
+
+@keyframes luma-table-skel-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

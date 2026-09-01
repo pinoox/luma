@@ -44,7 +44,7 @@ function exactAlias(aliases, id) {
     });
 }
 
-function invokeConfig(root, options = {}) {
+async function invokeConfig(root, options = {}) {
     const plugin = luma(options);
     return plugin.config({ root }, { mode: 'development', command: 'serve' });
 }
@@ -150,9 +150,9 @@ describe('legacy regression (why 0.4.1 exists)', () => {
 });
 
 describe('luma() plugin config hook', () => {
-    it('returns fs.allow entries that are absolute and include Luma + consumer root', () => {
+    it('returns fs.allow entries that are absolute and include Luma + consumer root', async () => {
         const root = process.cwd();
-        const conf = invokeConfig(root);
+        const conf = await invokeConfig(root);
         const allow = conf.server.fs.allow;
         assert.ok(Array.isArray(allow));
         assert.ok(allow.length >= 2);
@@ -160,42 +160,41 @@ describe('luma() plugin config hook', () => {
             assert.equal(typeof entry, 'string');
             assert.ok(path.isAbsolute(entry), `expected absolute: ${entry}`);
         }
-        assert.equal(path.normalize(allow[1]), path.normalize(toAllowPath(root)));
+        assert.ok(allow.some((entry) => path.normalize(entry) === path.normalize(toAllowPath(root))));
     });
 
-    it('does not throw when Vite root is a Windows drive path string', () => {
-        assert.doesNotThrow(() =>
+    it('does not throw when Vite root is a Windows drive path string', async () => {
+        await assert.doesNotReject(async () =>
             invokeConfig('C:\\projects\\com_pinoox_orbit\\theme\\orbit'),
         );
-        assert.doesNotThrow(() =>
+        await assert.doesNotReject(async () =>
             invokeConfig('C:/projects/com_pinoox_orbit/theme/orbit'),
         );
     });
 
-    it('does not throw when Vite root is a file: URL for this OS', () => {
+    it('does not throw when Vite root is a file: URL for this OS', async () => {
         const url = pathToFileURL(process.cwd()).href;
-        assert.doesNotThrow(() => invokeConfig(url));
-        const conf = invokeConfig(url);
-        assert.ok(path.isAbsolute(conf.server.fs.allow[1]));
+        await assert.doesNotReject(async () => invokeConfig(url));
+        const conf = await invokeConfig(url);
+        assert.ok(conf.server.fs.allow.some((entry) => path.isAbsolute(entry)));
     });
 
-    it('merges custom fsAllow paths', () => {
+    it('merges custom fsAllow paths', async () => {
         const extra = path.join(os.tmpdir(), 'luma-extra-allow');
-        const conf = invokeConfig(process.cwd(), { fsAllow: [extra] });
-        assert.ok(conf.server.fs.allow.includes(extra));
+        const conf = await invokeConfig(process.cwd(), { fsAllow: [extra], doctor: false });
+        assert.ok(conf.server.fs.allow.includes(toAllowPath(extra)));
     });
 
-    it('falls back to cwd when root is omitted', () => {
-        const plugin = luma();
-        const conf = plugin.config({}, { mode: 'production', command: 'build' });
-        assert.equal(
-            path.normalize(conf.server.fs.allow[1]),
-            path.normalize(toAllowPath(process.cwd())),
-        );
+    it('falls back to cwd when root is omitted', async () => {
+        const plugin = luma({ doctor: false });
+        const conf = await plugin.config({}, { mode: 'production', command: 'build' });
+        assert.ok(conf.server.fs.allow.some(
+            (entry) => path.normalize(entry) === path.normalize(toAllowPath(process.cwd())),
+        ));
     });
 
-    it('resolve.dedupe stays populated', () => {
-        const conf = invokeConfig(process.cwd());
+    it('resolve.dedupe stays populated', async () => {
+        const conf = await invokeConfig(process.cwd(), { doctor: false });
         assert.ok(conf.resolve.dedupe.includes('vue'));
         assert.ok(conf.resolve.dedupe.includes('primevue'));
         assert.ok(conf.optimizeDeps.exclude.includes('@pinooxhq/luma'));
@@ -220,10 +219,10 @@ describe('luma() plugin config hook', () => {
         assert.equal(main.find.test('@primeuix/themes/aura'), false);
     });
 
-    it('aliases @pinooxhq/auth/vue through package exports when auth is installed', () => {
+    it('aliases @pinooxhq/auth/vue through package exports when auth is installed', async () => {
         const authDir = resolvePackage('@pinooxhq/auth', lumaDir);
         if (authDir == null) return;
-        const conf = invokeConfig(lumaDir);
+        const conf = await invokeConfig(lumaDir, { doctor: false, appConfig: false });
         const vue = exactAlias(conf.resolve.alias, '@pinooxhq/auth/vue');
         const dirAlias = conf.resolve.alias.find((entry) => entry.find === '@pinooxhq/auth');
         assert.ok(vue || dirAlias);
@@ -386,7 +385,7 @@ describe('expandWildcardStringAliases', () => {
 });
 
 describe('resolveId dedupe', () => {
-    it('resolves @primeuix/themes/aura from the consumer node_modules', () => {
+    it('resolves @primeuix/themes/aura from the consumer node_modules', async () => {
         const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luma-resolveid-'));
         try {
             fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'app' }));
@@ -402,8 +401,8 @@ describe('resolveId dedupe', () => {
                 },
             }));
 
-            const plugin = luma({ local: dir });
-            plugin.config({ root: dir }, { mode: 'test', command: 'serve' });
+            const plugin = luma({ local: dir, doctor: false, appConfig: false });
+            await plugin.config({ root: dir }, { mode: 'test', command: 'serve' });
             const importer = path.join(dir, 'src', 'plugins', 'preset.js');
             fs.mkdirSync(path.dirname(importer), { recursive: true });
             const resolved = plugin.resolveId('@primeuix/themes/aura', importer);

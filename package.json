@@ -1,14 +1,17 @@
 {
     "name": "@pinooxhq/luma",
-    "version": "0.4.8",
+    "version": "0.4.9",
     "description": "Luma — A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
     "type": "module",
     "main": "./exports/index.js",
     "module": "./exports/index.js",
     "scripts": {
         "pack:check": "npm pack --dry-run",
-        "test": "npm run test:vite-paths && npm run test:form-primitives && npm run test:entity-form && npm run test:router-base",
+        "test": "npm run test:vite-paths && npm run test:vite-perf && npm run test:vite-config && npm run test:vite-theme-auto && npm run test:form-primitives && npm run test:entity-form && npm run test:router-base",
         "test:vite-paths": "node --test tests/vite-plugin-paths.test.js",
+        "test:vite-perf": "node --test tests/vite-perf.test.js",
+        "test:vite-config": "node --test tests/vite-config.test.js",
+        "test:vite-theme-auto": "node --test tests/vite-theme-auto.test.js",
         "test:router-base": "node --test tests/router-base.test.js",
         "test:form-primitives": "node --test tests/form-primitives.test.js",
         "test:entity-form": "node --test tests/entity-form.test.js",
@@ -97,6 +100,15 @@
         "./vite": {
             "import": "./vite.js"
         },
+        "./vite/perf": {
+            "import": "./vite-perf.js"
+        },
+        "./vite/config": {
+            "import": "./vite-config.js"
+        },
+        "./vite/theme-auto": {
+            "import": "./vite-theme-auto.js"
+        },
         "./package.json": "./package.json"
     },
     "files": [
@@ -104,6 +116,9 @@
         "src",
         "docs",
         "vite.js",
+        "vite-perf.js",
+        "vite-config.js",
+        "vite-theme-auto.js",
         "README.md",
         "CHANGELOG.md"
     ],

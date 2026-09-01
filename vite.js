@@ -1,14 +1,16 @@
 // @pinooxhq/luma — Vite plugin.
 //
-// Drop-in for `vite.config.js`:
+// Drop-in for `vite.config.js` — either style works:
 //
 //     import { defineConfig } from 'vite';
-//     import vue from '@vitejs/plugin-vue';
 //     import luma from '@pinooxhq/luma/vite';
+//     export default defineConfig({ plugins: [vue(), luma()] });
 //
-//     export default defineConfig({
-//       plugins: [luma(), vue()],
-//     });
+//     import { createLumaViteConfig } from '@pinooxhq/luma/vite';
+//     export default createLumaViteConfig({ plugins: [vue()] });
+//
+// Optional app overrides live in `luma.config.js` (warmup, extraChunkGroups, …).
+// Local Luma checkout: set LUMA_LOCAL in `.env.local`.
 //
 // What it does (zero config):
 //   1. Resolves every package Luma uses (primevue, pinia, vue-router, …)
@@ -46,12 +48,41 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {
+    LUMA_OPTIMIZE_DEPS,
+    lumaPerfConfig,
+} from './vite-perf.js';
+import { resolveLumaContext } from './vite-config.js';
 
 // Treat THIS package's location as the default `fs.allow` anchor.
 // Consumers usually link Luma via `file:`/`link:`, so its absolute path
 // can be found by looking at this file's own location.
 const here = fileURLToPath(new URL('.', import.meta.url));
 const require = createRequire(import.meta.url);
+
+/** Packages never deduped / not installed in consumer. */
+const DEDUPE_SKIP = new Set(['@pinooxhq/luma', 'sass']);
+
+/** Always include with primevue. */
+const DEDUPE_EXTRA = ['@primevue/core'];
+
+/**
+ * Peer + direct deps from this package.json — keeps LUMA_LOCAL builds working.
+ *
+ * @param {string[]} [extra]
+ * @returns {string[]}
+ */
+export function collectDedupePackages(extra = []) {
+    const pkg = JSON.parse(fs.readFileSync(path.join(here, 'package.json'), 'utf8'));
+    const names = [
+        ...Object.keys(pkg.peerDependencies ?? {}),
+        ...Object.keys(pkg.dependencies ?? {}),
+        ...DEDUPE_EXTRA,
+        ...extra,
+    ].filter((name) => name && !DEDUPE_SKIP.has(name));
+
+    return [...new Set(names)].sort();
+}
 
 /**
  * Normalize Vite `root` (absolute/relative FS path or file: URL) to an
@@ -92,18 +123,7 @@ function isInsideDir(file, dir) {
  * Packages Luma needs shared with its consumer to avoid duplicated
  * module instances and broken dependency injection.
  */
-const DEFAULT_DEDUPE = [
-    'vue',
-    'pinia',
-    'vue-router',
-    'axios',
-    'primevue',
-    '@primevue/core',
-    '@primeuix/themes',
-    'lucide-vue-next',
-    '@pinooxhq/auth',
-    '@pinooxhq/slug',
-];
+const DEFAULT_DEDUPE = collectDedupePackages();
 
 /**
  * Packages Luma imports directly. We exclude these from pre-bundling so
@@ -120,9 +140,7 @@ const DEFAULT_EXCLUDE_FROM_OPTIMIZE = [
  * "does not provide an export named 'default'".
  */
 const DEFAULT_INCLUDE_IN_OPTIMIZE = [
-    'moment-jalaali',
-    'moment',
-    'jalaali-js',
+    ...LUMA_OPTIMIZE_DEPS,
 ];
 
 /**
@@ -434,6 +452,25 @@ export function resolveLocalRoot(options = {}) {
 }
 
 /**
+ * Polling is only needed for LUMA_LOCAL / symlinked installs (chokidar misses them).
+ *
+ * @param {string} consumerRoot
+ * @param {string | null} localRoot
+ */
+export function needsWatchPolling(consumerRoot, localRoot) {
+    if (localRoot) return true;
+
+    const lumaPkg = resolvePackage('@pinooxhq/luma', consumerRoot);
+    if (!lumaPkg) return false;
+
+    try {
+        return fs.lstatSync(lumaPkg).isSymbolicLink();
+    } catch {
+        return false;
+    }
+}
+
+/**
  * Full alias map so local JS, Sass, and Vazir font URLs resolve like npm.
  * Longer / more-specific entries must come first (array form).
  *
@@ -488,13 +525,28 @@ export function localLumaAliases(lumaRoot) {
  *   root?: string,
  *   dedupe?: string[],
  *   excludeFromOptimize?: string[],
+ *   includeInOptimize?: string[],
  *   fsAllow?: string[],
  *   watchPolling?: { usePolling?: boolean, interval?: number, ignored?: string[] },
+ *   perf?: boolean,
+ *   entry?: string,
+ *   warmup?: string[],
+ *   extraOptimizeDeps?: string[],
+ *   extraChunkGroups?: Array<{ name: string, test: RegExp }>,
+ *   chunkSizeWarningLimit?: number,
+ *   configFile?: string,
+ *   appConfig?: boolean,
+ *   doctor?: boolean,
+ *   alias?: Record<string, string>,
+ *   vite?: import('vite').UserConfig,
+ *   server?: import('vite').UserConfig['server'],
+ *   resolve?: import('vite').UserConfig['resolve'],
  * }} [options]
  */
 export default function luma(options = {}) {
-    const localRoot = resolveLocalRoot(options);
-    const cfg = {
+    const perfEnabled = options.perf !== false;
+    let localRoot = resolveLocalRoot(options);
+    let cfg = {
         dedupe: [...DEFAULT_DEDUPE, ...(options.dedupe ?? [])],
         excludeFromOptimize: [
             ...DEFAULT_EXCLUDE_FROM_OPTIMIZE,
@@ -504,8 +556,10 @@ export default function luma(options = {}) {
             ...DEFAULT_INCLUDE_IN_OPTIMIZE,
             ...(options.includeInOptimize ?? []),
         ],
-        fsAllow: options.fsAllow ?? [],
-        watchPolling: options.watchPolling ?? { usePolling: true, interval: 300 },
+        fsAllow: (options.fsAllow ?? []).map((item) => (
+            path.isAbsolute(item) ? toAllowPath(item) : item
+        )),
+        watchPolling: options.watchPolling,
     };
 
     let consumerRoot = null;
@@ -515,10 +569,42 @@ export default function luma(options = {}) {
         name: 'pinooxhq-luma',
         enforce: 'pre',
 
-        config(config, env) {
+        async config(config, env) {
             // Vite passes the consumer's resolved root here. Fall back to
             // process.cwd() if it's not set (SSR-only contexts).
-            consumerRoot = toFsPath(config.root ?? process.cwd());
+            consumerRoot = toFsPath(config.root ?? options.root ?? process.cwd());
+
+            const ctx = await resolveLumaContext(
+                consumerRoot,
+                env.mode ?? 'development',
+                options,
+                { command: env.command },
+            );
+            localRoot = ctx.localRoot;
+
+            const usePolling = needsWatchPolling(consumerRoot, localRoot);
+            const watchPolling = ctx.watchPolling
+                ?? options.watchPolling
+                ?? (usePolling ? { usePolling: true, interval: 300 } : { usePolling: false });
+
+            cfg = {
+                dedupe: [...DEFAULT_DEDUPE, ...ctx.dedupe],
+                excludeFromOptimize: [
+                    ...DEFAULT_EXCLUDE_FROM_OPTIMIZE,
+                    ...(ctx.excludeFromOptimize ?? []),
+                    ...(options.excludeFromOptimize ?? []),
+                ],
+                includeInOptimize: [
+                    ...DEFAULT_INCLUDE_IN_OPTIMIZE,
+                    ...(ctx.includeInOptimize ?? []),
+                    ...(options.includeInOptimize ?? []),
+                ],
+                fsAllow: ctx.fsAllow,
+                watchPolling,
+            };
+
+            const perfOn = ctx.perf !== false && perfEnabled;
+            const lumaOpts = { ...ctx.lumaNested, ...options };
 
             const pkgDirs = {};
             const aliases = [];
@@ -535,37 +621,72 @@ export default function luma(options = {}) {
                 console.info(`[luma] local → ${localRoot}`);
             }
 
+            const perfPatch = perfOn
+                ? lumaPerfConfig({
+                    entry: ctx.entry,
+                    warmup: ctx.warmup,
+                    extraOptimizeDeps: [
+                        ...ctx.extraOptimizeDeps,
+                        ...(lumaOpts.includeInOptimize ?? []),
+                    ],
+                    extraChunkGroups: ctx.extraChunkGroups,
+                    chunkSizeWarningLimit: ctx.chunkSizeWarningLimit,
+                    includeLumaPackage: !localRoot,
+                    build: env.command === 'build',
+                    dev: env.command === 'serve',
+                })
+                : {};
+
+            const perfOptimize = perfPatch.optimizeDeps ?? {};
+            delete perfPatch.optimizeDeps;
+            const perfServer = perfPatch.server ?? {};
+            delete perfPatch.server;
+
+            const optimizeInclude = [
+                ...new Set([
+                    ...cfg.includeInOptimize,
+                    ...(perfOptimize.include ?? []),
+                ]),
+            ];
+
+            const serverFs = {
+                ...((ctx.serverPatch ?? {}).fs ?? {}),
+                allow: [
+                    here,
+                    ...(localRoot ? [toAllowPath(localRoot)] : []),
+                    toAllowPath(consumerRoot),
+                    ...Object.values(pkgDirs).map((pkgPath) => toAllowPath(pkgPath)),
+                    ...cfg.fsAllow,
+                    ...ctx.extraServerFsAllow,
+                ],
+            };
+
             return {
+                ...ctx.vitePatch,
+                ...perfPatch,
                 resolve: {
+                    ...ctx.resolvePatch,
                     dedupe: cfg.dedupe,
-                    // Array form keeps specific `@pinooxhq/luma/*` entries
-                    // ahead of the exact `@pinooxhq/luma` match.
                     alias: [
                         ...localAliases,
                         ...aliases,
+                        ...ctx.appAliases,
+                        ...ctx.extraResolveAlias,
                     ],
                 },
                 optimizeDeps: {
-                    include: cfg.includeInOptimize,
+                    entries: perfOptimize.entries,
+                    include: optimizeInclude,
                     exclude: cfg.excludeFromOptimize,
+                    holdUntilCrawlEnd: perfOptimize.holdUntilCrawlEnd ?? false,
                 },
                 ssr: {
                     noExternal: ['@pinooxhq/luma'],
                 },
                 server: {
-                    fs: {
-                        allow: [
-                            // Always allow Luma's own source directory.
-                            here,
-                            ...(localRoot ? [toAllowPath(localRoot)] : []),
-                            // Allow the consumer's root so symlinks resolve.
-                            // pathToFileURL + fileURLToPath normalizes across
-                            // Windows drive letters, UNC, and POSIX paths.
-                            toAllowPath(consumerRoot),
-                            ...Object.values(pkgDirs).map((pkgPath) => toAllowPath(pkgPath)),
-                            ...cfg.fsAllow,
-                        ],
-                    },
+                    ...ctx.serverPatch,
+                    ...perfServer,
+                    fs: serverFs,
                     watch: cfg.watchPolling,
                 },
             };
@@ -599,7 +720,9 @@ export default function luma(options = {}) {
          */
         luma: {
             here,
-            localRoot,
+            get localRoot() {
+                return localRoot;
+            },
             resolvePackage: (name) =>
                 consumerRoot ? resolvePackage(name, consumerRoot) : null,
         },
@@ -608,3 +731,26 @@ export default function luma(options = {}) {
 
 // Named export so consumers can grab helpers without invoking the plugin.
 export { resolvePackage };
+export {
+    createLumaViteConfig,
+    createAppAliases,
+    loadAppConfig,
+    loadThemeEnv,
+    lumaDoctor,
+    resolveLumaContext,
+    syncLumaEnv,
+} from './vite-config.js';
+export {
+    readFrontendConfigEntry,
+    resolveAutoThemeDefaults,
+    resolveLucideAlias,
+    resolveThemeEntry,
+} from './vite-theme-auto.js';
+export {
+    LUMA_CHUNK_GROUPS,
+    LUMA_OPTIMIZE_DEPS,
+    buildChunkConfig,
+    devPerfConfig,
+    lumaPerfConfig,
+    mergeChunkGroups,
+} from './vite-perf.js';

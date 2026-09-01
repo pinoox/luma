@@ -77,7 +77,7 @@ Import styles once in your app entry SCSS:
 
 ## Vite plugin
 
-Use the official plugin so peer packages are deduped and `file:`-linked Luma hot-reloads correctly:
+Use the official plugin so peer packages are deduped, path aliases are configured, performance is optimized, and `file:`-linked Luma hot-reloads correctly:
 
 ```js
 // vite.config.js
@@ -87,24 +87,52 @@ import luma from '@pinooxhq/luma/vite';
 
 export default defineConfig({
   plugins: [luma(), vue()],
-  resolve: {
-    alias: {
-      // app aliases…
-    },
-  },
 });
 ```
 
-What `luma()` does by default:
+Or use `createLumaViteConfig` for a zero-boilerplate setup:
 
-1. **Dedupes** peers (`primevue`, `pinia`, `vue-router`, …) against the consumer `node_modules` — avoids duplicate PrimeVue inject keys (e.g. broken `useToast()`).
-2. **Allows** the Luma package root through `server.fs.allow` and enables watch polling for `file:` / symlink installs.
-3. Keeps Luma out of `optimizeDeps` pre-bundle so source edits HMR cleanly.
-4. **Optional local checkout** — set `LUMA_LOCAL=/path/to/luma-ui` or `luma({ local: '/path/to/luma-ui' })`. Aliases every `@pinooxhq/luma` entry (JS, Sass, Vazir fonts) to that tree. Leave unset to use npm.
+```js
+// vite.config.js
+import vue from '@vitejs/plugin-vue';
+import { createLumaViteConfig } from '@pinooxhq/luma/vite';
+
+export default createLumaViteConfig({
+  plugins: [vue()],
+});
+```
+
+### What `luma()` does:
+
+1. **Dedupes & pre-bundles** peers (`primevue`, `pinia`, `vue-router`, `yup`, …) against the consumer `node_modules` — avoids duplicate inject keys and optimizes cold-start dev speed.
+2. **Auto-detects entry & warmup** — resolves theme entry from `frontend.config.php`, `index.html`, or `src/main.js` and configures server warmup.
+3. **App aliases** — automatically registers standard Pinoox theme aliases (`@/`, `@views`, `@pages`, `@stores`, `@components`, `@composables`, `@config`, `@utils`, `@api`, `@assets`, `@layouts`).
+4. **Vendor chunk splitting** — splits production builds into clean vendor chunks (`vendor-vue`, `vendor-luma`, `vendor-prime`, `vendor-tiptap`, `vendor-icons`, `vendor-date`, `vendor-http`).
+5. **Config & Environment** — automatically reads `luma.config.js` and loads `.env` / `.env.local` files.
+6. **Diagnostics (`lumaDoctor`)** — checks consumer `node_modules` during `vite dev` and warns if required dependencies or local checkout paths are missing.
+7. **Allows** the Luma package root through `server.fs.allow` and enables watch polling for `file:` / symlink installs.
+8. **Optional local checkout** — set `LUMA_LOCAL=/path/to/luma-ui` or `luma({ local: '/path/to/luma-ui' })`. Aliases every `@pinooxhq/luma` entry (JS, Sass, Vazir fonts) to that tree. Leave unset to use npm.
 
 **Typography:** Luma’s default stack is Vazir (`$px-font-sans` + `@font-face` in styles, and `DEFAULT_THEME_CONFIG.font`). Override with `applyThemeConfig({ font: { sans, mono } })` when needed.
 
-Optional overrides: `local`, `dedupe`, `excludeFromOptimize`, `fsAllow`, `watchPolling`. See comments in [`vite.js`](./vite.js).
+### Plugin options
+
+```js
+luma({
+  perf: true,                          // Dev pre-bundling & build chunk splitting (default: true)
+  entry: 'src/main.js',                // Custom entry file (or auto-detected)
+  warmup: ['src/main.js'],             // Dev server warmup files
+  configFile: 'luma.config.js',        // Theme config file (or set appConfig: false)
+  doctor: true,                        // Run dependency health-checks in dev (default: true)
+  dedupe: ['my-shared-lib'],           // Additional packages to dedupe
+  alias: { '@custom': 'src/custom' },  // Custom aliases
+  extraOptimizeDeps: ['my-lib'],       // Additional optimizeDeps
+  extraChunkGroups: [],                // Custom Rollup/Rolldown vendor chunk groups
+  fsAllow: ['/custom/peer-dir'],       // Additional server.fs.allow paths
+  watchPolling: false,                 // Polling options for file links
+  local: '/path/to/luma',              // Local Luma source override
+})
+```
 
 ### Local ↔ npm switch
 
@@ -728,8 +756,10 @@ See [primevue.org](https://primevue.org/) for the full API. Theme CSS comes from
 | `@pinooxhq/luma/fonts` | Vazir registration |
 | `@pinooxhq/luma/theme-config` | Nav / pageMeta / theme resolution helpers |
 | `@pinooxhq/luma/createApp` | Factory only |
-| `@pinooxhq/luma/applyThemeConfig` | Runtime CSS variable writer |
-| `@pinooxhq/luma/vite` | Vite plugin |
+| `@pinooxhq/luma/vite` | Vite plugin, presets, and context loader |
+| `@pinooxhq/luma/vite/perf` | Vite pre-bundling and vendor chunk splitting presets |
+| `@pinooxhq/luma/vite/config` | `createLumaViteConfig`, `createAppAliases`, `lumaDoctor`, config loaders |
+| `@pinooxhq/luma/vite/theme-auto` | Automatic theme entry detection and icon aliases |
 | `@pinooxhq/luma/preset` | Console preset (default export) |
 
 ---

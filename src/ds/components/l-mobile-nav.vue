@@ -15,6 +15,8 @@
                     'px-mobile-nav__item--disabled': item.disabled,
                 },
             ]"
+            @pointerenter="onHoverItem(item)"
+            @focus="onHoverItem(item)"
         >
             <span class="px-mobile-nav__icon">
                 <LIcon :name="item.icon" size="md" />
@@ -26,12 +28,19 @@
 </template>
 
 <script setup>
-import { useRoute, RouterLink } from 'vue-router';
+import { onMounted } from 'vue';
+import { useRoute, useRouter, RouterLink } from 'vue-router';
+import { prefetchRoute, prefetchNavItemsOnIdle } from '../../router/prefetch.js';
 import { LIcon } from '../../ui/index.js';
 
-defineProps({
+const props = defineProps({
     items: { type: Array, default: () => [] },
 });
+
+let router = null;
+try {
+    router = useRouter();
+} catch (_) {}
 
 const route = useRoute();
 
@@ -55,6 +64,20 @@ const resolveLink = (item) => {
     if (routeName(item) || item.match) return RouterLink;
     return 'a';
 };
+
+const onHoverItem = (item) => {
+    if (!router || item?.disabled) return;
+    const target = linkTo(item);
+    if (target) {
+        prefetchRoute(router, target);
+    }
+};
+
+onMounted(() => {
+    if (router && props.items?.length) {
+        prefetchNavItemsOnIdle(router, props.items);
+    }
+});
 </script>
 
 <style lang="scss">

@@ -1,3 +1,4 @@
+export { prefetchRoute, prefetchNavItemsOnIdle } from './prefetch.js';
 import {
     auth,
     useAuthStore,

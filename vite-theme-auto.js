@@ -114,6 +114,52 @@ export function resolveAutoChunkGroups(root) {
 }
 
 /**
+ * Auto-discover entry and common layout/view components for server warmup.
+ *
+ * @param {string} root
+ * @returns {string[]}
+ */
+export function findAutoWarmupFiles(root) {
+    const fsRoot = toFsPath(root);
+    const files = new Set();
+    const entry = resolveThemeEntry(fsRoot);
+    if (entry) files.add(`./${entry.replace(/^\.\//, '')}`);
+
+    const commonLayouts = [
+        'src/layouts/AppLayout.vue',
+        'src/layouts/PageLayout.vue',
+        'src/layouts/AuthLayout.vue',
+    ];
+    for (const layout of commonLayouts) {
+        if (fs.existsSync(path.join(fsRoot, layout))) {
+            files.add(`./${layout}`);
+        }
+    }
+
+    const viewsDir = path.join(fsRoot, 'src', 'views');
+    if (fs.existsSync(viewsDir)) {
+        try {
+            const scan = (dir, depth = 0) => {
+                if (depth > 2 || files.size >= 16) return;
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                for (const e of entries) {
+                    if (files.size >= 16) break;
+                    if (e.isDirectory() && !['node_modules', 'components', 'styles', 'composables', 'model'].includes(e.name)) {
+                        scan(path.join(dir, e.name), depth + 1);
+                    } else if (e.isFile() && e.name.endsWith('.vue') && (e.name.startsWith('Page') || depth === 0)) {
+                        const rel = path.relative(fsRoot, path.join(dir, e.name)).replace(/\\/g, '/');
+                        files.add(`./${rel}`);
+                    }
+                }
+            };
+            scan(viewsDir);
+        } catch (_) {}
+    }
+
+    return [...files];
+}
+
+/**
  * Zero-config defaults for Pinoox Luma themes.
  *
  * @param {string} root
@@ -125,7 +171,7 @@ export function resolveAutoThemeDefaults(root) {
 
     return {
         entry: normalizedEntry,
-        warmup: [`./${normalizedEntry}`],
+        warmup: findAutoWarmupFiles(fsRoot),
         alias: resolveLucideAlias(fsRoot),
         extraChunkGroups: resolveAutoChunkGroups(fsRoot),
     };

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.10] — 2026-09-01
+
 ### Fixed
 - Router BASE `'/'` is treated as an explicit root mount. Luma no longer infers `/auth` from the current URL, which looped the `/login` trap.
 - `loginUrl` may include the theme-context prefix (`/panel/auth/login`) without doubling when Vue Router history base is `/panel`.

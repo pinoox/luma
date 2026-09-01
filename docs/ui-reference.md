@@ -66,18 +66,26 @@ export default defineConfig({
 
 | Concern | What it configures |
 |---------|-------------------|
-| Peer dedupe | Vue, Pinia, Vue Router, PrimeVue, axios, … resolve once (avoids broken `useToast()` with `file:` links) |
-| `optimizeDeps.exclude` | Keeps `@pinooxhq/luma` out of the pre-bundle for clean HMR |
+| Peer dedupe | Vue, Pinia, Vue Router, PrimeVue, axios, yup, … resolve once (avoids broken `useToast()` with `file:` links) |
+| Pre-bundling & Perf | Pre-bundles peer dependencies (`LUMA_OPTIMIZE_DEPS`) for faster dev server cold starts |
+| Vendor chunk splitting | Splits production bundles into structured vendor groups (`vendor-vue`, `vendor-luma`, `vendor-prime`, `vendor-tiptap`, `vendor-icons`, `vendor-date`, `vendor-http`) |
+| Theme auto-detection | Auto-detects theme entry (`frontend.config.php`, `index.html`, `src/main.js`) and warms up client files |
+| App aliases | Standard `@/`, `@views`, `@stores`, `@components`, `@composables`, `@config`, `@utils`, `@api`, `@assets`, `@layouts` |
+| Diagnostics (`lumaDoctor`) | Warns about missing peer dependencies or bad `LUMA_LOCAL` paths during dev |
 | `ssr.noExternal` | Same package set for dev and build |
 | `server.fs.allow` | Allows Luma + project roots (Windows-safe path handling) |
 | `server.watch` | Polling so HMR works for `file:` / symlink installs |
 
 ```js
 luma({
-  dedupe: ['my-shared-lib'],
-  excludeFromOptimize: ['some/heavy/package'],
-  fsAllow: ['/custom/peer-dir'],
-  watchPolling: false,
+  perf: true,                          // Dev pre-bundling & build chunk splitting (default: true)
+  entry: 'src/main.js',                // Custom entry or auto-detected
+  doctor: true,                        // Run dependency health checks (default: true)
+  configFile: 'luma.config.js',        // Theme config file (or appConfig: false)
+  dedupe: ['my-shared-lib'],           // Extra dedupe packages
+  alias: { '@custom': 'src/custom' },  // Extra aliases
+  fsAllow: ['/custom/peer-dir'],       // Extra server.fs.allow paths
+  watchPolling: false,                 // Polling options
 });
 ```
 

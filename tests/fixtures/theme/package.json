@@ -1,4 +1,5 @@
 {
   "name": "luma-fixture-theme",
+  "type": "module",
   "private": true
 }

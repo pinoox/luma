@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.9] — 2026-09-01
+
+### Added
+- **Vite Performance Optimization** (`@pinooxhq/luma/vite/perf`) — Pre-bundles core peer dependencies via `LUMA_OPTIMIZE_DEPS` and configures Rolldown / Vite 8 production code splitting into structured vendor chunk groups (`LUMA_CHUNK_GROUPS`: `vendor-vue`, `vendor-luma`, `vendor-prime`, `vendor-tiptap`, `vendor-icons`, `vendor-date`, `vendor-http`). Custom vendor groups can be merged with `mergeChunkGroups()`.
+- **Vite Theme Auto-Detection** (`@pinooxhq/luma/vite/theme-auto`) — Automatically resolves theme entry points (probing `frontend.config.php`, `index.html`, and `src/main.js`), sets dev server warmup client files, resolves Lucide icon fallback aliases (`resolveLucideAlias`), and configures optional vendor chunks (`resolveAutoThemeDefaults`).
+- **Vite Config & Factory Helpers** (`@pinooxhq/luma/vite/config`) — `createLumaViteConfig()` helper for zero-boilerplate Vite configuration. `createAppAliases()` establishes standard theme aliases (`@/`, `@views`, `@pages`, `@stores`, `@components`, `@composables`, `@config`, `@utils`, `@api`, `@assets`, `@layouts`). `loadThemeEnv()` and `loadAppConfig()` load environment variables and `luma.config.js`.
+- **Diagnostic Tool (`lumaDoctor`)** — Proactively verifies consumer `node_modules` during development, warns of missing peer dependencies, and checks `LUMA_LOCAL` path validity.
+- **Package Subpath Exports** — Exposed `./vite/perf`, `./vite/config`, and `./vite/theme-auto` in `package.json`.
+
 ## [0.4.8] — 2026-08-24
 
 ### Fixed

@@ -33,19 +33,17 @@
 import { createApp as createVueApp } from 'vue';
 import { setActivePinia } from 'pinia';
 
-import { setActiveThemeConfig, resolveThemeConfig } from './ds/theme-config.js';
+import { setActiveThemeConfig } from './ds/theme-config.js';
 import { applyThemeConfig } from './customization/applyThemeConfig.js';
 import { applyDevBootstrap } from './core/boot.js';
 import { applyDocumentDirection, resolveDirection } from './core/direction.js';
 import setupPrimeVue from './plugins/primevue.js';
 import { useTheme, initThemeEarly } from './ds/composables/use-theme.js';
 import {
-    auth,
-    useAuthStore,
     configureAuth,
     getActiveAuth,
 } from './core/auth/index.js';
-import { createAppRouter, redirectToLogin } from './router/guards.js';
+import { createAppRouter, bindAuthRedirect } from './router/guards.js';
 
 // `RootShell` is intentionally NOT imported here. It's a Vue SFC, and
 // importing it from this module would force Node-side consumers of the
@@ -56,24 +54,6 @@ import { createAppRouter, redirectToLogin } from './router/guards.js';
 //   2. Pass their own `AppRoot` component to `createApp()`.
 // The default below is `null`, so apps must pass `AppRoot` explicitly.
 const DEFAULT_MOUNT = '#app';
-
-let unauthorizedRedirectPending = false;
-
-function wireAuthRedirect() {
-    auth.on('unauthorized', async () => {
-        if (unauthorizedRedirectPending) return;
-        unauthorizedRedirectPending = true;
-        try {
-            const store = useAuthStore();
-            const valid = await store.canUserAccess(true);
-            if (!valid && !store.isAuth) {
-                redirectToLogin();
-            }
-        } finally {
-            unauthorizedRedirectPending = false;
-        }
-    });
-}
 
 /**
  * Merge `themeConfig.auth.endpoints` into `authOptions.endpoints`. Apps that
@@ -132,13 +112,12 @@ export async function createApp(options = {}) {
     // 0. Resolve theme config first so auth defaults can read `themeConfig.auth`.
     const config = setActiveThemeConfig(userConfig);
 
+    let routerRef = null;
+
     // 0a. Apply auth overrides (must happen before the first router guard).
     const authBoot = resolveAuthBootOptions(config, authOptions);
     if (Object.keys(authBoot).length > 0) {
         configureAuth(authBoot);
-        // The `wireAuthRedirect` listener was attached to the old instance.
-        // Re-attach on the new active instance.
-        wireAuthRedirect();
     }
 
     // 0b. Install the verifyAuth hook (read by the router guard).
@@ -163,8 +142,8 @@ export async function createApp(options = {}) {
     // 2. Prime the theme before mounting to avoid flash.
     initThemeEarly();
 
-    // 3. Wire auth-redirect listener (also called after configureAuth above).
-    wireAuthRedirect();
+    // 3. 401s bounce to loginUrl without doubling BASE (SPA when router is ready).
+    bindAuthRedirect(() => routerRef);
 
     // 4. Build the Vue app.
     const app = createVueApp(AppRoot);
@@ -187,6 +166,7 @@ export async function createApp(options = {}) {
 
     // 7. Router — created asynchronously (lazy-loads vue-router).
     const router = await createAppRouter(routes);
+    routerRef = router;
     app.use(router);
 
     // 8. Mount.

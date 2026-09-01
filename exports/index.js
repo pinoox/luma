@@ -12,8 +12,16 @@ export {
     createAppRouter,
     authGuard,
     redirectToLogin,
+    bindAuthRedirect,
     buildAppPath,
     resolveHistoryBase,
+    resolveGuestExit,
+    isAuthLocation,
+    isAuthPath,
+    loginRouterLocation,
+    toBrowserPath,
+    toRouterPath,
+    normalizeAppBase,
 } from '../src/router/guards.js';
 
 export {

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Router BASE `'/'` is treated as an explicit root mount. Luma no longer infers `/auth` from the current URL, which looped the `/login` trap.
+- `loginUrl` may include the theme-context prefix (`/panel/auth/login`) without doubling when Vue Router history base is `/panel`.
+- 401 redirects skip guest auth pages and use the SPA login route when a router is bound.
+
+### Added
+- `toBrowserPath` / `toRouterPath` / `isAuthLocation` / `resolveGuestExit` / `bindAuthRedirect` for apps that boot their own Vue app instead of `createApp()`.
+
 ## [0.4.8] — 2026-08-24
 
 ### Fixed

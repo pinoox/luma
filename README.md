@@ -464,6 +464,22 @@ import { auth, useAuthStore, http, configureAuth, getActiveAuth } from '@pinooxh
 
 `http` is an axios client with auth headers wired — prefer it over a fresh axios instance.
 
+Theme-context panels mount under `__PINOOX__.url.BASE` (`/panel`) and set `auth.loginUrl` to the **browser** path (`/panel/auth/login`). Vue Router still uses unprefixed records (`/auth/login`). Do not rewrite `url.BASE` in the app. Use:
+
+```js
+import {
+  resolveHistoryBase,
+  bindAuthRedirect,
+  resolveGuestExit,
+} from '@pinooxhq/luma';
+
+const router = createRouter({
+  history: createWebHistory(resolveHistoryBase()),
+  routes,
+});
+bindAuthRedirect(router);
+```
+
 ---
 
 ## Usage examples
@@ -704,7 +720,7 @@ See [primevue.org](https://primevue.org/) for the full API. Theme CSS comes from
 | `@pinooxhq/luma/ds` | Shell chrome + legacy `LEmptyState` |
 | `@pinooxhq/luma/layouts` | `RootShell`, `PageLayout` |
 | `@pinooxhq/luma/composables` | `usePage`, … |
-| `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `redirectToLogin`, history helpers |
+| `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `bindAuthRedirect`, `redirectToLogin`, BASE/login helpers |
 | `@pinooxhq/luma/core` | `auth`, `http`, `useAuthStore`, `configureAuth`, `env`, dates, media helpers |
 | `@pinooxhq/luma/plugins` | `setupPrimeVue`, `ConsolePreset` |
 | `@pinooxhq/luma/styles` | Main SCSS bundle |

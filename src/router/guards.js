@@ -3,23 +3,39 @@ import {
     useAuthStore,
 } from '../core/auth/index.js';
 import { getActiveThemeConfig, composeMetaTitle } from '../ds/theme-config.js';
-import { isDev } from '../core/env.js';
+import {
+    isAuthPath,
+    readBootBase,
+    readLoginUrl,
+    resolveHistoryBase,
+    toBrowserPath,
+    toRouterPath,
+} from './base.js';
+
+export {
+    isAuthPath,
+    normalizeAppBase,
+    readBootBase,
+    readLoginUrl,
+    resolveGuestExit,
+    resolveHistoryBase,
+    toBrowserPath,
+    toRouterPath,
+} from './base.js';
 
 let isFirstSession = false;
+let unauthorizedRedirectPending = false;
 
-/**
- * Resolve the current app path from the Pinoox bootstrap.
- * App routes live under <url.BASE>; if missing, fall back to '/'.
- */
-const getBase = () => {
-    if (typeof globalThis === 'undefined') return '/';
-    const boot = globalThis.__PINOOX__;
-    const base = boot?.url?.BASE;
-    if (typeof base !== 'string' || base.trim() === '') {
-        return '/';
-    }
-    const trimmed = base.replace(/\/$/, '');
-    return trimmed === '' ? '/' : trimmed;
+const authPathOptions = () => ({
+    base: readBootBase() ?? resolveHistoryBase(),
+    loginUrl: auth.config?.loginUrl ?? readLoginUrl(),
+});
+
+export const isAuthLocation = (pathname) => isAuthPath(pathname, authPathOptions());
+
+export const loginRouterLocation = () => {
+    const loginUrl = (auth.config?.loginUrl ?? readLoginUrl()).split('?')[0] || '/login';
+    return { path: toRouterPath(loginUrl, authPathOptions().base) };
 };
 
 /**
@@ -27,26 +43,66 @@ const getBase = () => {
  * `<base>/...` are returned as-is; other routes get the base prepended.
  */
 export const buildAppPath = (routePath) => {
-    const base = getBase();
+    const base = resolveHistoryBase();
 
     if (typeof routePath === 'string' && routePath !== '' && routePath !== '/') {
-        if (base !== '/' && routePath.startsWith(base)) return routePath;
-        if (base === '/') {
-            return routePath.startsWith('/') ? routePath : `/${routePath}`;
-        }
-        return `${base}${routePath.startsWith('/') ? routePath : `/${routePath}`}`;
+        return toBrowserPath(routePath, base);
+    }
+
+    if (typeof window === 'undefined') {
+        return base === '/' ? '/' : `${base}/`;
     }
 
     const current = `${window.location.pathname}${window.location.search}`;
-    if (base === '/') {
-        return current.startsWith('/') ? current : `/${current}`;
-    }
-    return current.startsWith(base) ? current : `${base}/`;
+    return toBrowserPath(current.split('?')[0] || '/', base) + (current.includes('?') ? `?${current.split('?')[1]}` : '');
 };
 
 export const redirectToLogin = (returnPath) => {
     auth.redirectToLogin(buildAppPath(returnPath));
 };
+
+/**
+ * Subscribe once. Apps that boot their own Vue app (not `createApp()`)
+ * pass the router so 401s stay in the SPA under the panel BASE.
+ */
+export function bindAuthRedirect(routerOrGetter) {
+    const getRouter = typeof routerOrGetter === 'function'
+        ? routerOrGetter
+        : () => routerOrGetter;
+
+    auth.on('unauthorized', async () => {
+        if (unauthorizedRedirectPending) return;
+        if (typeof window !== 'undefined' && isAuthLocation(window.location.pathname)) {
+            return;
+        }
+
+        unauthorizedRedirectPending = true;
+        try {
+            const store = useAuthStore();
+            try {
+                auth.clearToken?.();
+                store.token = null;
+                store.user = null;
+            } catch {
+                // best-effort — still bounce to login
+            }
+
+            const router = getRouter?.();
+            if (router?.replace) {
+                const loc = loginRouterLocation();
+                const current = router.currentRoute?.value?.path;
+                if (current !== loc.path) {
+                    await router.replace(loc);
+                }
+                return;
+            }
+
+            redirectToLogin();
+        } finally {
+            unauthorizedRedirectPending = false;
+        }
+    });
+}
 
 /**
  * If the manager app passed a JWT via `?__manager_token=...`, persist it as
@@ -177,33 +233,6 @@ export async function authGuard(to) {
 }
 
 /**
- * Derive the history base from `window.location.pathname` when the
- * bootstrap didn't supply one. Strips the trailing route segment so the
- * router knows where the app is mounted.
- */
-const deriveBaseFromLocation = () => {
-    if (typeof window === 'undefined') return '/';
-    const path = window.location.pathname;
-    if (!path || path === '/') return '/';
-    // Strip the last segment to keep the route visible inside `<base>/<route>`.
-    const idx = path.lastIndexOf('/');
-    const candidate = idx > 0 ? path.slice(0, idx) : '/';
-    return candidate || '/';
-};
-
-export const resolveHistoryBase = () => {
-    const base = getBase();
-    if (typeof base === 'string' && base !== '') {
-        return base;
-    }
-    const derived = deriveBaseFromLocation();
-    if (isDev() && derived !== '/') {
-        console.warn(`[luma/router] Missing __PINOOX__.url.BASE; using "${derived}" derived from location`);
-    }
-    return derived;
-};
-
-/**
  * Resolve the `<title>` tag value for the current route.
  * Reads from the active `themeConfig.pageMeta[routeName]` and falls back to brand.
  * Returns the full composed title: "{page} · {brand}".
@@ -224,7 +253,11 @@ const resolveDocumentTitle = (to) => {
 const routeDefinesLogin = (list = []) =>
     list.some((route) => {
         const path = String(route?.path ?? '');
-        if (path === '/login' || path === 'login') return true;
+        const name = String(route?.name ?? '');
+        if (name === 'login' || name === 'auth.login') return true;
+        if (path === '/login' || path === 'login' || path === '/auth/login' || path === 'auth/login') {
+            return true;
+        }
         if (Array.isArray(route?.children) && routeDefinesLogin(route.children)) return true;
         return false;
     });

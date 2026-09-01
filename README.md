@@ -748,7 +748,7 @@ See [primevue.org](https://primevue.org/) for the full API. Theme CSS comes from
 | `@pinooxhq/luma/ds` | Shell chrome + legacy `LEmptyState` |
 | `@pinooxhq/luma/layouts` | `RootShell`, `PageLayout` |
 | `@pinooxhq/luma/composables` | `usePage`, … |
-| `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `bindAuthRedirect`, `redirectToLogin`, BASE/login helpers |
+| `@pinooxhq/luma/router` | `createAppRouter`, `authGuard`, `bindAuthRedirect`, `redirectToLogin`, route prefetching, BASE/login helpers |
 | `@pinooxhq/luma/core` | `auth`, `http`, `useAuthStore`, `configureAuth`, `env`, dates, media helpers |
 | `@pinooxhq/luma/plugins` | `setupPrimeVue`, `ConsolePreset` |
 | `@pinooxhq/luma/styles` | Main SCSS bundle |

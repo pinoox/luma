@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.11] — 2026-09-01
+
+### Added
+- **Route Prefetching (`@pinooxhq/luma/router`)** — Introduced `prefetchRoute` and `prefetchNavItemsOnIdle` helpers. `LSidebar` and `LMobileNav` now automatically prefetch route components on link hover and schedule idle prefetching via `requestIdleCallback` for instant navigation.
+- **Vite Server Warmup View Discovery** — `resolveAutoThemeDefaults` automatically discovers view components under `src/views` and `src/pages` to warm up Vite's dev server client files on startup.
+- **Expanded Default Optimize Deps** — Added common dependencies (e.g. `chart.js`, `vue-chartjs`, `yup`, `@primevue/forms`) to `LUMA_OPTIMIZE_DEPS`.
+
+### Fixed
+- **Vite Theme Style Optimize Exclusion** — Excluded theme style and Sass entry points from `optimizeDeps.include` to prevent missing chunk hash errors during Vite dev server bundling.
+
 ## [0.4.10] — 2026-09-01
 
 ### Fixed

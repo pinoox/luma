@@ -22,6 +22,8 @@ export {
     toBrowserPath,
     toRouterPath,
     normalizeAppBase,
+    prefetchRoute,
+    prefetchNavItemsOnIdle,
 } from '../src/router/guards.js';
 
 export {

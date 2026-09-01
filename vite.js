@@ -132,6 +132,9 @@ const DEFAULT_DEDUPE = collectDedupePackages();
  */
 const DEFAULT_EXCLUDE_FROM_OPTIMIZE = [
     '@pinooxhq/luma',
+    '@primeuix/themes',
+    '@primeuix/styled',
+    '@primeuix/utils',
 ];
 
 /**

@@ -31,6 +31,7 @@ export {
     useAuthRedirect,
     auth,
     http,
+    api,
     configureAuth,
     getActiveAuth,
     isAuthConfigured,
@@ -43,6 +44,13 @@ export {
     beginLocalLoading,
     endLocalLoading,
 } from '../src/core/http/loading.js';
+
+export {
+    unwrapApiBody,
+    unwrapResponse,
+    unwrap,
+    attachApiEnvelope,
+} from '../src/core/http/envelope.js';
 
 export {
     TABLE_SKEL_FLAG,

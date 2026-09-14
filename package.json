@@ -1,194 +1,194 @@
 {
-    "name": "@pinooxhq/luma",
-    "version": "0.4.12",
-    "description": "Luma — A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
-    "type": "module",
-    "main": "./exports/index.js",
-    "module": "./exports/index.js",
-    "scripts": {
-        "pack:check": "npm pack --dry-run",
-        "test": "npm run test:vite-paths && npm run test:vite-perf && npm run test:vite-config && npm run test:vite-theme-auto && npm run test:form-primitives && npm run test:entity-form && npm run test:router-base && npm run test:http-loading && npm run test:table-skeleton && npm run test:swipe-reveal",
-        "test:vite-paths": "node --test tests/vite-plugin-paths.test.js",
-        "test:vite-perf": "node --test tests/vite-perf.test.js",
-        "test:vite-config": "node --test tests/vite-config.test.js",
-        "test:vite-theme-auto": "node --test tests/vite-theme-auto.test.js",
-        "test:router-base": "node --test tests/router-base.test.js",
-        "test:form-primitives": "node --test tests/form-primitives.test.js",
-        "test:entity-form": "node --test tests/entity-form.test.js",
-        "test:http-loading": "node --test tests/http-loading.test.js",
-        "test:table-skeleton": "node --test tests/table-skeleton.test.js",
-        "test:swipe-reveal": "node --test tests/swipe-reveal.test.js",
-        "test:smoke": "npm pack && rm -rf smoke-test && mkdir smoke-test && cd smoke-test && npm init -y >/dev/null 2>&1 && npm install ../$(ls ../pinooxhq-luma-*.tgz | head -1) primevue@^4 vue@^3.5 pinia@^4 @vue/devtools-api@^8 vue-router@^5 axios@^1 lucide-vue-next@^1 @primeuix/themes@^2 @pinooxhq/auth@^0.1 sass@^1 vite@^8 && node --input-type=module -e \"import { createApp, usePage, useTheme, applyThemeConfig, applyDarkThemeConfig, configureAuth, getActiveAuth, isAuthConfigured, configureHttpLoading, useHttpLoading, beginLocalLoading, endLocalLoading, useLocalLoading, useTableRows, createSkeletonRows, isSkelRow, authGuard, setupPrimeVue, ConsolePreset, createAppRouter, redirectToLogin, bindAuthRedirect, resolveHistoryBase, resolveGuestExit, isAuthLocation, toRouterPath, toBrowserPath, useAuthStore, auth, http, applyDevBootstrap, resolveDevBootstrap, getBoot, getUrl, hasBoot, flattenNavItems, findNavItemByRoute, findPageMeta, resolveUserDisplayName, buildUserInfo, resolveThemeConfig, setActiveThemeConfig, getActiveThemeConfig, DEFAULT_THEME_CONFIG, initThemeEarly, getActiveTheme, slugify, sanitizeSlug, toFinglish } from '@pinooxhq/luma'; console.log('luma smoke ok');\""
+  "name": "@pinooxhq/luma",
+  "version": "0.4.13",
+  "description": "Luma — A modern Vue 3 dashboard framework built on PrimeVue. Themeable, customizable, and ready for production.",
+  "type": "module",
+  "main": "./exports/index.js",
+  "module": "./exports/index.js",
+  "scripts": {
+    "pack:check": "npm pack --dry-run",
+    "test": "npm run test:vite-paths && npm run test:vite-perf && npm run test:vite-config && npm run test:vite-theme-auto && npm run test:form-primitives && npm run test:entity-form && npm run test:router-base && npm run test:http-loading && npm run test:table-skeleton && npm run test:swipe-reveal",
+    "test:vite-paths": "node --test tests/vite-plugin-paths.test.js",
+    "test:vite-perf": "node --test tests/vite-perf.test.js",
+    "test:vite-config": "node --test tests/vite-config.test.js",
+    "test:vite-theme-auto": "node --test tests/vite-theme-auto.test.js",
+    "test:router-base": "node --test tests/router-base.test.js",
+    "test:form-primitives": "node --test tests/form-primitives.test.js",
+    "test:entity-form": "node --test tests/entity-form.test.js",
+    "test:http-loading": "node --test tests/http-loading.test.js",
+    "test:table-skeleton": "node --test tests/table-skeleton.test.js",
+    "test:swipe-reveal": "node --test tests/swipe-reveal.test.js",
+    "test:smoke": "npm pack && rm -rf smoke-test && mkdir smoke-test && cd smoke-test && npm init -y >/dev/null 2>&1 && npm install ../$(ls ../pinooxhq-luma-*.tgz | head -1) primevue@^4 vue@^3.5 pinia@^4 @vue/devtools-api@^8 vue-router@^5 axios@^1 lucide-vue-next@^1 @primeuix/themes@^2 @pinooxhq/auth@^0.1 sass@^1 vite@^8 && node --input-type=module -e \"import { createApp, usePage, useTheme, applyThemeConfig, applyDarkThemeConfig, configureAuth, getActiveAuth, isAuthConfigured, configureHttpLoading, useHttpLoading, beginLocalLoading, endLocalLoading, useLocalLoading, useTableRows, createSkeletonRows, isSkelRow, authGuard, setupPrimeVue, ConsolePreset, createAppRouter, redirectToLogin, bindAuthRedirect, resolveHistoryBase, resolveGuestExit, isAuthLocation, toRouterPath, toBrowserPath, useAuthStore, auth, http, applyDevBootstrap, resolveDevBootstrap, getBoot, getUrl, hasBoot, flattenNavItems, findNavItemByRoute, findPageMeta, resolveUserDisplayName, buildUserInfo, resolveThemeConfig, setActiveThemeConfig, getActiveThemeConfig, DEFAULT_THEME_CONFIG, initThemeEarly, getActiveTheme, slugify, sanitizeSlug, toFinglish } from '@pinooxhq/luma'; console.log('luma smoke ok');\""
+  },
+  "exports": {
+    ".": {
+      "import": "./exports/index.js",
+      "sass": "./exports/styles.scss",
+      "style": "./exports/styles.scss"
     },
-    "exports": {
-        ".": {
-            "import": "./exports/index.js",
-            "sass": "./exports/styles.scss",
-            "style": "./exports/styles.scss"
-        },
-        "./ds/*": "./src/ds/*",
-        "./ds": "./src/ds/index.js",
-        "./core/*": "./src/core/*",
-        "./core": "./src/core/index.js",
-        "./ui/*": "./src/ui/*",
-        "./ui": "./src/ui/index.js",
-        "./router/*": "./src/router/*",
-        "./router": "./src/router/guards.js",
-        "./plugins/*": "./src/plugins/*",
-        "./plugins": "./src/plugins/preset.js",
-        "./composables/*": "./src/composables/*",
-        "./composables": "./src/composables/index.js",
-        "./layouts/*": "./src/layouts/*",
-        "./layouts": "./src/layouts/index.js",
-        "./styles/*": {
-            "sass": "./src/scss/*",
-            "style": "./src/scss/*",
-            "import": "./src/scss/*"
-        },
-        "./styles": {
-            "import": "./src/scss/_styles.scss",
-            "sass": "./src/scss/_styles.scss",
-            "style": "./src/scss/_styles.scss",
-            "default": "./src/scss/_styles.scss"
-        },
-        "./styles/_main": {
-            "import": "./src/scss/_main.scss",
-            "sass": "./src/scss/_main.scss",
-            "style": "./src/scss/_main.scss",
-            "default": "./src/scss/_main.scss"
-        },
-        "./tokens/*": {
-            "sass": "./src/scss/tokens/*",
-            "style": "./src/scss/tokens/*",
-            "import": "./src/scss/tokens/*"
-        },
-        "./tokens": {
-            "import": "./src/scss/tokens/_index.scss",
-            "sass": "./src/scss/tokens/_index.scss",
-            "style": "./src/scss/tokens/_index.scss",
-            "default": "./src/scss/tokens/_index.scss"
-        },
-        "./tokens/_index": {
-            "import": "./src/scss/tokens/_index.scss",
-            "sass": "./src/scss/tokens/_index.scss",
-            "style": "./src/scss/tokens/_index.scss",
-            "default": "./src/scss/tokens/_index.scss"
-        },
-        "./fonts": "./src/fonts/vazir.js",
-        "./fonts/*": "./src/fonts/*",
-        "./preset": {
-            "import": "./exports/preset.js"
-        },
-        "./tokens.scss": {
-            "import": "./exports/tokens.scss",
-            "sass": "./exports/tokens.scss",
-            "style": "./exports/tokens.scss",
-            "default": "./exports/tokens.scss"
-        },
-        "./styles.scss": {
-            "import": "./exports/styles.scss",
-            "sass": "./exports/styles.scss",
-            "style": "./exports/styles.scss",
-            "default": "./exports/styles.scss"
-        },
-        "./createApp": {
-            "import": "./src/createApp.js"
-        },
-        "./applyThemeConfig": {
-            "import": "./exports/applyThemeConfig.js"
-        },
-        "./theme-config": {
-            "import": "./src/ds/theme-config.js"
-        },
-        "./vite": {
-            "import": "./vite.js"
-        },
-        "./vite/perf": {
-            "import": "./vite-perf.js"
-        },
-        "./vite/config": {
-            "import": "./vite-config.js"
-        },
-        "./vite/theme-auto": {
-            "import": "./vite-theme-auto.js"
-        },
-        "./package.json": "./package.json"
+    "./ds/*": "./src/ds/*",
+    "./ds": "./src/ds/index.js",
+    "./core/*": "./src/core/*",
+    "./core": "./src/core/index.js",
+    "./ui/*": "./src/ui/*",
+    "./ui": "./src/ui/index.js",
+    "./router/*": "./src/router/*",
+    "./router": "./src/router/guards.js",
+    "./plugins/*": "./src/plugins/*",
+    "./plugins": "./src/plugins/preset.js",
+    "./composables/*": "./src/composables/*",
+    "./composables": "./src/composables/index.js",
+    "./layouts/*": "./src/layouts/*",
+    "./layouts": "./src/layouts/index.js",
+    "./styles/*": {
+      "sass": "./src/scss/*",
+      "style": "./src/scss/*",
+      "import": "./src/scss/*"
     },
-    "files": [
-        "exports",
-        "src",
-        "docs",
-        "vite.js",
-        "vite-perf.js",
-        "vite-config.js",
-        "vite-theme-auto.js",
-        "README.md",
-        "CHANGELOG.md"
-    ],
-    "sideEffects": [
-        "**/*.scss",
-        "**/*.vue",
-        "./src/fonts/vazir.js"
-    ],
-    "peerDependencies": {
-        "@pinooxhq/auth": "^0.1.2",
-        "@primeuix/themes": "^2.0.0",
-        "@vue/devtools-api": "^8.1.5",
-        "axios": "^1.19.0",
-        "lucide-vue-next": "^1.0.0",
-        "pinia": "^4.0.2",
-        "primevue": "^4.5.0",
-        "vue": "^3.5.41",
-        "vue-router": "^5.2.0"
+    "./styles": {
+      "import": "./src/scss/_styles.scss",
+      "sass": "./src/scss/_styles.scss",
+      "style": "./src/scss/_styles.scss",
+      "default": "./src/scss/_styles.scss"
     },
-    "dependencies": {
-        "@pinooxhq/auth": "^0.1.2",
-        "@pinooxhq/slug": "^0.2.0",
-        "@primeuix/themes": "^2.0.0",
-        "@primevue/forms": "^4.5.5",
-        "@tiptap/extension-link": "^3.29.2",
-        "@tiptap/extension-list": "^3.29.2",
-        "@tiptap/extension-placeholder": "^3.29.2",
-        "@tiptap/starter-kit": "^3.29.2",
-        "@tiptap/vue-3": "^3.29.2",
-        "@vue/devtools-api": "^8.1.5",
-        "@vueuse/gesture": "^2.0.0",
-        "axios": "^1.19.0",
-        "lucide-vue-next": "^1.0.0",
-        "moment": "^2.30.1",
-        "moment-jalaali": "^0.10.4",
-        "pinia": "^4.0.2",
-        "primevue": "^4.5.0",
-        "sass": "^1.102.0",
-        "vue": "^3.5.41",
-        "vue-router": "^5.2.0",
-        "yup": "^1.7.1"
+    "./styles/_main": {
+      "import": "./src/scss/_main.scss",
+      "sass": "./src/scss/_main.scss",
+      "style": "./src/scss/_main.scss",
+      "default": "./src/scss/_main.scss"
     },
-    "engines": {
-        "node": ">=18"
+    "./tokens/*": {
+      "sass": "./src/scss/tokens/*",
+      "style": "./src/scss/tokens/*",
+      "import": "./src/scss/tokens/*"
     },
-    "keywords": [
-        "pinoox",
-        "luma",
-        "design-system",
-        "vue",
-        "vue3",
-        "primevue",
-        "dashboard",
-        "admin-panel",
-        "rtl",
-        "vazir",
-        "ui-framework",
-        "pinia",
-        "vue-router"
-    ],
-    "homepage": "https://github.com/pinoox/luma#readme",
-    "bugs": {
-        "url": "https://github.com/pinoox/luma/issues"
+    "./tokens": {
+      "import": "./src/scss/tokens/_index.scss",
+      "sass": "./src/scss/tokens/_index.scss",
+      "style": "./src/scss/tokens/_index.scss",
+      "default": "./src/scss/tokens/_index.scss"
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/pinoox/luma.git"
+    "./tokens/_index": {
+      "import": "./src/scss/tokens/_index.scss",
+      "sass": "./src/scss/tokens/_index.scss",
+      "style": "./src/scss/tokens/_index.scss",
+      "default": "./src/scss/tokens/_index.scss"
     },
-    "license": "MIT"
+    "./fonts": "./src/fonts/vazir.js",
+    "./fonts/*": "./src/fonts/*",
+    "./preset": {
+      "import": "./exports/preset.js"
+    },
+    "./tokens.scss": {
+      "import": "./exports/tokens.scss",
+      "sass": "./exports/tokens.scss",
+      "style": "./exports/tokens.scss",
+      "default": "./exports/tokens.scss"
+    },
+    "./styles.scss": {
+      "import": "./exports/styles.scss",
+      "sass": "./exports/styles.scss",
+      "style": "./exports/styles.scss",
+      "default": "./exports/styles.scss"
+    },
+    "./createApp": {
+      "import": "./src/createApp.js"
+    },
+    "./applyThemeConfig": {
+      "import": "./exports/applyThemeConfig.js"
+    },
+    "./theme-config": {
+      "import": "./src/ds/theme-config.js"
+    },
+    "./vite": {
+      "import": "./vite.js"
+    },
+    "./vite/perf": {
+      "import": "./vite-perf.js"
+    },
+    "./vite/config": {
+      "import": "./vite-config.js"
+    },
+    "./vite/theme-auto": {
+      "import": "./vite-theme-auto.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "exports",
+    "src",
+    "docs",
+    "vite.js",
+    "vite-perf.js",
+    "vite-config.js",
+    "vite-theme-auto.js",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": [
+    "**/*.scss",
+    "**/*.vue",
+    "./src/fonts/vazir.js"
+  ],
+  "peerDependencies": {
+    "@pinooxhq/auth": "^0.1.2",
+    "@primeuix/themes": "^2.0.0",
+    "@vue/devtools-api": "^8.1.5",
+    "axios": "^1.19.0",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^4.0.2",
+    "primevue": "^4.5.0",
+    "vue": "^3.5.41",
+    "vue-router": "^5.2.0"
+  },
+  "dependencies": {
+    "@pinooxhq/auth": "^0.1.2",
+    "@pinooxhq/slug": "^0.2.0",
+    "@primeuix/themes": "^2.0.0",
+    "@primevue/forms": "^4.5.5",
+    "@tiptap/extension-link": "^3.29.2",
+    "@tiptap/extension-list": "^3.29.2",
+    "@tiptap/extension-placeholder": "^3.29.2",
+    "@tiptap/starter-kit": "^3.29.2",
+    "@tiptap/vue-3": "^3.29.2",
+    "@vue/devtools-api": "^8.1.5",
+    "@vueuse/gesture": "^2.0.0",
+    "axios": "^1.19.0",
+    "lucide-vue-next": "^1.0.0",
+    "moment": "^2.30.1",
+    "moment-jalaali": "^0.10.4",
+    "pinia": "^4.0.2",
+    "primevue": "^4.5.0",
+    "sass": "^1.102.0",
+    "vue": "^3.5.41",
+    "vue-router": "^5.2.0",
+    "yup": "^1.7.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "pinoox",
+    "luma",
+    "design-system",
+    "vue",
+    "vue3",
+    "primevue",
+    "dashboard",
+    "admin-panel",
+    "rtl",
+    "vazir",
+    "ui-framework",
+    "pinia",
+    "vue-router"
+  ],
+  "homepage": "https://github.com/pinoox/luma#readme",
+  "bugs": {
+    "url": "https://github.com/pinoox/luma/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pinoox/luma.git"
+  },
+  "license": "MIT"
 }

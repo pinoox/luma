@@ -13,7 +13,11 @@ const prefetchedRoutes = new Set();
 export function prefetchRoute(router, target) {
     if (!router || !target) return;
     try {
-        const resolved = typeof router.resolve === 'function' ? router.resolve(target) : null;
+        let routeLocation = target;
+        if (typeof routeLocation === 'string' && !routeLocation.startsWith('/') && !routeLocation.startsWith('http')) {
+            routeLocation = { name: routeLocation };
+        }
+        const resolved = typeof router.resolve === 'function' ? router.resolve(routeLocation) : null;
         if (!resolved?.matched?.length) return;
 
         for (const record of resolved.matched) {
@@ -54,7 +58,7 @@ export function prefetchNavItemsOnIdle(router, items = [], delay = 400) {
     const extract = (list) => {
         for (const item of list) {
             if (!item || item.disabled) continue;
-            const target = item.to || (item.route ? { name: item.route } : null);
+            const target = item.route ? { name: item.route } : (typeof item.to === 'string' && !item.to.startsWith('/') ? { name: item.to } : item.to);
             if (target) targets.push(target);
             if (Array.isArray(item.children)) extract(item.children);
             if (Array.isArray(item.items)) extract(item.items);

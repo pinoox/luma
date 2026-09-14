@@ -650,7 +650,12 @@ export default function luma(options = {}) {
                     ...cfg.includeInOptimize,
                     ...(perfOptimize.include ?? []),
                 ]),
-            ];
+            ].filter((specifier) => {
+                if (!consumerRoot) return true;
+                const parts = specifier.split("/");
+                const basePkg = specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0];
+                return Boolean(resolvePackage(basePkg, consumerRoot));
+            });
 
             const serverFs = {
                 ...((ctx.serverPatch ?? {}).fs ?? {}),

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.13] — 2026-09-14
+
+### Added
+- **High-level `api` client** — Exported `api` from `@pinooxhq/luma` with automatic unwrapping of Pinoox API responses (`{ success: true, data: ... }`), removing the need for ad-hoc extraction functions across apps.
+- **`unwrapResponse` & `unwrap` utilities** — Standard helper functions exported from `@pinooxhq/luma` to normalize Axios response objects, raw envelopes, or plain payloads into clean data.
+
+### Fixed
+- **Vite dependency optimization** — Dynamically filter `LUMA_OPTIMIZE_DEPS` in `vite.js` against consumer-installed packages to avoid `Failed to resolve dependency` warnings.
+- **Route Prefetch string locations** — Normalize string route targets without leading slashes to `{ name: target }` in `prefetchRoute` and `prefetchNavItemsOnIdle`, eliminating Vue Router `[VUE_ROUTER_R0004]` warnings.
+- **LDatePicker & LSidebar enhancements** — Fixed date picker and sidebar link resolution and active states.
+
 ## [0.4.12] — 2026-09-01
 
 ### Added

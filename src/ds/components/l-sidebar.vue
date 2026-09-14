@@ -466,8 +466,9 @@ watch(
         display: flex;
         align-items: center;
         gap: var(--px-space-2);
-        padding: 7px var(--px-space-2);
-        border-radius: var(--px-radius-md);
+        padding: 8px 12px;
+        gap: 10px;
+        border-radius: 12px;
         color: var(--px-text-soft);
         text-decoration: none;
         font-size: var(--px-text-sm);
@@ -524,13 +525,16 @@ watch(
     }
 
     &__link-badge {
-        font-size: 10px;
-        font-weight: var(--px-weight-semibold);
-        padding: 1px 6px;
-        border-radius: var(--px-radius-full);
-        background: var(--px-primary-soft);
-        color: var(--px-primary);
+        margin-inline-start: auto;
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        background: #f1f5f9;
+        color: #94a3b8;
         flex-shrink: 0;
+        line-height: 1.3;
+        white-space: nowrap;
     }
 
     &__chevron {

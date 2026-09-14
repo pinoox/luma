@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import { createAuth, createHttp } from '@pinooxhq/auth';
 import { env, isDev } from '../env.js';
 import { attachHttpLoading } from '../http/loading.js';
-import { attachApiEnvelope } from '../http/envelope.js';
+import { attachApiEnvelope, unwrapResponse } from '../http/envelope.js';
 
 /**
  * Default auth instance. Luma auto-creates one at module load using the
@@ -100,6 +100,25 @@ export const http = new Proxy({}, {
     set: (_target, prop, value) => {
         activeHttp[prop] = value;
         return true;
+    },
+});
+
+/**
+ * High-level API client returning the unwrapped data payload directly.
+ * Wraps any activeHttp method call with unwrapResponse.
+ */
+export const api = new Proxy({}, {
+    get: (_target, prop) => {
+        const val = activeHttp[prop];
+        if (typeof val === "function") {
+            return (...args) => {
+                const result = val.apply(activeHttp, args);
+                return result && typeof result.then === "function"
+                    ? result.then(unwrapResponse)
+                    : result;
+            };
+        }
+        return val;
     },
 });
 

@@ -12,7 +12,7 @@ export const LUMA_PAGINATOR_TEMPLATE_MINIMAL =
     'CurrentPageReport PrevPageLink NextPageLink';
 
 /** Default page summary for PrimeVue CurrentPageReport. */
-export const LUMA_CURRENT_PAGE_REPORT_TEMPLATE = 'Page {currentPage} of {totalPages}';
+export const LUMA_CURRENT_PAGE_REPORT_TEMPLATE = 'صفحه {currentPage} از {totalPages}';
 
 /**
  * vue-i18n eats `{name}` placeholders — pass PrimeVue tokens through t().

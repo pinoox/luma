@@ -49,3 +49,27 @@ export function attachApiEnvelope(client) {
 
     return client;
 }
+
+/**
+ * Extract data payload from a Pinoox API response:
+ * - Axios response object: unwrap response.data
+ * - Pinoox envelope { success: true, data }: return data
+ * - Raw data / already unwrapped: return as is
+ */
+export function unwrapResponse(response) {
+    if (response == null) {
+        return response;
+    }
+
+    if (
+        typeof response === "object" &&
+        "data" in response &&
+        ("status" in response || "headers" in response || "config" in response)
+    ) {
+        return unwrapApiBody(response.data);
+    }
+
+    return unwrapApiBody(response);
+}
+
+export const unwrap = unwrapResponse;

@@ -84,8 +84,8 @@ import {
 } from '../core/format/jalali.js';
 
 const PANEL_GAP = 6;
-const PANEL_WIDTH = 280;
-const PANEL_EST_HEIGHT = 320;
+const PANEL_DEFAULT_WIDTH = 296;
+const PANEL_EST_HEIGHT = 330;
 
 const props = defineProps({
     modelValue: { type: [Date, String, Number], default: null },
@@ -98,6 +98,8 @@ const props = defineProps({
     disabled: { type: Boolean, default: false },
     showIcon: { type: Boolean, default: true },
     persianDigits: { type: Boolean, default: true },
+    panelWidth: { type: Number, default: 296 },
+    matchTriggerWidth: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -149,7 +151,10 @@ const updatePosition = () => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const panelHeight = panelEl.value?.offsetHeight || PANEL_EST_HEIGHT;
-    const panelWidth = Math.max(PANEL_WIDTH, rect.width);
+    const targetWidth = props.panelWidth || PANEL_DEFAULT_WIDTH;
+    const panelWidth = props.matchTriggerWidth
+        ? Math.max(targetWidth, rect.width)
+        : Math.min(targetWidth, vw - 16);
 
     const spaceBelow = vh - rect.bottom - PANEL_GAP;
     const spaceAbove = rect.top - PANEL_GAP;
@@ -298,92 +303,120 @@ onBeforeUnmount(() => {
     }
 
     &__panel {
-        min-width: 280px;
-        padding: 0.75rem;
+        width: 296px;
+        max-width: calc(100vw - 16px);
+        padding: 0.75rem 0.85rem;
         border-radius: 16px;
         background: var(--px-surface-strong, #fff);
         border: 1px solid var(--px-border, #e2e8f0);
-        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+        box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.16), 0 6px 12px -4px rgba(15, 23, 42, 0.08);
         box-sizing: border-box;
+        direction: rtl;
+        font-family: inherit;
     }
 
     &__nav {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0.55rem;
+        margin-bottom: 0.65rem;
+        padding: 0 0.15rem;
         gap: 0.35rem;
     }
 
     &__nav strong {
-        font-size: 0.9rem;
-        font-weight: 700;
+        font-size: 0.88rem;
+        font-weight: 750;
+        color: var(--px-text, #0f172a);
     }
 
     &__nav-btn {
         appearance: none;
         border: 0;
         background: var(--px-surface-muted, #f1f5f9);
-        width: 1.85rem;
-        height: 1.85rem;
+        width: 1.95rem;
+        height: 1.95rem;
         border-radius: 8px;
-        display: grid;
-        place-items: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        color: inherit;
+        color: var(--px-text, #334155);
+        transition: all 0.15s ease;
+
+        &:hover {
+            background: color-mix(in srgb, var(--px-primary, #0E73FD) 12%, transparent);
+            color: var(--px-primary, #0E73FD);
+        }
     }
 
     &__weekdays {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 0.15rem;
-        margin-bottom: 0.25rem;
+        gap: 2px;
+        margin-bottom: 0.35rem;
         text-align: center;
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         color: var(--px-text-muted, #64748b);
-        font-weight: 600;
+        font-weight: 700;
+        padding: 0.15rem 0;
     }
 
     &__grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 0.15rem;
+        gap: 2px;
+        row-gap: 3px;
     }
 
     &__day {
         appearance: none;
         border: 0;
         background: transparent;
-        aspect-ratio: 1;
+        width: 36px;
+        height: 36px;
+        margin: 0 auto;
         border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
         font: inherit;
         font-size: 0.82rem;
-        color: inherit;
+        font-weight: 600;
+        color: var(--px-text, #1e293b);
+        transition: all 0.12s ease;
 
-        &:hover {
+        &:hover:not(.is-selected) {
             background: var(--px-surface-muted, #f1f5f9);
+            color: var(--px-text, #0f172a);
         }
 
         &.is-outside {
-            opacity: 0.35;
+            opacity: 0.3;
+            color: var(--px-text-muted, #94a3b8);
         }
 
-        &.is-today {
-            box-shadow: inset 0 0 0 1px var(--px-primary, #6366f1);
+        &.is-today:not(.is-selected) {
+            box-shadow: inset 0 0 0 1.5px var(--px-primary, #0E73FD);
+            font-weight: 750;
+            color: var(--px-primary, #0E73FD);
         }
 
         &.is-selected {
-            background: var(--px-primary, #6366f1);
-            color: var(--px-primary-contrast, #fff);
+            background: var(--px-primary, #0E73FD) !important;
+            color: #ffffff !important;
+            font-weight: 750;
+            box-shadow: 0 2px 6px color-mix(in srgb, var(--px-primary, #0E73FD) 35%, transparent);
         }
     }
 
     &__footer {
         display: flex;
         justify-content: space-between;
-        margin-top: 0.55rem;
-        padding-top: 0.45rem;
+        align-items: center;
+        margin-top: 0.65rem;
+        padding-top: 0.5rem;
         border-top: 1px solid var(--px-border, #e2e8f0);
     }
 
@@ -391,12 +424,18 @@ onBeforeUnmount(() => {
         appearance: none;
         border: 0;
         background: transparent;
-        color: var(--px-primary, #6366f1);
+        color: var(--px-primary, #0E73FD);
         font: inherit;
         font-size: 0.8rem;
         font-weight: 650;
         cursor: pointer;
-        padding: 0;
+        padding: 0.2rem 0.45rem;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+
+        &:hover {
+            background: color-mix(in srgb, var(--px-primary, #0E73FD) 10%, transparent);
+        }
     }
 
     &__gregorian {

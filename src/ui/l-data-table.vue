@@ -9,6 +9,9 @@
     :data-key="resolvedDataKey"
     :paginator="resolvedPaginator"
     :rows="mobileRows"
+    :total-records="resolvedTotalRecords"
+    :first="resolvedFirst"
+    :lazy="resolvedLazy"
     :rows-per-page-options="resolvedRowsPerPageOptions"
     :paginator-template="resolvedPaginatorTemplate"
     :current-page-report-template="resolvedPageReportTemplate"
@@ -19,6 +22,8 @@
     :empty-action-label="emptyActionLabel"
     :empty-action-icon="emptyActionIcon"
     @empty-action="emit('emptyAction')"
+    @page="onMobilePage"
+    @update:first="onMobileUpdateFirst"
   >
     <template v-if="slots['mobile-item']" #mobile-item="slotData">
       <slot name="mobile-item" v-bind="slotData" />
@@ -138,7 +143,7 @@ const props = defineProps({
     currentPageReportTemplate: { type: String, default: undefined },
 });
 
-const emit = defineEmits(['emptyAction']);
+const emit = defineEmits(['emptyAction', 'page', 'update:first']);
 const attrs = useAttrs();
 const slots = useSlots();
 
@@ -230,6 +235,36 @@ const mobileRootClass = computed(() => [
     props.loading ? 'luma-table--loading' : '',
     attrs.class,
 ]);
+
+const resolvedTotalRecords = computed(() => {
+    const total = attrs['total-records'] ?? attrs.totalRecords;
+    if (total !== null && total !== undefined) return Number(total);
+    return props.value?.length ?? 0;
+});
+
+const resolvedFirst = computed(() => {
+    const first = attrs.first;
+    if (first !== null && first !== undefined) return Number(first);
+    return 0;
+});
+
+const resolvedLazy = computed(() => (
+    attrs.lazy === true || attrs.lazy === '' || attrs.lazy === 'true'
+));
+
+function onMobilePage(event) {
+    emit('page', event);
+    if (typeof attrs.onPage === 'function') {
+        attrs.onPage(event);
+    }
+}
+
+function onMobileUpdateFirst(first) {
+    emit('update:first', first);
+    if (typeof attrs['onUpdate:first'] === 'function') {
+        attrs['onUpdate:first'](first);
+    }
+}
 
 const forwarded = computed(() => {
     const {

@@ -63,13 +63,14 @@
             v-if="showPaginator"
             class="luma-mobile-table__paginator"
             :rows="rows"
-            :first="first"
+            :first="currentFirst"
             :total-records="totalRecords"
             :rows-per-page-options="resolvedRowsPerPageOptions"
             :template="paginatorTemplate"
             :current-page-report-template="currentPageReportTemplate"
+            :page-link-size="3"
             @page="onPage"
-            @update:first="first = $event"
+            @update:first="onPage({ first: $event, rows: props.rows, page: Math.floor($event / props.rows) })"
         />
     </div>
 </template>
@@ -105,14 +106,23 @@ const props = defineProps({
     emptyMessage: { type: String, default: '' },
     emptyActionLabel: { type: String, default: '' },
     emptyActionIcon: { type: String, default: 'plus' },
+    totalRecords: { type: Number, default: null },
+    first: { type: Number, default: 0 },
+    lazy: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['emptyAction', 'update:first']);
+const emit = defineEmits(['emptyAction', 'update:first', 'page']);
 const slots = useSlots();
 
 const DEFAULT_ROWS_OPTIONS = [20, 50, 100, 500];
 
-const first = ref(0);
+const currentFirst = ref(props.first ?? 0);
+
+watch(() => props.first, (val) => {
+    if (val !== undefined && val !== null && val !== currentFirst.value) {
+        currentFirst.value = val;
+    }
+});
 
 const skeletonPlaceholderRows = computed(() => createSkeletonRows(props.skeletonRows));
 
@@ -120,11 +130,17 @@ const displayRows = computed(() => (
     props.loading ? skeletonPlaceholderRows.value : (props.value ?? [])
 ));
 
-const totalRecords = computed(() => displayRows.value.length);
+const totalRecords = computed(() => {
+    if (props.totalRecords !== null && props.totalRecords !== undefined) {
+        return props.totalRecords;
+    }
+    return displayRows.value.length;
+});
 
 const pageRows = computed(() => {
     if (!props.paginator || props.loading) return displayRows.value;
-    return displayRows.value.slice(first.value, first.value + props.rows);
+    if (props.lazy) return displayRows.value;
+    return displayRows.value.slice(currentFirst.value, currentFirst.value + props.rows);
 });
 
 const resolvedRowsPerPageOptions = computed(
@@ -140,7 +156,10 @@ const showEmpty = computed(() => (
 ));
 
 watch(() => props.value, () => {
-    if (first.value >= totalRecords.value) first.value = 0;
+    if (!props.lazy && currentFirst.value >= totalRecords.value) {
+        currentFirst.value = 0;
+        emit('update:first', 0);
+    }
 });
 
 function rowKey(row, index) {
@@ -163,7 +182,8 @@ function hasSwipeActions(row) {
 }
 
 function onPage(event) {
-    first.value = event.first;
+    currentFirst.value = event.first;
     emit('update:first', event.first);
+    emit('page', event);
 }
 </script>

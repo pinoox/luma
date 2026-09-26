@@ -35,7 +35,7 @@ export {
     JALALI_MONTHS,
     JALALI_WEEKDAYS,
 } from './format/jalali.js';
-export { resolveMediaUrl } from './media/url.js';
+export { resolveMediaUrl, fileServeUrl, fileDownloadUrl } from './media/url.js';
 export { env, isDev, isProd } from './env.js';
 export { resolveDirection, applyDocumentDirection } from './direction.js';
 export {

@@ -161,3 +161,9 @@ export {
     useEntityForm,
     defineEntity,
 } from '../src/composables/index.js';
+
+export {
+    resolveMediaUrl,
+    fileServeUrl,
+    fileDownloadUrl,
+} from '../src/core/media/url.js';

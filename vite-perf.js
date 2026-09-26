@@ -78,6 +78,9 @@ export const LUMA_OPTIMIZE_DEPS = [
     'moment',
     'jalaali-js',
     'yup',
+    'tiny-case',
+    'property-expr',
+    'toposort',
 ];
 
 /**

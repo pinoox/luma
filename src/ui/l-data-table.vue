@@ -22,8 +22,8 @@
     :empty-action-label="emptyActionLabel"
     :empty-action-icon="emptyActionIcon"
     @empty-action="emit('emptyAction')"
-    @page="onMobilePage"
-    @update:first="onMobileUpdateFirst"
+    @page="onTablePage"
+    @update:first="onTableUpdateFirst"
   >
     <template v-if="slots['mobile-item']" #mobile-item="slotData">
       <slot name="mobile-item" v-bind="slotData" />
@@ -44,10 +44,15 @@
     :data-key="resolvedDataKey"
     :paginator="resolvedPaginator"
     :rows="rows"
+    :total-records="resolvedTotalRecords"
+    :first="resolvedFirst"
+    :lazy="resolvedLazy"
     :paginator-template="resolvedPaginatorTemplate"
     :current-page-report-template="resolvedPageReportTemplate"
     :is-data-selectable="resolvedSelectable"
     :rows-per-page-options="resolvedRowsPerPageOptions"
+    @page="onTablePage"
+    @update:first="onTableUpdateFirst"
   >
     <slot />
     <template v-for="name in desktopSlotNames" :key="name" #[name]="slotData">
@@ -254,14 +259,14 @@ const resolvedFirst = computed(() => {
 });
 
 
-function onMobilePage(event) {
+function onTablePage(event) {
     emit('page', event);
     if (typeof attrs.onPage === 'function') {
         attrs.onPage(event);
     }
 }
 
-function onMobileUpdateFirst(first) {
+function onTableUpdateFirst(first) {
     emit('update:first', first);
     if (typeof attrs['onUpdate:first'] === 'function') {
         attrs['onUpdate:first'](first);
@@ -275,6 +280,10 @@ const forwarded = computed(() => {
         isDataSelectable: _isDataSelectable,
         rows: _rows,
         paginatorTemplate: _paginatorTemplate,
+        first: _first,
+        totalRecords: _totalRecords,
+        'total-records': _totalRecordsKebab,
+        lazy: _lazy,
         ...rest
     } = attrs;
     return rest;

@@ -181,9 +181,14 @@ const resolvedDataKey = computed(() => (
     props.loading ? TABLE_SKEL_KEY : (props.dataKey || undefined)
 ));
 
-const resolvedPaginator = computed(() => (
-    props.loading ? false : props.paginator
+const resolvedLazy = computed(() => (
+    attrs.lazy === true || attrs.lazy === '' || attrs.lazy === 'true'
 ));
+
+const resolvedPaginator = computed(() => {
+    if (resolvedLazy.value) return Boolean(props.paginator);
+    return props.loading ? false : props.paginator;
+});
 
 const resolvedSelectable = computed(() => {
     if (props.loading) return isSkelRowSelectable;
@@ -248,9 +253,6 @@ const resolvedFirst = computed(() => {
     return 0;
 });
 
-const resolvedLazy = computed(() => (
-    attrs.lazy === true || attrs.lazy === '' || attrs.lazy === 'true'
-));
 
 function onMobilePage(event) {
     emit('page', event);

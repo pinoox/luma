@@ -23,3 +23,10 @@ test('createSkeletonRows marks placeholder rows', () => {
 test('createSkeletonRows respects count', () => {
     assert.equal(createSkeletonRows(3).length, 3);
 });
+
+test('l-data-table preserves paginator when lazy is enabled during loading', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const content = fs.readFileSync(path.resolve('src/ui/l-data-table.vue'), 'utf8');
+    assert.equal(content.includes('if (resolvedLazy.value) return Boolean(props.paginator);'), true);
+});

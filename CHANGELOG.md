@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.15] — 2026-10-18
+
+### Added
+- **File URL helpers (`@pinooxhq/luma/core`)** — Exported `fileServeUrl` and `fileDownloadUrl` helpers to build normalized file serve and download endpoints with token and storage path support.
+
+### Fixed
+- **LDataTable server-side pagination** — Bound `page` and `update:first` events directly to desktop `DataTable`, forwarding `total-records`, `first`, and `lazy`.
+- **LDataTable paginator preservation** — Preserved paginator during loading states when `resolvedLazy` is true so pagination controls don't disappear during fetches.
+- **LMobileTable server-side pagination** — Forwarded `total-records`, `first`, `lazy`, and `page` events to `LMobileTable` for mobile tables.
+
+## [0.4.14] — 2026-09-27
+
+### Fixed
+- **Table pagination & skeleton** — Initial publish of lazy pagination preservation and mobile pagination forwarding.
+
 ## [0.4.13] — 2026-09-14
 
 ### Added

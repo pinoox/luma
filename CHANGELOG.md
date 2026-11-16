@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.18] — 2026-11-16
+
+### Fixed
+- **Sidebar Mobile Collapse Override (`@pinooxhq/luma/styles`)** — Added `!important` to `.px-layout__sidebar { display: none !important; }` at `@media (max-width: 1024px)` and baked sidebar scroll/flex containment directly into core layout stylesheet so custom parent overrides can never leak `display: flex` on mobile viewports.
+
 ## [0.4.17] — 2026-11-16
 
 ### Fixed

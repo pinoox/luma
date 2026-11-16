@@ -406,11 +406,17 @@ const avatarPt = {
         }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
         &__menu-btn {
             display: inline-flex;
         }
 
+        &__user-meta {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
         &__search {
             display: none;
         }
@@ -420,10 +426,6 @@ const avatarPt = {
         }
 
         &__spotlight-kbd {
-            display: none;
-        }
-
-        &__user-meta {
             display: none;
         }
     }

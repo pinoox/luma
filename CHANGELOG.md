@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.17] — 2026-11-16
+
+### Fixed
+- **Responsive Layout & Navigation Drawer (`@pinooxhq/luma/layouts`, `@pinooxhq/luma/styles`)** — Synchronized collapsing breakpoint between `.px-layout__sidebar` and `.px-topbar__menu-btn` at `1024px`, added global backdrop filter and styling for `.px-nav-drawer`, full-width slide-over on viewports `<= 640px`, and RTL-aware placement.
+
 ## [0.4.16] — 2026-11-16
 
 ### Added

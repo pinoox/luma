@@ -28,8 +28,11 @@
         </div>
 
         <Drawer
+            class="px-nav-drawer"
+            :pt="{ root: { class: 'px-nav-drawer' } }"
             :visible="drawerOpen"
-            position="right"
+            :position="layoutDir === 'rtl' ? 'right' : 'left'"
+            :block-scroll="true"
             @update:visible="(value) => (drawerOpen = value)"
         >
             <template #header>

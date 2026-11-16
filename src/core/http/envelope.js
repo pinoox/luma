@@ -8,11 +8,17 @@ export function unwrapApiBody(body) {
         return body;
     }
 
-    if (body.success === false || body.error) {
+    if (body.success === false || body.status === false || body.error) {
         return body;
     }
 
-    if (body.success === true && 'data' in body) {
+    // Pinoox 3 standard envelope: { status: true, result: ... }
+    if ('result' in body && (body.status === true || typeof body.status !== 'undefined')) {
+        return body.result;
+    }
+
+    // Classic / legacy envelope: { success: true, data: ... }
+    if ((body.success === true || body.status === true) && 'data' in body) {
         return body.data;
     }
 

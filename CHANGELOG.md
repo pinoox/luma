@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.16] — 2026-11-16
+
+### Added
+- **LPaginator with RTL smart pills & page jumping (`@pinooxhq/luma/ui`)** — Enhanced modern paginator component supporting smart ellipsis, jump to page input, Persian digits converter, and compact mobile layout.
+- **Spotlight Scope Filters (`@pinooxhq/luma/ds`)** — Added `scopes` and `defaultScope` tabs to `LSpotlight` with Tab key cycling and async scope queries.
+
+### Fixed
+- **Pinoox 3 API envelope unwrapping (`@pinooxhq/luma/core`)** — Added support for native `{ status: true, result: ... }` response bodies alongside legacy envelopes.
+- **RootShell layout sizing** — Replaced `height: 100%` with `min-height: 100%` on html/body/#app for seamless vertical scrolling.
+
 ## [0.4.15] — 2026-10-18
 
 ### Added

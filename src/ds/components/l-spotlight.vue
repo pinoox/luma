@@ -28,6 +28,22 @@
                         <kbd v-if="showShortcutHint" class="px-spotlight__kbd">esc</kbd>
                     </div>
 
+                    <div v-if="scopes && scopes.length" class="px-spotlight__scopes" role="tablist" aria-label="فیلتر دسته‌بندی جستجو">
+                        <button
+                            v-for="s in scopes"
+                            :key="s.key"
+                            type="button"
+                            role="tab"
+                            class="px-spotlight__scope-btn"
+                            :class="{ 'px-spotlight__scope-btn--active': activeScope === s.key }"
+                            :aria-selected="activeScope === s.key"
+                            @click="setScope(s.key)"
+                        >
+                            <LIcon v-if="s.icon" :name="s.icon" size="xs" />
+                            <span>{{ s.label }}</span>
+                        </button>
+                    </div>
+
                     <div class="px-spotlight__body" ref="listRef">
                         <div v-if="loading" class="px-spotlight__status">
                             <LSpinner size="sm" />
@@ -76,6 +92,7 @@
                     <footer class="px-spotlight__footer">
                         <span><kbd>↑</kbd><kbd>↓</kbd> حرکت</span>
                         <span><kbd>↵</kbd> انتخاب</span>
+                        <span v-if="scopes && scopes.length"><kbd>tab</kbd> تغییر بخش</span>
                         <span><kbd>esc</kbd> بستن</span>
                     </footer>
                 </div>
@@ -105,6 +122,9 @@ const props = defineProps({
     /** Minimum query length before calling async providers (local items still filter). */
     providerMinLength: { type: Number, default: 1 },
     debounceMs: { type: Number, default: 180 },
+    /** Category / Scope tabs, e.g. [{ key: 'all', label: 'همه' }, { key: 'scores', label: 'نت‌ها' }, ...] */
+    scopes: { type: Array, default: () => [] },
+    defaultScope: { type: String, default: 'all' },
     /**
      * Text direction. Defaults like LToast:
      * prop → `__PINOOX__.direction` → `document.dir` → `ltr`.
@@ -113,10 +133,24 @@ const props = defineProps({
     dir: { type: String, default: '', validator: (v) => !v || ['rtl', 'ltr'].includes(v) },
 });
 
-const emit = defineEmits(['select', 'query']);
+const emit = defineEmits(['select', 'query', 'scope-change']);
 
 const router = useRouter();
 const { visible, query, loading } = useSpotlight();
+const activeScope = ref(props.defaultScope || 'all');
+
+const setScope = (scopeKey) => {
+    activeScope.value = scopeKey;
+    emit('scope-change', scopeKey);
+    refreshProviders();
+};
+
+const cycleScope = (delta) => {
+    if (!props.scopes || !props.scopes.length) return;
+    const idx = props.scopes.findIndex((s) => s.key === activeScope.value);
+    const nextIdx = (idx + delta + props.scopes.length) % props.scopes.length;
+    setScope(props.scopes[nextIdx].key);
+};
 
 const resolvedDir = computed(() => {
     if (props.dir) return props.dir;
@@ -152,14 +186,19 @@ const filterLocalItems = (list, q) => {
 };
 
 const flatItems = computed(() => {
-    const local = filterLocalItems(props.items ?? [], query.value).map((item, i) => ({
-        ...item,
-        id: item.id ?? `local-${i}-${item.title}`,
-    }));
-    const remote = (providerItems.value ?? []).map((item, i) => ({
-        ...item,
-        id: item.id ?? `remote-${i}-${item.title}`,
-    }));
+    const scope = activeScope.value;
+    const local = filterLocalItems(props.items ?? [], query.value)
+        .filter((item) => scope === 'all' || !item.scope || item.scope === scope)
+        .map((item, i) => ({
+            ...item,
+            id: item.id ?? `local-${i}-${item.title}`,
+        }));
+    const remote = (providerItems.value ?? [])
+        .filter((item) => scope === 'all' || !item.scope || item.scope === scope)
+        .map((item, i) => ({
+            ...item,
+            id: item.id ?? `remote-${i}-${item.title}`,
+        }));
 
     // Prefer remote when ids collide; keep local first for empty query.
     const seen = new Set();
@@ -218,6 +257,11 @@ const moveActive = (delta) => {
 };
 
 const onInputKeydown = (event) => {
+    if (event.key === 'Tab' && props.scopes && props.scopes.length) {
+        event.preventDefault();
+        cycleScope(event.shiftKey ? -1 : 1);
+        return;
+    }
     if (event.key === 'ArrowDown') {
         event.preventDefault();
         moveActive(1);
@@ -248,7 +292,7 @@ const refreshProviders = async () => {
         providerItems.value = [];
         return;
     }
-    providerItems.value = await runSpotlightProviders(q);
+    providerItems.value = await runSpotlightProviders(q, activeScope.value);
 };
 
 watch(visible, async (isOpen) => {
@@ -326,6 +370,42 @@ onBeforeUnmount(() => {
         gap: var(--px-space-2);
         padding: var(--px-space-3) var(--px-space-4);
         border-bottom: 1px solid var(--px-border);
+    }
+
+    &__scopes {
+        display: flex;
+        align-items: center;
+        gap: var(--px-space-1-5, 6px);
+        padding: var(--px-space-2) var(--px-space-4);
+        border-bottom: 1px solid var(--px-border);
+        background: color-mix(in srgb, var(--px-surface-muted) 35%, transparent);
+    }
+
+    &__scope-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: var(--px-radius-full, 999px);
+        font-size: var(--px-font-size-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--px-text-muted);
+        background: transparent;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+            color: var(--px-text);
+            background: var(--px-surface-muted);
+        }
+
+        &--active {
+            color: var(--px-primary);
+            background: color-mix(in srgb, var(--px-primary) 12%, var(--px-surface));
+            border-color: color-mix(in srgb, var(--px-primary) 30%, transparent);
+            font-weight: 700;
+        }
     }
 
     &__search-icon {

@@ -30,7 +30,7 @@ export const spotlightShortcutLabel = () => (isMacPlatform() ? '⌘K' : 'Ctrl+K'
  * @returns {() => void} unregister
  */
 export function registerSpotlightProvider(provider) {
-    if (typeof provider !== 'function') return () => {};
+    if (typeof provider !== 'function') return () => { };
     const entry = { id: ++providerSeq, provider };
     providers.value = [...providers.value, entry];
     return () => {
@@ -48,7 +48,7 @@ export function useSpotlightProvider(provider) {
     return unregister;
 }
 
-export async function runSpotlightProviders(q) {
+export async function runSpotlightProviders(q, scope = 'all') {
     const list = providers.value;
     if (!list.length) return [];
 
@@ -57,7 +57,7 @@ export async function runSpotlightProviders(q) {
         const chunks = await Promise.all(
             list.map(async ({ provider }) => {
                 try {
-                    const result = await provider(q ?? '');
+                    const result = await provider(q ?? '', scope ?? 'all');
                     return Array.isArray(result) ? result : [];
                 } catch {
                     return [];
@@ -80,7 +80,7 @@ function onGlobalKeydown(event) {
 }
 
 export function bindSpotlightShortcut() {
-    if (shortcutBound || typeof window === 'undefined') return () => {};
+    if (shortcutBound || typeof window === 'undefined') return () => { };
     shortcutHandler = onGlobalKeydown;
     window.addEventListener('keydown', shortcutHandler);
     shortcutBound = true;

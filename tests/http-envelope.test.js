@@ -22,12 +22,19 @@ test('unwrapApiBody extracts success payload', () => {
         unwrapApiBody({ success: true, data: { brands: [] }, message: 'OK', meta: {} }),
         { brands: [] },
     );
+    assert.deepEqual(
+        unwrapApiBody({ status: true, result: { items: [1, 2, 3], total: 3 }, message: 'OK' }),
+        { items: [1, 2, 3], total: 3 },
+    );
     assert.equal(unwrapApiBody({ success: true, data: null, message: 'OK' }), null);
+    assert.equal(unwrapApiBody({ status: true, result: null, message: 'OK' }), null);
 });
 
 test('unwrapApiBody keeps error envelope', () => {
     const err = { success: false, error: { code: 'X', message: 'fail' } };
     assert.deepEqual(unwrapApiBody(err), err);
+    const pinooxErr = { status: false, error: { code: 'Y', message: 'fail' } };
+    assert.deepEqual(unwrapApiBody(pinooxErr), pinooxErr);
 });
 
 test('attachApiEnvelope unwraps axios response.data', () => {

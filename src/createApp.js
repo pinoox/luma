@@ -165,7 +165,7 @@ export async function createApp(options = {}) {
     app.config.globalProperties.$theme = theme;
 
     // 7. Router — created asynchronously (lazy-loads vue-router).
-    const router = await createAppRouter(routes);
+    const router = await createAppRouter(routes, { scrollBehavior: options.scrollBehavior });
     routerRef = router;
     app.use(router);
 

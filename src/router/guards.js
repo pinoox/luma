@@ -263,7 +263,7 @@ const routeDefinesLogin = (list = []) =>
         return false;
     });
 
-export const createAppRouter = async (routes = []) => {
+export const createAppRouter = async (routes = [], options = {}) => {
     const { createRouter, createWebHistory } = await import('vue-router');
     const base = resolveHistoryBase();
 
@@ -283,12 +283,24 @@ export const createAppRouter = async (routes = []) => {
             ...routes,
         ];
 
+    const defaultScrollBehavior = (to, from, savedPosition) => {
+        if (savedPosition) {
+            return savedPosition;
+        }
+        if (to.hash) {
+            return { el: to.hash };
+        }
+        // Do not scroll to top if path is identical (only query / hash changed, e.g. tab switches)
+        if (to.path === from.path) {
+            return false;
+        }
+        return { top: 0 };
+    };
+
     const router = createRouter({
         history: createWebHistory(base),
         routes: resolvedRoutes,
-        scrollBehavior() {
-            return { top: 0 };
-        },
+        scrollBehavior: typeof options.scrollBehavior === 'function' ? options.scrollBehavior : defaultScrollBehavior,
     });
 
     router.beforeEach(authGuard);
